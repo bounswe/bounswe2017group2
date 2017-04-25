@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from concert.models import Concert, LANGUAGE_CHOICES, STYLE_CHOICES
+from concert.models import Concert, User, LANGUAGE_CHOICES, STYLE_CHOICES
+
+
 
 
 class ConcertSerializer(serializers.Serializer):
