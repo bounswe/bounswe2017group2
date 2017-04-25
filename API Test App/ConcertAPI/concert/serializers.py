@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from concert.models import Concert,User, LANGUAGE_CHOICES, STYLE_CHOICES
-from concert.models import 
 
 class ConcertSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
