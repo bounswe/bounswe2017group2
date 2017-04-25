@@ -7,8 +7,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from concert.models import Concert
-from concert.serializers import ConcertSerializer
+from concert.models import Concert,User
+from concert.serializers import ConcertSerializer, UserSerializer
 
 
 # Create your views here.
