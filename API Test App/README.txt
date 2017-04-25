@@ -1,4 +1,4 @@
-Assuming that you have pip install django as follows
+Assuming that you have pip, install django as follows:
 pip install django
 pip install djangorestframework
 pip install pygments
