@@ -33,3 +33,23 @@ class Concert(models.Model):
     
     class Meta:
         ordering = ('created',)
+
+class User(models.Model):
+    
+    # creation time of the user object
+    created = models.DateTimeField(auto_now_add=True)
+    
+    # Name of the user
+    name = models.TextField(blank=False, default='')
+    
+    # Email of the user
+    email = models.TextField(blank=False, default='')
+    
+    # Password of the user
+    password= models.TextField(blank=False, default='')
+    
+    # Age ticket price, 0 by default
+    age = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ('created',)
