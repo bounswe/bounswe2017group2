@@ -3,7 +3,7 @@ import unittest
 import os
 import commands
 
-class TestStringMethods(unittest.TestCase):
+class TestAPIMethods(unittest.TestCase):
     
     def test_update_concert(self):
         result = commands.getoutput('http --json PUT http://127.0.0.1:8000/concert/12/ artist="Atena" date="2017-04-28" location="BogaziciUniTasoda"')
