@@ -10,6 +10,8 @@ from rest_framework.parsers import JSONParser
 from concert.models import Concert,User
 from concert.serializers import ConcertSerializer, UserSerializer
 
+import unittest
+
 
 # Create your views here.
 @csrf_exempt
@@ -102,5 +104,12 @@ def user_detail(request, pk):
     elif request.method == 'DELETE':
         user.delete()
         return HttpResponse(status=204)
+
+class Test(unittest.TestCase):    
+    def test_get_a_concert(request,pk):
+        expected_result = ''
+        unittest.TestCase.assertEqual(concert_detail(request,pk), '')
+#unittest.main()
+
 
 
