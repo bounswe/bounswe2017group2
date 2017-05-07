@@ -10,10 +10,8 @@ class TestAPIMethods(unittest.TestCase):
         
      
         expected = '{' + '"id": 12, ' + '"artist": "Atena", ' + '"location": "BogaziciUniTasoda", ' + '"date": "2017-04-28", ' + '"minprice": 0, ' + '"maxprice": 0' + '}'
-        
-        #print(result)
-        #print(expected)
-        self.assertEqual(result, expected)
+
+        self.assertEqual(result, expected) # result should be equal to expected
 
 if __name__ == '__main__':
     unittest.main()
