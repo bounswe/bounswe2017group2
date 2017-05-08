@@ -36,6 +36,21 @@ class TestsForConcerts(APITestCase):
         response = self.client.get(url)
         self.assertEqual(json.loads(response.content), {'id': 1, 'artist': 'Duman', 'location': 'BogaziciUniTasoda', 'date': '2017-05-20', 'minprice': 0, 'maxprice': 0})
  
+class TestsForUsers(APITestCase):
+    #Populating Database
+    def setUp(self):
+        User.objects.create(name="Elif Guler", email="elif@gmail.com", password="12345", age="20")
+        sleep(1)
+        User.objects.create(name="Haluk Alper Karaevli", email="haluk@gmail.com", password="12345", age="22")
+        sleep(1)
+    
+    #Testcase User 1:    
+    def test_create_user(self):
+        url = '/user/'
+        data = {'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age': 52}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(json.loads(response.content), {'id': 3, 'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age':'52'})
 
 if __name__ == '__main__':
     unittest.main()
