@@ -62,17 +62,24 @@ class TestsForUsers(APITestCase):
     #Testcase User 1:    
     def test_create_user(self):
         url = '/user/'
-        data = {'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age': 52}
+        data = {'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age':52}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(json.loads(response.content), {'id': 3, 'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age':'52'})
+        self.assertEqual(json.loads(response.content), {'id': 3, 'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age':52})
 
     #Testcase User 2: 
     def test_delete_user(self):
         url = '/user/1/'
         response = self.client.delete(url)
-        self.assertEqual(Concert.objects.count(), 1)
+        self.assertEqual(User.objects.count(), 1)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    #Testcase User 3:
+    def test_update_user(self):
+        url = '/user/2/'
+        data = {'name': 'Sebnem Ferah', 'email':'sferah@gmail.com', 'password':'ferahla', 'age':44}
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(json.loads(response.content), {'id': 2, 'name': 'Sebnem Ferah', 'email':'sferah@gmail.com', 'password':'ferahla', 'age':44})
 
 if __name__ == '__main__':
     unittest.main()
