@@ -35,7 +35,14 @@ class TestsForConcerts(APITestCase):
         url = '/concert/1/'
         response = self.client.get(url)
         self.assertEqual(json.loads(response.content), {'id': 1, 'artist': 'Duman', 'location': 'BogaziciUniTasoda', 'date': '2017-05-20', 'minprice': 0, 'maxprice': 0})
- 
+    
+    #Testcase 4:
+    def test_delete_concert(self):
+        url = '/concert/1/'
+        response = self.client.delete(url)
+        self.assertEqual(Concert.objects.count(), 1)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
 class TestsForUsers(APITestCase):
     #Populating Database
     def setUp(self):
@@ -51,6 +58,13 @@ class TestsForUsers(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(json.loads(response.content), {'id': 3, 'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age':'52'})
+
+    #Testcase User 2: 
+    def test_delete_user(self):
+        url = '/user/1/'
+        response = self.client.delete(url)
+        self.assertEqual(Concert.objects.count(), 1)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 if __name__ == '__main__':
     unittest.main()
