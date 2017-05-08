@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import subprocess
-from django.test import TestCase
 from concert.models import Concert
-import unittest
 from rest_framework.test import APITestCase
 from rest_framework import status
 from time import sleep
@@ -19,7 +16,7 @@ class TestsForConcerts(APITestCase):
         Concert.objects.create(artist="Bulent Ortacgil", location ="BogaziciUniTasoda", date="2017-05-21")
         sleep(1)
                 
-    #1
+    #Testcase 1
     def test_update_concert(self):
 
         url = '/concert/1/'
