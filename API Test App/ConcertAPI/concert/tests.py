@@ -23,7 +23,14 @@ class TestsForConcerts(APITestCase):
         data = {'artist': 'Sebnem Ferah', 'date':'2017-06-20', 'location':'BogaziciUniTasoda'}
         response = self.client.put(url, data, format='json')
         self.assertEqual(json.loads(response.content), {'id': 1, 'artist': 'Sebnem Ferah', 'date':'2017-06-20', 'location':'BogaziciUniTasoda', 'minprice': 0, 'maxprice': 0})
-
+    
+    #Testcase 2
+    def test_create_concert(self):
+        url = '/concert/'
+        data = {'artist': 'Sezen Aksu', 'date':'2017-05-20', 'location':'BogaziciUniTasoda'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(json.loads(response.content), {'id': 3, 'artist': 'Sezen Aksu', 'location': 'BogaziciUniTasoda', 'date': '2017-05-20', 'minprice': 0, 'maxprice': 0})
 
 if __name__ == '__main__':
     unittest.main()
