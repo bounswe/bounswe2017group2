@@ -24,13 +24,21 @@ class TestsForConcerts(APITestCase):
         response = self.client.put(url, data, format='json')
         self.assertEqual(json.loads(response.content), {'id': 1, 'artist': 'Sebnem Ferah', 'date':'2017-06-20', 'location':'BogaziciUniTasoda', 'minprice': 0, 'maxprice': 0})
 
-    #Testcase 2:
+    #Testcase 2
+    def test_create_concert(self):
+        url = '/concert/'
+        data = {'artist': 'Sezen Aksu', 'date':'2017-05-20', 'location':'BogaziciUniTasoda'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(json.loads(response.content), {'id': 3, 'artist': 'Sezen Aksu', 'location': 'BogaziciUniTasoda', 'date': '2017-05-20', 'minprice': 0, 'maxprice': 0})
+
+    #Testcase 3:
     def test_get_all_concerts(self):
         url = '/concert/'
         response = self.client.get(url)
         self.assertEqual(json.loads(response.content), [{'id': 1, 'artist': 'Duman', 'location': 'BogaziciUniTasoda', 'date': '2017-05-20', 'minprice': 0, 'maxprice': 0},{'id': 2, 'artist': 'Bulent Ortacgil', 'location': 'BogaziciUniTasoda', 'date': '2017-05-21', 'minprice': 0, 'maxprice': 0}])
     
-    #Testcase 3:
+    #Testcase 4:
     def test_get_concert_via_id(self):
         url = '/concert/1/'
         response = self.client.get(url)
