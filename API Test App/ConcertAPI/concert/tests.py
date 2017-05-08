@@ -65,7 +65,7 @@ class TestsForUsers(APITestCase):
         data = {'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age':52}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(json.loads(response.content), {'id': 3, 'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age':'52'})
+        self.assertEqual(json.loads(response.content), {'id': 3, 'name': 'Sezen Aksu', 'email':'saksu@gmail.com', 'password':'minikkus', 'age':52})
 
     #Testcase User 2: 
     def test_delete_user(self):
@@ -79,7 +79,7 @@ class TestsForUsers(APITestCase):
         url = '/user/2/'
         data = {'name': 'Sebnem Ferah', 'email':'sferah@gmail.com', 'password':'ferahla', 'age':44}
         response = self.client.put(url, data, format='json')
-        self.assertEqual(json.loads(response.content), {'id': 2, 'name': 'Sebnem Ferah', 'email':'sferah@gmail.com', 'password':'ferahla', 'age':'44'})
+        self.assertEqual(json.loads(response.content), {'id': 2, 'name': 'Sebnem Ferah', 'email':'sferah@gmail.com', 'password':'ferahla', 'age':44})
 
 if __name__ == '__main__':
     unittest.main()
