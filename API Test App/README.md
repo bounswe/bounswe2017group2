@@ -26,11 +26,17 @@ Run the server: python manage.py runserver
 See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
 
 * Get All Concerts [GET]
+
   You can get all concert by sending a GET request. 
+  
   Parameters: None
+  
   Example Request:
+  
   `http --json GET http://127.0.0.1:8000/concert/`
+  
   Example Response:
+  
   `[
      {
      'id': 1, 
@@ -49,6 +55,7 @@ See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
      'maxprice': 0
      }
    ]`
+   
 * Get A Specific Concert [GET]
 * Create New Concert [POST]
 * Update A Concert [PUT]
