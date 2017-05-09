@@ -1,11 +1,9 @@
 # README
 
-<center>
 <img 
 name="cover-pic"
 src="https://drive.google.com/uc?export=view&id=0BwxjlJsvjKMLSnVmOGRJOVVlZFk"
 height=200>
-</center>
 
 # Concert API
 Concert API is the API for a small part of our Concert project. You can perfom CRUD operations on Concerts and Users.
