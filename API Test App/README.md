@@ -5,21 +5,36 @@ Concert API is the API for a small part of our Concert project. You can perfom C
 
 ## Setup
 Assuming that you have pip, install django as follows:
+```
 pip install django
 pip install djangorestframework
 pip install pygments
+```
 After these installations 
 
 Create a folder to copy the branch.
-Clone the repository: git clone https://github.com/bounswe/bounswe2017group2.git ~/Desktop/ConcertAPI
+Clone the repository: 
+```
+git clone https://github.com/bounswe/bounswe2017group2.git ~/Desktop/ConcertAPI
+```
 Go into the folder: ConcertAPI
 All the required, most recent files are there.
 
-Move into the folder of the api: cd "ConcertAPI"
+Move into the folder of the api: 
+```
+cd ConcertAPI
+```
 Yes we have 2 concerts API folders consecutively
-Activate the environment: source env/bin/activate
-Go into the ConcertAPI folder: cd ConcertAPI
-Run the server: python manage.py runserver
+Activate the environment: 
+```
+source env/bin/activate
+```
+Go into the ConcertAPI folder: 
+```
+cd ConcertAPI
+```
+Run the server:
+```python manage.py runserver```
 
 ## Endpoints
 ### Concert Endpoints (/concert/)
@@ -62,7 +77,7 @@ Run the server: python manage.py runserver
   You can get a specific concert by sending a GET request with that concert's id. 
   
   Parameters: 
-  * ID of the Concert
+  * Concert ID
   
   Example Request:
   
@@ -93,11 +108,48 @@ Run the server: python manage.py runserver
   
   Example Request:
   
-  `http --json POST http://127.0.0.1:8000/concert/ artist="Sezen Aksu", location = "Istanbul", date = "2017-10-10", minPrice = 100, maxPrice = 300`
+  `http --json POST http://127.0.0.1:8000/concert/ artist="Sezen Aksu", location = "Istanbul", date = "2017-10-10", minprice = 100, maxprice = 300`
   
   Example Response:
+  
+  ```JSON
+   {
+      "id": 1, 
+      "artist": "Sezen Aksu", 
+      "location": "Istanbul", 
+      "date": "2017-10-10", 
+      "minprice": 100, 
+      "maxprice": 300
+    }
+  ```  
 
 * Update A Concert [PUT]
+  You can update a concert by giving the appropriate parameters.
+  
+  Parameters: 
+  * Concert ID
+  * Artist (required)
+  * Location (required)
+  * Date (required)
+  * Min-Price
+  * Max-Price
+  
+   Example Request:
+  `http --json PUT http://127.0.0.1:8000/concert/1/ artist="Sebnem Ferah", location = "BogaziciUniTasoda", date = "2017-06-20", minprice = 50, maxprice = 200`
+  
+  Example Response:
+  
+  ```JSON
+   {
+      "id": 1, 
+      "artist": "Sebnem Ferah", 
+      "location": "BogaziciUniTasoda", 
+      "date": "2017-06-20", 
+      "minprice": 50, 
+      "maxprice": 200
+    }
+  ```  
+  
 * Delete A Concert [DELETE]
 
 ### User Endpoints (/user/)
