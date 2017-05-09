@@ -39,20 +39,20 @@ Run the server: python manage.py runserver
   ```JSON
   [
    {
-    "id": 1, 
-    "artist": "Duman", 
-    "location": "BogaziciUniTasoda", 
-    "date": "2017-05-20", 
-    "minprice": 0, 
-    "maxprice": 0
+      "id": 1, 
+      "artist": "Duman", 
+      "location": "BogaziciUniTasoda", 
+      "date": "2017-05-20", 
+      "minprice": 0, 
+      "maxprice": 0
     },
     {
-     "id": 2, 
-     "artist": "Bulent Ortacgil", 
-     "location": "BogaziciUniTasoda", 
-     "date": "2017-05-21", 
-     "minprice": 0, 
-     "maxprice": 0
+       "id": 2, 
+       "artist": "Bulent Ortacgil", 
+       "location": "BogaziciUniTasoda", 
+       "date": "2017-05-21", 
+       "minprice": 0, 
+       "maxprice": 0
      }
     ]
   ```
@@ -72,23 +72,31 @@ Run the server: python manage.py runserver
   
   ```JSON
    {
-    "id": 1, 
-    "artist": "Duman", 
-    "location": "BogaziciUniTasoda", 
-    "date": "2017-05-20", 
-    "minprice": 0, 
-    "maxprice": 0
-    },
-    {
-     "id": 2, 
-     "artist": "Bulent Ortacgil", 
-     "location": "BogaziciUniTasoda", 
-     "date": "2017-05-21", 
-     "minprice": 0, 
-     "maxprice": 0
-     }
+      "id": 1, 
+      "artist": "Duman", 
+      "location": "BogaziciUniTasoda", 
+      "date": "2017-05-20", 
+      "minprice": 0, 
+      "maxprice": 0
+    }
   ```
 * Create New Concert [POST]
+
+  You can create a new concert by giving appropriate parameters.
+  
+  Parameters: 
+  * Artist (required)
+  * Location (required)
+  * Date (required)
+  * Min-Price
+  * Max-Price
+  
+  Example Request:
+  
+  `http --json POST http://127.0.0.1:8000/concert/ artist="Sezen Aksu", location = "Istanbul", date = "2017-10-10", minPrice = 100, maxPrice = 300`
+  
+  Example Response:
+
 * Update A Concert [PUT]
 * Delete A Concert [DELETE]
 
@@ -100,5 +108,4 @@ Run the server: python manage.py runserver
 * Update A User [PUT]
 * Delete A User [DELETE]
 
-Post new concert by typing: "http --json POST http://127.0.0.1:8000/concert/ artist="Sezen Aksu", location = "Istanbul", date = "2017-10-10", minPrice = 100, maxPrice = 300"
 Post new user by typing "http --json POST http://127.0.0.1:8000/user/" posting json file by writing "http://127.0.0.1:8000/users/ name="Ali", email = "aliveli@mail.com", password = "aosjd123", age = 23"
