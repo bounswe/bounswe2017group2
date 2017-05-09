@@ -42,7 +42,7 @@ Run the server:
 ## Endpoints
 ### Concert Endpoints (/concert/)
 
-* Get All Concerts [GET]
+* **Get All Concerts [GET]**
 
   You can get all concert by sending a GET request. 
   
@@ -75,7 +75,7 @@ Run the server:
     ]
   ```
    
-* Get A Specific Concert [GET]
+* **Get A Specific Concert [GET]**
 
   You can get a specific concert by sending a GET request with that concert's id. 
   
@@ -98,7 +98,7 @@ Run the server:
       "maxprice": 0
     }
   ```
-* Create New Concert [POST]
+* **Create New Concert [POST]**
 
   You can create a new concert by giving appropriate parameters.
   
@@ -126,7 +126,7 @@ Run the server:
     }
   ```  
 
-* Update A Concert [PUT]
+* **Update A Concert [PUT]**
 
   You can update a concert by giving the appropriate parameters.
   
@@ -155,12 +155,12 @@ Run the server:
     }
   ```  
   
-* Delete A Concert [DELETE]
+* **Delete A Concert [DELETE]**
 
 ### User Endpoints (/user/)
 
-* Get All Users [GET]
-* Get A Specific User [GET]
-* Create New User [POST]
-* Update A User [PUT]
-* Delete A User [DELETE]
+* **Get All Users [GET]**
+* **Get A Specific User [GET]**
+* **Create New User [POST]**
+* **Update A User [PUT]**
+* **Delete A User [DELETE]**
