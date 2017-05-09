@@ -16,28 +16,26 @@ pip install pygments
 After these installations 
 
 Create a folder to copy the branch.
+
 Clone the repository: 
 ```
-git clone https://github.com/bounswe/bounswe2017group2.git ~/Desktop/ConcertAPI
+git clone https://github.com/bounswe/bounswe2017group2.git ~/Desktop/swe2017
 ```
-Go into the folder: ConcertAPI
-All the required, most recent files are there.
-
 Move into the folder of the api: 
 ```
-cd ConcertAPI
+cd swe2017/API\ Test\ App/ConcertAPI
 ```
-Yes we have 2 concerts API folders consecutively
+Yes we have 2 concerts API folders consecutively.
+
 Activate the environment: 
 ```
 source env/bin/activate
 ```
-Go into the ConcertAPI folder: 
-```
-cd ConcertAPI
-```
 Run the server:
 ```python manage.py runserver```
+
+Or, to run the tests:
+```python manage.py test```
 
 ## Endpoints
 ### Concert Endpoints (/concert/)
