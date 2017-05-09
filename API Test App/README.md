@@ -23,13 +23,13 @@ Go into the ConcertAPI folder: cd ConcertAPI
 Run the server: python manage.py runserver
 
 ## Endpoints
-###Concert Endpoints
+### Concert Endpoints
 
-See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
+  See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
 
 * Create A Concert
 
-###User Endpoints
+### User Endpoints
 
 See the Users lists by going to the adress "http://127.0.0.1:8000/user/"
 
