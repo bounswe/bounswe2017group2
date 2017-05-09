@@ -107,5 +107,3 @@ Run the server: python manage.py runserver
 * Create New User [POST]
 * Update A User [PUT]
 * Delete A User [DELETE]
-
-Post new user by typing "http --json POST http://127.0.0.1:8000/user/" posting json file by writing "http://127.0.0.1:8000/users/ name="Ali", email = "aliveli@mail.com", password = "aosjd123", age = 23"
