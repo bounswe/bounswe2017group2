@@ -37,16 +37,17 @@ See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
   
   Example Response:
   
-  `[
-     {
-     'id': 1, 
-     'artist': 'Duman', 
-     'location': 'BogaziciUniTasoda', 
-     'date': '2017-05-20', 
-     'minprice': 0, 
-     'maxprice': 0
-     },
-     {
+  ```
+  [
+   {
+    'id': 1, 
+    'artist': 'Duman', 
+    'location': 'BogaziciUniTasoda', 
+    'date': '2017-05-20', 
+    'minprice': 0, 
+    'maxprice': 0
+    },
+    {
      'id': 2, 
      'artist': 'Bulent Ortacgil', 
      'location': 'BogaziciUniTasoda', 
@@ -54,7 +55,8 @@ See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
      'minprice': 0, 
      'maxprice': 0
      }
-   ]`
+    ]
+  ```
    
 * Get A Specific Concert [GET]
 * Create New Concert [POST]
