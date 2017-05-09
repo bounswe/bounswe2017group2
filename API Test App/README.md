@@ -131,7 +131,7 @@ Run the server:
   You can update a concert by giving the appropriate parameters.
   
   Parameters: 
-  * Concert ID
+  * Concert ID (required)
   * Artist (required)
   * Location (required)
   * Date (required)
