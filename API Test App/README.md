@@ -22,17 +22,39 @@ Go into the ConcertAPI folder: cd ConcertAPI
 Run the server: python manage.py runserver
 
 ## Endpoints
-### Concert Endpoints
+### Concert Endpoints (/concert/)
 See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
 
 * Get All Concerts [GET]
-
+  You can get all concert by sending a GET request. 
+  Parameters: None
+  Example Request:
+  `http --json GET http://127.0.0.1:8000/concert/`
+  Example Response:
+  `[
+     {
+     'id': 1, 
+     'artist': 'Duman', 
+     'location': 'BogaziciUniTasoda', 
+     'date': '2017-05-20', 
+     'minprice': 0, 
+     'maxprice': 0
+     },
+     {
+     'id': 2, 
+     'artist': 'Bulent Ortacgil', 
+     'location': 'BogaziciUniTasoda', 
+     'date': '2017-05-21', 
+     'minprice': 0, 
+     'maxprice': 0
+     }
+   ]`
 * Get A Specific Concert [GET]
 * Create New Concert [POST]
 * Update A Concert [PUT]
 * Delete A Concert [DELETE]
 
-### User Endpoints
+### User Endpoints (/user/)
 See the Users lists by going to the adress "http://127.0.0.1:8000/user/"
 
 * Get All Users [GET]
