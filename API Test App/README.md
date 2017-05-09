@@ -54,6 +54,8 @@ Run the server:
   
   Example Response:
   
+  Response code: 200, OK
+  
   ```JSON
   [
      {
@@ -88,6 +90,8 @@ Run the server:
   
   Example Response:
   
+  Response code: 200, OK
+  
   ```JSON
    {
       "id": 1, 
@@ -114,6 +118,8 @@ Run the server:
   `http --json POST http://127.0.0.1:8000/concert/ artist="John Mayer" location="LA" date="2017-08-08" minprice=200 maxprice=400`
   
   Example Response:
+  
+  Response code: 201, CREATED
   
   ```JSON
    {
@@ -143,6 +149,8 @@ Run the server:
   `http --json PUT http://127.0.0.1:8000/concert/1/ artist="Sebnem Ferah", location = "BogaziciUniTasoda", date = "2017-06-20", minprice = 50, maxprice = 200`
   
   Example Response:
+  
+  Response code: 200, OK
   
   ```JSON
    {
