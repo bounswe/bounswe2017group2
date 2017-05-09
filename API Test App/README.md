@@ -129,6 +129,7 @@ Run the server:
   ```  
 
 * Update A Concert [PUT]
+
   You can update a concert by giving the appropriate parameters.
   
   Parameters: 
@@ -140,6 +141,7 @@ Run the server:
   * Max-Price
   
    Example Request:
+   
   `http --json PUT http://127.0.0.1:8000/concert/1/ artist="Sebnem Ferah", location = "BogaziciUniTasoda", date = "2017-06-20", minprice = 50, maxprice = 200`
   
   Example Response:
