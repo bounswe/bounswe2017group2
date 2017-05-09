@@ -108,18 +108,18 @@ Run the server:
   
   Example Request:
   
-  `http --json POST http://127.0.0.1:8000/concert/ artist="Sezen Aksu", location = "Istanbul", date = "2017-10-10", minprice = 100, maxprice = 300`
+  `http --json POST http://127.0.0.1:8000/concert/ artist="John Mayer" location="LA" date="2017-08-08" minprice=200 maxprice=400`
   
   Example Response:
   
   ```JSON
    {
       "id": 1, 
-      "artist": "Sezen Aksu", 
-      "location": "Istanbul", 
-      "date": "2017-10-10", 
-      "minprice": 100, 
-      "maxprice": 300
+      "artist": "John Mayer", 
+      "location": "LA", 
+      "date": "2017-08-08", 
+      "minprice": 200, 
+      "maxprice": 400
     }
   ```  
 
