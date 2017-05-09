@@ -23,7 +23,6 @@ Run the server: python manage.py runserver
 
 ## Endpoints
 ### Concert Endpoints (/concert/)
-See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
 
 * Get All Concerts [GET]
 
@@ -33,12 +32,14 @@ See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
   
   Example Request:
   
-  `http --json GET http://127.0.0.1:8000/concert/`
+  `http http://127.0.0.1:8000/concert/`
   
   Example Response:
   
   ```JSON
-  [{"id": 1, 
+  [
+   {
+    "id": 1, 
     "artist": "Duman", 
     "location": "BogaziciUniTasoda", 
     "date": "2017-05-20", 
@@ -57,12 +58,41 @@ See the Concerts lists by going to the address "http://127.0.0.1:8000/concert/"
   ```
    
 * Get A Specific Concert [GET]
+
+  You can get a specific concert by sending a GET request with that concert's id. 
+  
+  Parameters: 
+  * ID of the Concert
+  
+  Example Request:
+  
+  `http http://127.0.0.1:8000/concert/1/`
+  
+  Example Response:
+  
+  ```JSON
+   {
+    "id": 1, 
+    "artist": "Duman", 
+    "location": "BogaziciUniTasoda", 
+    "date": "2017-05-20", 
+    "minprice": 0, 
+    "maxprice": 0
+    },
+    {
+     "id": 2, 
+     "artist": "Bulent Ortacgil", 
+     "location": "BogaziciUniTasoda", 
+     "date": "2017-05-21", 
+     "minprice": 0, 
+     "maxprice": 0
+     }
+  ```
 * Create New Concert [POST]
 * Update A Concert [PUT]
 * Delete A Concert [DELETE]
 
 ### User Endpoints (/user/)
-See the Users lists by going to the adress "http://127.0.0.1:8000/user/"
 
 * Get All Users [GET]
 * Get A Specific User [GET]
