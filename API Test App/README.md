@@ -38,22 +38,22 @@ Run the server: python manage.py runserver
   
   ```JSON
   [
-   {
-      "id": 1, 
-      "artist": "Duman", 
-      "location": "BogaziciUniTasoda", 
-      "date": "2017-05-20", 
-      "minprice": 0, 
-      "maxprice": 0
-    },
-    {
-       "id": 2, 
-       "artist": "Bulent Ortacgil", 
-       "location": "BogaziciUniTasoda", 
-       "date": "2017-05-21", 
-       "minprice": 0, 
-       "maxprice": 0
-     }
+     {
+        "id": 1, 
+        "artist": "Duman", 
+        "location": "BogaziciUniTasoda", 
+        "date": "2017-05-20", 
+        "minprice": 0, 
+        "maxprice": 0
+      },
+      {
+         "id": 2, 
+         "artist": "Bulent Ortacgil", 
+         "location": "BogaziciUniTasoda", 
+         "date": "2017-05-21", 
+         "minprice": 0, 
+         "maxprice": 0
+       }
     ]
   ```
    
