@@ -23,7 +23,7 @@ git clone https://github.com/bounswe/bounswe2017group2.git ~/Desktop/swe2017
 ```
 Move into the folder of the api: 
 ```
-cd swe2017/API\ Test\ App/ConcertAPI
+cd ~/Desktop/swe2017/API\ Test\ App/ConcertAPI
 ```
 Yes we have 2 concerts API folders consecutively.
 
