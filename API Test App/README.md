@@ -224,3 +224,13 @@ You can update a user by giving the appropriate parameters.
  ```
 
 * **Delete A User [DELETE]**
+
+Parameters: None
+
+Example Request:
+  
+  `http --json DELETE http://127.0.0.1:8000/user/1/`
+  
+Example Response
+  
+Response code: 204, NO CONTENT
