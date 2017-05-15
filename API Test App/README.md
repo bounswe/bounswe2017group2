@@ -169,4 +169,29 @@ Or, to run the tests:
 * **Get A Specific User [GET]**
 * **Create New User [POST]**
 * **Update A User [PUT]**
+You can update a user by giving the appropriate parameters.
+  
+  Parameters: 
+  * Name
+  * e-mail
+  * Password
+  * Age
+  
+  Example Request:
+  
+  `http --json PUT http://127.0.0.1:8000/user/1/ name="Sebnem Ferah", email = "sferah@gmail.com", password = "ferahla", age = 44`
+  
+  Example Response
+  
+  Response code: 200, OK
+  
+  ```JSON
+   {
+      "id": 1, 
+      "name": "Sebnem Ferah", 
+      "email": "sferah@gmail.com", 
+      "password": "ferahla", 
+      "age": 44
+    }
+
 * **Delete A User [DELETE]**
