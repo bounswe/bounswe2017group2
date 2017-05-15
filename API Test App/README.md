@@ -169,6 +169,7 @@ Or, to run the tests:
 * **Get A Specific User [GET]**
 * **Create New User [POST]**
 * **Update A User [PUT]**
+
 You can update a user by giving the appropriate parameters.
   
   Parameters: 
