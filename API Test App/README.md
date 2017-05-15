@@ -194,5 +194,6 @@ You can update a user by giving the appropriate parameters.
       "password": "ferahla", 
       "age": 44
     }
+ ```
 
 * **Delete A User [DELETE]**
