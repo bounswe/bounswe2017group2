@@ -167,7 +167,34 @@ Or, to run the tests:
 
 * **Get All Users [GET]**
 * **Get A Specific User [GET]**
-* **Create New User [POST]**
+* **Create New User [POST]*
+
+You can create a new user by giving appropriate parameters.
+
+  Parameters:
+  * Name
+  * e-mail
+  * Password
+  * Age
+  
+Example Request:
+
+`http --json POST http://127.0.0.1:8000/user/ name="John Wick" email="jwick@hotmail.com" password="123456" age=35`
+
+Example Response:
+
+Response code: 201, CREATED
+
+```JSON
+   {
+       "id": 1, 
+      "name": "John Wick", 
+      "email": "jwick@hotmail.com", 
+      "password": "123456", 
+      "age": 35
+    }
+  ```  
+  
 * **Update A User [PUT]**
 
 You can update a user by giving the appropriate parameters.
