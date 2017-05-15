@@ -167,7 +167,7 @@ Or, to run the tests:
 
 * **Get All Users [GET]**
 * **Get A Specific User [GET]**
-* **Create New User [POST]*
+* **Create New User [POST]**
 
 You can create a new user by giving appropriate parameters.
 
