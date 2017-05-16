@@ -197,7 +197,31 @@ Or, to run the tests:
        }
     ]
   ```
+  
 * **Get A Specific User [GET]**
+
+ You can get a specific user via giving id of that user as a get parameter.
+
+ Parameters: 
+  * Id
+  
+ Example Request:
+  
+ `http http://127.0.0.1:8000/user/1`
+ 
+ Example Response:
+ 
+ Response code: 200, OK
+ 
+ ```
+  {
+    "id": 1, 
+    "name": "Haluk Alper Karaevli", 
+    "email": "halukkaraevli@hotmail.com", 
+    "password": "123456", 
+    "age": 22
+  }
+  ```
 * **Create New User [POST]**
 
 You can create a new user by giving appropriate parameters.
