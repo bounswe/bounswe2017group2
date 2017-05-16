@@ -166,6 +166,37 @@ Or, to run the tests:
 ### User Endpoints (/user/)
 
 * **Get All Users [GET]**
+
+ You can get all users with a GET request. 
+  
+  Parameters: None
+  
+  Example Request:
+  
+  `http http://127.0.0.1:8000/user/`
+  
+  Example Response:
+  
+  Response code: 200, OK
+  
+  ```JSON
+  [
+     {
+      "id": 1, 
+      "name": "Furkan Şenharputlu", 
+      "email": "furkan_senharputlu@hotmail.com", 
+      "password": "123456", 
+      "age": 22
+      },
+      {
+      "id": 1, 
+      "name": "Oğuzhan Göller", 
+      "email": "goller.oguzhan@gmail.com", 
+      "password": "78910", 
+      "age": 22
+       }
+    ]
+  ```
 * **Get A Specific User [GET]**
 * **Create New User [POST]**
 
