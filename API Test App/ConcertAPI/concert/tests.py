@@ -24,7 +24,7 @@ class TestsForConcerts(APITestCase):
         response = self.client.put(url, data, format='json')
         self.assertEqual(json.loads(response.content), {'id': 1, 'artist': 'Sebnem Ferah', 'date':'2017-06-20', 'location':'BogaziciUniTasoda', 'minprice': 0, 'maxprice': 0})
 
-    # Concert Testcase 2
+    # Concert Testcase 2:
     def test_create_concert(self):
         url = '/concert/'
         data = {'artist': 'Sezen Aksu', 'date':'2017-05-20', 'location':'BogaziciUniTasoda'}

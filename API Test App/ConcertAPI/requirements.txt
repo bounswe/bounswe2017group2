@@ -1,0 +1,11 @@
+Django==1.11
+Pygments==2.2.0
+dj-database-url==0.4.2
+djangorestframework==3.6.2
+gunicorn==19.7.1
+httpie==0.9.9
+pytz==2017.2
+requests==2.13.0
+vboxapi==1.0
+virtualenv==15.1.0
+wsgiref==0.1.2
