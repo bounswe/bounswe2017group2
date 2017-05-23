@@ -83,7 +83,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   You can get a specific concert by sending a GET request with that concert's id. 
   
   Parameters: 
-  * Concert ID
+  * Concert ID (required)
   
   Example Request:
   
@@ -166,22 +166,22 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
 * **Delete A Concert [DELETE]**
 
-Parameters:
-    * Id
+  Parameters:
+  * Concert ID (required)
     
-Example Request:
+  Example Request:
   
   `http --json DELETE http://127.0.0.1:8000/concert/1/`
   
-Example Response:
+  Example Response:
   
-Response code: 204, NO CONTENT
+  Response code: 204, NO CONTENT
 
 ### User Endpoints (/user/)
 
 * **Get All Users [GET]**
 
- You can get all users with a GET request. 
+  You can get all users with a GET request. 
   
   Parameters: None
   
@@ -214,20 +214,20 @@ Response code: 204, NO CONTENT
   
 * **Get A Specific User [GET]**
 
- You can get a specific user via giving id of that user as a get parameter.
+  You can get a specific user via giving id of that user as a get parameter.
 
- Parameters: 
-  * Id
+  Parameters: 
+  * User ID (required) 
   
- Example Request:
+  Example Request:
   
  `http http://127.0.0.1:8000/user/1`
  
- Example Response:
+  Example Response:
  
- Response code: 200, OK
+  Response code: 200, OK
  
- ```
+  ```
   {
     "id": 1, 
     "name": "Haluk Alper Karaevli", 
@@ -238,7 +238,7 @@ Response code: 204, NO CONTENT
   ```
 * **Create New User [POST]**
 
-You can create a new user by giving appropriate parameters.
+  You can create a new user by giving appropriate parameters.
 
   Parameters:
   * Name
@@ -246,15 +246,15 @@ You can create a new user by giving appropriate parameters.
   * Password
   * Age
   
-Example Request:
+  Example Request:
 
-`http --json POST http://127.0.0.1:8000/user/ name="John Wick" email="jwick@hotmail.com" password="123456" age=35`
+  `http --json POST http://127.0.0.1:8000/user/ name="John Wick" email="jwick@hotmail.com" password="123456" age=35`
 
-Example Response:
+  Example Response:
 
-Response code: 201, CREATED
+  Response code: 201, CREATED
 
-```JSON
+  ```JSON
    {
        "id": 1, 
       "name": "John Wick", 
@@ -266,9 +266,10 @@ Response code: 201, CREATED
   
 * **Update A User [PUT]**
 
-You can update a user by giving the appropriate parameters.
+  You can update a user by giving the appropriate parameters.
   
   Parameters: 
+  * User ID (required)
   * Name
   * e-mail
   * Password
@@ -294,13 +295,13 @@ You can update a user by giving the appropriate parameters.
 
 * **Delete A User [DELETE]**
 
-Parameters:
-    * Id
+  Parameters:
+  * User ID (required)
     
-Example Request:
+  Example Request:
   
   `http --json DELETE http://127.0.0.1:8000/user/1/`
   
-Example Response
+  Example Response
   
-Response code: 204, NO CONTENT
+  Response code: 204, NO CONTENT
