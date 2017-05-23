@@ -38,6 +38,9 @@ Or, to run the tests:
 ```python manage.py test```
 
 ## Endpoints
+Below you can find the descriptions and usage examples of each endpoint.
+Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
+
 ### Concert Endpoints (/concert/)
 
 * **Get All Concerts [GET]**
@@ -163,6 +166,17 @@ Or, to run the tests:
   
 * **Delete A Concert [DELETE]**
 
+Parameters:
+    * Id
+    
+Example Request:
+  
+  `http --json DELETE http://127.0.0.1:8000/concert/1/`
+  
+Example Response:
+  
+Response code: 204, NO CONTENT
+
 ### User Endpoints (/user/)
 
 * **Get All Users [GET]**
@@ -280,8 +294,9 @@ You can update a user by giving the appropriate parameters.
 
 * **Delete A User [DELETE]**
 
-Parameters: None
-
+Parameters:
+    * Id
+    
 Example Request:
   
   `http --json DELETE http://127.0.0.1:8000/user/1/`
