@@ -147,7 +147,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
    Example Request:
    
-  `http --json PUT https://swe2017-group2-concertapi.herokuapp.com/concert/1/ artist="Sebnem Ferah", location = "BogaziciUniTasoda", date = "2017-06-20", minprice = 50, maxprice = 200`
+  `http --json PUT https://swe2017-group2-concertapi.herokuapp.com/concert/1/ artist="Sebnem Ferah" location="BogaziciUniTasoda" date="2017-06-20" minprice=50 maxprice=200`
   
   Example Response:
   
@@ -277,7 +277,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
   Example Request:
   
-  `http --json PUT https://swe2017-group2-concertapi.herokuapp.com/user/1/ name="Sebnem Ferah", email = "sferah@gmail.com", password = "ferahla", age = 44`
+  `http --json PUT https://swe2017-group2-concertapi.herokuapp.com/user/1/ name="Sebnem Ferah" email="sferah@gmail.com" password="ferahla", age=44`
   
   Example Response
   
