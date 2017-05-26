@@ -51,7 +51,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
   Example Request:
   
-  `http http://127.0.0.1:8000/concert/`
+  `http https://swe2017-group2-concertapi.herokuapp.com/concert/`
   
   Example Response:
   
@@ -87,7 +87,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
   Example Request:
   
-  `http http://127.0.0.1:8000/concert/1/`
+  `http https://swe2017-group2-concertapi.herokuapp.com/concert/1/`
   
   Example Response:
   
@@ -116,7 +116,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
   Example Request:
   
-  `http --json POST http://127.0.0.1:8000/concert/ artist="John Mayer" location="LA" date="2017-08-08" minprice=200 maxprice=400`
+  `http --json POST https://swe2017-group2-concertapi.herokuapp.com/concert/ artist="John Mayer" location="LA" date="2017-08-08" minprice=200 maxprice=400`
   
   Example Response:
   
@@ -147,7 +147,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
    Example Request:
    
-  `http --json PUT http://127.0.0.1:8000/concert/1/ artist="Sebnem Ferah", location = "BogaziciUniTasoda", date = "2017-06-20", minprice = 50, maxprice = 200`
+  `http --json PUT https://swe2017-group2-concertapi.herokuapp.com/concert/1/ artist="Sebnem Ferah", location = "BogaziciUniTasoda", date = "2017-06-20", minprice = 50, maxprice = 200`
   
   Example Response:
   
@@ -171,7 +171,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
     
   Example Request:
   
-  `http --json DELETE http://127.0.0.1:8000/concert/1/`
+  `http --json DELETE https://swe2017-group2-concertapi.herokuapp.com/concert/1/`
   
   Example Response:
   
@@ -187,7 +187,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
   Example Request:
   
-  `http http://127.0.0.1:8000/user/`
+  `http https://swe2017-group2-concertapi.herokuapp.com/user/`
   
   Example Response:
   
@@ -221,7 +221,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
   Example Request:
   
- `http http://127.0.0.1:8000/user/1`
+ `http https://swe2017-group2-concertapi.herokuapp.com/user/1`
  
   Example Response:
  
@@ -248,7 +248,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
   Example Request:
 
-  `http --json POST http://127.0.0.1:8000/user/ name="John Wick" email="jwick@hotmail.com" password="123456" age=35`
+  `http --json POST https://swe2017-group2-concertapi.herokuapp.com/user/ name="John Wick" email="jwick@hotmail.com" password="123456" age=35`
 
   Example Response:
 
@@ -277,7 +277,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
   
   Example Request:
   
-  `http --json PUT http://127.0.0.1:8000/user/1/ name="Sebnem Ferah", email = "sferah@gmail.com", password = "ferahla", age = 44`
+  `http --json PUT https://swe2017-group2-concertapi.herokuapp.com/user/1/ name="Sebnem Ferah", email = "sferah@gmail.com", password = "ferahla", age = 44`
   
   Example Response
   
@@ -300,7 +300,7 @@ Host URL for our API is: https://swe2017-group2-concertapi.herokuapp.com/
     
   Example Request:
   
-  `http --json DELETE http://127.0.0.1:8000/user/1/`
+  `http --json DELETE https://swe2017-group2-concertapi.herokuapp.com/user/1/`
   
   Example Response
   
