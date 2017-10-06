@@ -1,0 +1,12 @@
+Amazon AWS account 
+
+UserName : concertgroup
+Mail : goller.oguzhan@gmail.com
+Password : Bogazici2017
+ 
+Instance ID : i-08684caee0af6570d
+Instance type : t2.micro
+Zone : us-west-2b(oregon)
+Public DNS(IPv4) : ec2-35-166-145-103.us-west-2.compute.amazonaws.com
+IPv4 Public IP : 35.166.145.103
+keypairname : keypair (with .pem extension)
