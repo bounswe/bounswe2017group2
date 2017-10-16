@@ -4,30 +4,31 @@ from lfc_backend.models import Concert, Tag, Report, Location, Rating
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ('value');
+        fields = ('value',)
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
-        fields = ('venue','coordinates');
+        fields = ('venue','coordinates',)
 
 class ConcertSerializer(serializers.ModelSerializer):
-    #tags = TagSerializer(many=True)
+    tags = TagSerializer(many=True)
     #location = LocationSerializer()
 
     class Meta:
         model = Concert
-        #fields = ('name','artist','date_time','description','price_min','price_max','tags','location')
-        fields = ('name','artist','date_time','description','price_min','price_max')
+        #"fields = ('name','artist','date_time','description','price_min','price_max','tags','location')
+        fields = ('name','artist','date_time','description','price_min','price_max','tags',)
+        #fields = ('name','artist','date_time','description','price_min','price_max')
 
     def create(self, validated_data):
-        #tags_data = validated_data.pop('tags')
+        tags_data = validated_data.pop('tags')
         #location_data = validated_data.pop('location')
         concert = Concert.objects.create(**validated_data)
         #location.objects.create(concert = concert, **location_data)
-        #for tag_data in tags_data:
-        #    tag = Tag.objects.create(**tag_data)#creates tag object without the field concerts <------- NEEDS A CHANGE look at notes 1
-        #    tag.concerts.add(concert) #adds concert to tags concerts field also adds tag to concerts tags field
+        for tag_data in tags_data:
+            tag = Tag.objects.create(**tag_data)#creates tag object without the field concerts <------- NEEDS A CHANGE look at notes 1
+            tag.concerts.add(concert) #adds concert to tags concerts field also adds tag to concerts tags field
                 #<--- Stayed here
         return concert
 

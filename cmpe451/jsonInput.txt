@@ -1,0 +1,1 @@
+'{"artist":"TestArtist","date_time":"2017-09-09","name":"TestName","price_max":400,"price_min":200,"tags":[{"value":"TestTag"}]}'
