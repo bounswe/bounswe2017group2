@@ -10,10 +10,17 @@ import java.util.Date;
 
 
 public class Concert {
-    String artistName;
-    Location location;
-    Date date;
-    Pair<Double,Double> priceRange;
+    private String name;
+    private String artistName;
+    private Location location;
+    private Date date;
+    private Pair<Double,Double> priceRange;
+
+    public String getName() { return name;}
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getArtistName() {
         return artistName;
