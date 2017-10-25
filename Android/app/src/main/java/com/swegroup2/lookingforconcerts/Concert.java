@@ -10,6 +10,7 @@ import java.util.Date;
 
 
 public class Concert {
+
     private String name;
     private String artistName;
     private Location location;
@@ -21,6 +22,7 @@ public class Concert {
     public void setName(String name) {
         this.name = name;
     }
+
 
     public String getArtistName() {
         return artistName;

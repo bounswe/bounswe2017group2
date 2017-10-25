@@ -5,32 +5,43 @@
   </h1>
   <img width="300" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
 </div>
-<h2>Here are some links to help you start: </h2>
-<form [formGroup]="concertForm" >
-  <div>
-      <label >Date:
-          <input type="date" class="form-control" formControlName="date_time">
-      </label>
-  </div>
-  <div>
-    <label>Name:
-        <input class="form-control" formControlName="name">
-    </label>
-  </div>
-  <div>
-    <label >Artist:
-        <input class="form-control" formControlName="artist">
-    </label>
-  </div>
-  <div>
-    <label >Minimum Price for Tickets:
-        <input class="form-control" formControlName="price_min">
-    </label>
-  </div>
-  <div>
-    <label >Maximum Price for Tickets:
-        <input class="form-control" formControlName="price_max">
-    </label>
+<form [formGroup]="concertForm" style="text-align:center" (submit)="createConcert()">
+  <div style="text-align:center">
+  <table class="CreateConcertTable">
+    <tr> 
+      <td> <label >Date:</label> </td>
+      <td> <input type="date" class="form-control" formControlName="date_time"> </td>
+      <td> <div *ngIf="!concertForm.get('date_time').valid && isValid">Required</div> </td>
+    </tr>
+
+    <tr> 
+      <td> <label >Name:</label> </td>
+      <td> <input class="form-control" formControlName="name"> </td> 
+      <td> <div *ngIf="!concertForm.get('name').valid && isValid">Required</div> </td>
+    </tr>
+    
+    <tr>
+      <td> <label >Artist:</label> </td>
+      <td> <input class="form-control" formControlName="artist"> </td>
+      <td> <div *ngIf="!concertForm.get('artist').valid && isValid">Required</div> </td>
+    </tr>
+
+    
+    <tr>
+        <td> <label >Minimum Price:</label> </td>
+        <td> <input type="number" class="form-control" formControlName="price_min"> </td>
+        <td> <div *ngIf="!concertForm.get('price_min').valid && isValid">Required</div> </td>
+    </tr>
+
+
+    <tr>
+        <td> <label >Maximum Price:</label> </td>
+        <td> <input type="number" class="form-control" formControlName="price_max"> </td>
+        <td> <div *ngIf="!concertForm.get('price_max').valid && isValid">Required</div> </td>
+      </tr>
+    <tr>
+  </table>
+  <button type="submit">Create a concert</button> 
   </div>
 </form>
 

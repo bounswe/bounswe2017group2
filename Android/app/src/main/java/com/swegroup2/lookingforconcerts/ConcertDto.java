@@ -5,12 +5,14 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+
 /**
  * Created by furkan on 9.10.2017.
  */
 
 
 public class ConcertDto {
+
     @SerializedName("name")
     @Expose()
     public String name;
@@ -52,4 +54,5 @@ class Tag {
     @SerializedName("value")
     @Expose
     public String value;
+
 }
