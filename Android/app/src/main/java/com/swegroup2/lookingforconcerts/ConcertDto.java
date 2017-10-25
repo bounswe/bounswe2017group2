@@ -1,9 +1,10 @@
 package com.swegroup2.lookingforconcerts;
 
-import java.util.Date;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
 
 /**
  * Created by furkan on 9.10.2017.
@@ -11,27 +12,47 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class ConcertDto {
-    @SerializedName("artistName")
+
+    @SerializedName("name")
+    @Expose()
+    public String name;
+
+    @SerializedName("artist")
     @Expose()
     public String artistName;
 
-    @SerializedName("latitude")
-    @Expose()
-    public Double latitude;
+//    @SerializedName("latitude")
+//    @Expose()
+//    public Double latitude;
+//
+//    @SerializedName("longtitude")
+//    @Expose()
+//    public Double longtitude;
 
-    @SerializedName("longtitude")
+    @SerializedName("date_time")
     @Expose()
-    public Double longtitude;
+    public String date;
 
-    @SerializedName("date")
+    @SerializedName("description")
     @Expose()
-    public Date date;
+    public String description;
 
-    @SerializedName("date")
+    @SerializedName("price_min")
     @Expose()
-    public Double minPrice;
+    public Integer minPrice;
 
-    @SerializedName("date")
+    @SerializedName("price_max")
     @Expose()
-    public Double maxPrice;
+    public Integer maxPrice;
+
+    @SerializedName("tags")
+    @Expose()
+    public List<Tag> tags;
+}
+
+class Tag {
+    @SerializedName("value")
+    @Expose
+    public String value;
+
 }
