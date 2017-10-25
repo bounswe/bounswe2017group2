@@ -16,8 +16,7 @@ import retrofit2.http.POST;
 
 public interface RestInterfaceController {
 
-
-    @POST()
+    @POST("/concert/")
     Call<ConcertResponse> createConcert(@Body ConcertDto concertDto);
 
     @GET("/concert")
