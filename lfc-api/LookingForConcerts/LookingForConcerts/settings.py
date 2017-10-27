@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# our customized user model
+AUTH_USER_MODEL = "lfc_backend.RegisteredUser"
 
 # Application definition
 
@@ -40,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'lfc_backend.apps.LfcBackendConfig',
-    'corsheaders',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
