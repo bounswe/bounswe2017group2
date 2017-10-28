@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from lfc_backend.models import Concert, Tag, Report, Location, Rating
-from lfc_backend.serializers import ConcertSerializer, RegisteredUserSerializer
+from lfc_backend.models import Concert, Tag, Report, Location, Rating, Comment
+from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer
 
 from django.contrib.auth import authenticate, login # for user authentication and login
 from django.contrib.auth import logout # for user logout
@@ -93,7 +93,6 @@ def create_user():
         return Response(serializer.data, status = status.HTTP_201_CREATED)
     return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-
 def registered_user_login(request):
     username = request.data['username']
     password = request.data['password']
@@ -109,3 +108,42 @@ def registered_user_login(request):
 def registered_user_logout(request):
     logout(request)
     # Redirect to a success page.
+
+@api_view(['GET'])
+def list_locations(request):
+    '''
+    returns all locations
+    @params: None
+    '''
+    if request.method =='GET':
+        locations = Location.objects.all()
+        serializer = LocationSerializer(locations, many=True)
+        return Response(serializer.data)
+    else:
+        return status.HTTP_400_BAD_REQUEST
+
+@api_view(['GET'])
+def location_detail(request, pk):
+    try:
+        location = Location.objects.get(pk=pk) # <-- this pk might be location_id, I'm not sure.
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    # returns the concert with the given primary key
+    serializer = LocationSerializer(location)
+    return Response(serializer.data)
+
+@api_view(['POST']) 
+def comment_create(request,pk):
+    try:
+        concert = Concert.objects.get(pk=pk)
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    serializer = CommentSerializer(data = request.data)
+    serializer.is_valid()
+    comment = serializer.save()
+    concert.comments.add(comment)
+    return Response(serializer.data)
+    #need session data of the current user to relate the comment to him/her.
+    
+        
