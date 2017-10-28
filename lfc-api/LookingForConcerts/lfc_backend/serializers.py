@@ -41,6 +41,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tags_data = validated_data.pop('tags')
         location_data = validated_data.pop('location')
+        validated_data.pop('comments');
         location = Location.objects.create(**location_data)
         concert = Concert.objects.create(**validated_data)
         for tag_data in tags_data:
