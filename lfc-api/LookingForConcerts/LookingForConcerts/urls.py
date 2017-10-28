@@ -24,8 +24,12 @@ urlpatterns = [
     url(r'^concerts/$', views.list_concerts), # lists all concerts in DB
     url(r'^newconcert/$', views.create_concert), # creates a concert with provided info
     url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert
+    url(r'^concert/(?P<pk>[0-9]+)/newcomment/$', views.comment_create), #adds new comment to the concert specified by its primary key 
     url(r'^users/$',views.list_users), # lists all the users registered to our app
     url(r'^newuser/$',views.list_users), # creates a new user with provided info
+    url(r'^locations/$',views.list_locations), # lists all locations in DB
+    url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
+    
     #url('^', include('django.contrib.auth.urls'))
     # auth.urls includes:
     # ^login/$ [name='login']

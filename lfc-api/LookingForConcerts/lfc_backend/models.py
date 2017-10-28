@@ -12,8 +12,6 @@ class RegisteredUser(AbstractUser): #NEEDS IMPLEMENTING / THINKING
     #concerts = models.ManyToManyField(Concert, related_name= 'users')
 
 class Location(models.Model):
-    '''
-    '''
     location_id = models.AutoField(primary_key=True)
     # venue and coordinates should be retrieved from Google API.
     # charfields are placeholders for now.
@@ -24,12 +22,10 @@ class Location(models.Model):
         unique_together = ("venue", "coordinates")
 
 class Concert(models.Model):
-    '''
-    '''
     concert_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length= 150)
     artist = models.CharField(max_length= 50)
-    #location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.DO_NOTHING);
+    location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.CASCADE,  null=True);
 
     #location -implemented in location --ONE TO MANY
     #tags -implemented in tag --MANY TO MANY
@@ -45,10 +41,10 @@ class Concert(models.Model):
         unique_together = ("artist", "date_time")
 
 class Comment(models.Model):
-    '''
-    '''
     comment_id = models.AutoField(primary_key=True)
-    owner = models.ForeignKey(RegisteredUser, related_name= 'comments')
+    #owner_id = models.ForeignKey(RegisteredUser, related_name = 'comments', on_delete = models.CASCADE , null = True) ----------> Needs session functionality
+    concert_id = models.ForeignKey(Concert, related_name = 'comments', on_delete = models.CASCADE, null = True)
+    content = models.CharField(max_length = 600, default = "")
 
 
 class Tag(models.Model):
@@ -76,9 +72,8 @@ class Concert_Report(Report):
     # 0: date & time
     # 1: artist
     # 2: location
-    # 3: venue ...
+    # 3: venue
     concert = models.ForeignKey(Concert, related_name = 'reports',on_delete = models.CASCADE)
-
 
 class Rating(models.Model):
     '''
