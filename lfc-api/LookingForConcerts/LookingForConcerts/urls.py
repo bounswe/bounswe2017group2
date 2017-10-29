@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert
     url(r'^users/$',views.list_users), # lists all the users registered to our app
     url(r'^newuser/$',views.list_users), # creates a new user with provided info
+	url(r'^index/$',views.index, name='index'), # creates a new user with provided info
     #url('^', include('django.contrib.auth.urls'))
     # auth.urls includes:
     # ^login/$ [name='login']

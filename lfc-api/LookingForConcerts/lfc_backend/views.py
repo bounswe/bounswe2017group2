@@ -109,3 +109,9 @@ def registered_user_login(request):
 def registered_user_logout(request):
     logout(request)
     # Redirect to a success page.
+
+def index(request):
+	concerts = Concert.objects.all()
+	return render(request, "index.html", {'concertlist':concerts})
+
+
