@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Rating, Comment
+from django.contrib.auth.hashers import make_password
 
 class RegisteredUserSerializer(serializers.ModelSerializer):
     class Meta:
         model=RegisteredUser
-        fields = ('username','password','email','first_name','last_name','age',)
+        fields = ('email','password','first_name','last_name','age','date_joined','is_active','avatar')
     def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
         return registered_user
 
@@ -13,7 +15,7 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('label',)
-        
+
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
@@ -23,11 +25,11 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('content',)
-        
+
     def create(self, validated_data):
         comment = Comment.objects.create(**validated_data)
         return comment
-    
+
 class ConcertSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     location = LocationSerializer()
