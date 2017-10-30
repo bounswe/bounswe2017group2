@@ -21,14 +21,6 @@ public class ConcertDto {
     @Expose()
     public String artistName;
 
-//    @SerializedName("latitude")
-//    @Expose()
-//    public Double latitude;
-//
-//    @SerializedName("longtitude")
-//    @Expose()
-//    public Double longtitude;
-
     @SerializedName("date_time")
     @Expose()
     public String date;
@@ -48,11 +40,28 @@ public class ConcertDto {
     @SerializedName("tags")
     @Expose()
     public List<Tag> tags;
+
+    @SerializedName("location")
+    @Expose()
+    public ConcertLocation location;
+
+    @SerializedName("comments")
+    @Expose()
+    public List<String> comments;
 }
 
 class Tag {
-    @SerializedName("value")
+    @SerializedName("label")
     @Expose
-    public String value;
+    public String label;
+}
 
+class ConcertLocation {
+    @SerializedName("venue")
+    @Expose
+    public String venue;
+
+    @SerializedName("coordinates")
+    @Expose
+    public String coordinates;
 }
