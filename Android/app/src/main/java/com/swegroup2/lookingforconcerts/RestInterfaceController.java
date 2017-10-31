@@ -16,10 +16,10 @@ import retrofit2.http.POST;
 
 public interface RestInterfaceController {
 
-    @POST("/concert/")
+    @POST("/newconcert/")
     Call<ConcertResponse> createConcert(@Body ConcertDto concertDto);
 
-    @GET("/concert")
+    @GET("/concerts")
     Call<List<ConcertDto>> getAllConcerts();
 
 }
