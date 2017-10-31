@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Rating, Comment
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ObjectDoesNotExist
 
 class RegisteredUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,7 +45,10 @@ class ConcertSerializer(serializers.ModelSerializer):
         tags_data = validated_data.pop('tags')
         location_data = validated_data.pop('location')
         validated_data.pop('comments');
-        location = Location.objects.create(**location_data)
+        try:
+            location = Location.objects.get(**location_data)
+        except ObjectDoesNotExist:
+            location = Location.objects.create(**location_data)
         concert = Concert.objects.create(**validated_data)
         for tag_data in tags_data:
             tag = Tag.objects.create(**tag_data)#creates tag object without adding concert to the concerts field<------- NEEDS A CHANGE look at notes 1
