@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate, login # for user authentication an
 from django.contrib.auth import logout # for user logout
 from django.contrib.auth.decorators import login_required, permission_required # permissions
 from django.shortcuts import render, redirect
+from rest_framework.authtoken.models import Token
 
 # The actual python functions that do the backend work.
 
@@ -100,6 +101,12 @@ def registered_user_logout(request):
     return Response(status=status.HTTP_200_OK)
     # Redirect to a success page.
 
+
+@api_view(['GET'])
+def get_logged_in_user(request):
+    user = request.user
+    return Response(user,status=status.HTTP_200_OK)
+
 '''
 CONCERT FUNCTIONS
 '''
@@ -124,7 +131,6 @@ def create_concert(request):
     '''
     inserts a concert into the database
     '''
-
     if request.method =='POST':
         serializer = ConcertSerializer(data = request.data)
         if serializer.is_valid():
@@ -185,7 +191,7 @@ def list_locations(request):
 @api_view(['GET'])
 def location_detail(request, pk):
     try:
-        location = Location.objects.get(pk=pk) # <-- this pk might be location_id, I'm not sure.
+        location = Location.objects.get(pk=pk) # <-- this pk might be location_id, I'm not sure. <--- It is
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
     # returns the concert with the given primary key
@@ -205,7 +211,22 @@ def comment_create(request,pk):
 
     serializer = CommentSerializer(data = request.data)
     serializer.is_valid()
+    #comment = serializer.save(owner = request.user)
     comment = serializer.save()
     concert.comments.add(comment)
     return Response(serializer.data)
     #need session data of the current user to relate the comment to him/her.
+'''
+TOKEN FUNCTIONS
+'''
+
+@api_view(['POST'])
+def get_token(request):
+    email = request.data['email']
+    password = request.data['password']
+    user = authenticate(request, username=email, password=password)
+    print(user)
+    token, created = Token.objects.get_or_create(user=user)
+    
+    return Response({'token': token.key})
+

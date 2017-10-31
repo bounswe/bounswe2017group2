@@ -16,8 +16,11 @@ Including another URLconf
 '''
 from django.conf.urls import url
 from django.contrib import admin
+from rest_framework.authtoken import views as tokenviews #for acquiring token for a user
 from lfc_backend import views
+
 from LookingForConcerts import settings
+
 
 urlpatterns = [
     # USER
@@ -27,6 +30,7 @@ urlpatterns = [
     url(r'^login/$', views.registered_user_login, name='registered_user_login'),
     url(r'^logout/$', views.registered_user_logout, name='registered_user_logout'),
     url(r'^users/$',views.list_users), # lists all the users registered to our app
+    url(r'^logged_in_user/$', views.get_logged_in_user),
     # CONCERT
     url(r'^concerts/$', views.list_concerts), # lists all concerts in DB
     url(r'^newconcert/$', views.create_concert), # creates a concert with provided info
@@ -39,7 +43,8 @@ urlpatterns = [
     # COMMENT
     # REPORT
     # RATING
-
+    #TOKEN
+    url(r'^get_token/$', views.get_token) #Returns users token given the email and password of the user
     #url('^', include('django.contrib.auth.urls'))
     # auth.urls includes:
     # ^login/$ [name='login']
