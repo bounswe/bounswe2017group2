@@ -44,7 +44,7 @@ urlpatterns = [
     # REPORT
     # RATING
     #TOKEN
-    url(r'^api-token-auth/$', views.get_token) #Returns users token given the email and password of the user
+    url(r'^get_token/$', views.get_token) #Returns users token given the email and password of the user
     #url('^', include('django.contrib.auth.urls'))
     # auth.urls includes:
     # ^login/$ [name='login']
