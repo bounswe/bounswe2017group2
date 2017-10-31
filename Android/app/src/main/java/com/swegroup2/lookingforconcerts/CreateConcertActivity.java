@@ -63,8 +63,10 @@ public class CreateConcertActivity extends AppCompatActivity {
                 date = dateEditText.getText().toString();
                 description = descriptionEditText.getText().toString().trim();
                 //TODO: add validation for prices
-                minPrice = Integer.parseInt(minPriceEditText.getText().toString());
-                maxPrice = Integer.parseInt(maxPriceEditText.getText().toString());
+                minPrice = Integer.parseInt(minPriceEditText.getText().toString().isEmpty() ? "0" :
+                        minPriceEditText.getText().toString());
+                maxPrice = Integer.parseInt(maxPriceEditText.getText().toString().isEmpty() ? "0" :
+                        maxPriceEditText.getText().toString());
                 tags = tagsEditText.getText().toString().trim().split(",");
                 venue = venueEditText.getText().toString().trim();
                 coordinates = coordinatesEditText.getText().toString().trim();
@@ -104,9 +106,11 @@ public class CreateConcertActivity extends AppCompatActivity {
         concertDto.maxPrice = maxPrice;
         List<Tag> tagList = new ArrayList<>();
         for (String tag : tags) {
-            Tag temp = new Tag();
-            temp.label = tag;
-            tagList.add(temp);
+            if (!tag.isEmpty()) {
+                Tag temp = new Tag();
+                temp.label = tag;
+                tagList.add(temp);
+            }
         }
         concertDto.tags = tagList;
         ConcertLocation concertLocation = new ConcertLocation();
@@ -129,6 +133,7 @@ public class CreateConcertActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(CreateConcertActivity.this, ConcertListActivity.class);
                 startActivity(intent);
+                CreateConcertActivity.this.finish();
             }
         });
     }

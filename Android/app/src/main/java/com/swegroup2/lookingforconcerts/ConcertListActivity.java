@@ -71,5 +71,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     public void createConcert(View view) {
         Intent intent = new Intent(this, CreateConcertActivity.class);
         startActivity(intent);
+        finish();
     }
 }

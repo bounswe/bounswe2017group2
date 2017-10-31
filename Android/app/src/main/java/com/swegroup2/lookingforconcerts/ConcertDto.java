@@ -13,6 +13,10 @@ import java.util.List;
 
 public class ConcertDto {
 
+    @SerializedName("concert_id")
+    @Expose()
+    public Integer id;
+
     @SerializedName("name")
     @Expose()
     public String name;
