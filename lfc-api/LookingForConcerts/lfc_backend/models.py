@@ -4,7 +4,17 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 from .managers import UserManager
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+from django.conf import settings
 
+# This code is triggered whenever a new user has been created and saved to the database
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
 
 # Models in our Database.
 
@@ -56,8 +66,6 @@ class Location(models.Model):
     venue = models.CharField(max_length = 200)
     coordinates = models.CharField(max_length=200)
 
-    class Meta:
-        unique_together = ("venue", "coordinates")
 
 class Concert(models.Model):
     concert_id = models.AutoField(primary_key=True)
