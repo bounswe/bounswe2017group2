@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,9 +22,25 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
 
     public ConcertListAdapter(ConcertListAdapterOnClickHandler clickHandler) {
         mClickHandler = clickHandler;
+
+        // This is dummy data, if get request does not work, it will be appear on list
+        mConcertData = new ArrayList<ConcertDto>();
+        ConcertDto dto = new ConcertDto();
+        dto.name = "dummy";
+        dto.artistName = "dummy";
+        dto.date = "dummy";
+        dto.description = "dummy";
+        dto.minPrice = 1;
+        dto.maxPrice = 2;
+        ConcertLocation loc = new ConcertLocation();
+        loc.venue = "dummy";
+        loc.coordinates = "dummy";
+        dto.location = loc;
+        mConcertData.add(dto);
+        // This is dummy data, if get request does not work, it will be appear on list
     }
 
-    public void setConcertData(List<ConcertDto> concertData){
+    public void setConcertData(List<ConcertDto> concertData) {
         mConcertData = concertData;
         notifyDataSetChanged();
     }
@@ -51,7 +68,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
 
     @Override
     public int getItemCount() {
-        if(mConcertData == null){
+        if (mConcertData == null) {
             return 0;
         }
 
@@ -64,7 +81,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
         public final TextView mConcertDate;
 
 
-        public ConcertListAdapterViewHolder(View view){
+        public ConcertListAdapterViewHolder(View view) {
             super(view);
 
             mConcertName = (TextView) view.findViewById(R.id.concert_name_tv);

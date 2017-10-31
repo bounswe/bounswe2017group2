@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -17,7 +18,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ConcertListActivity extends AppCompatActivity implements ConcertListAdapter.ConcertListAdapterOnClickHandler{
+public class ConcertListActivity extends AppCompatActivity implements ConcertListAdapter.ConcertListAdapterOnClickHandler {
     private RecyclerView recyclerView;
     private ConcertListAdapter adapter;
     private Button createConcertButton;
@@ -36,13 +37,19 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         recyclerView.setAdapter(adapter);
 
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
-
+        
         getConcerts();
     }
 
     @Override
     public void onClick(ConcertDto concertDto) {
-
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_right)
+                .replace(R.id.layout_concert_list, new ConcertDetails().newInstance(concertDto))
+                .add(R.id.layout_concert_list, new ConcertDetails())
+                .addToBackStack(null)
+                .commit();
     }
 
     private void getConcerts() {
@@ -51,7 +58,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        RestInterfaceController controller= retrofit.create(RestInterfaceController.class);
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         Call<List<ConcertDto>> call = controller.getAllConcerts();
 
@@ -63,7 +70,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
             @Override
             public void onFailure(Call<List<ConcertDto>> call, Throwable t) {
-                Toast.makeText(ConcertListActivity.this,"ERROR",Toast.LENGTH_SHORT).show();
+                Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
             }
         });
     }
