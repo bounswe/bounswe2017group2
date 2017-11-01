@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^login/$', views.registered_user_login, name='registered_user_login'),
     url(r'^logout/$', views.registered_user_logout, name='registered_user_logout'),
     url(r'^users/$',views.list_users), # lists all the users registered to our app
+    url(r'^user/(?P<pk>[0-9]+)/$', views.user_detail),
     url(r'^logged_in_user/$', views.get_logged_in_user),
     # CONCERT
     url(r'^concerts/$', views.list_concerts), # lists all concerts in DB

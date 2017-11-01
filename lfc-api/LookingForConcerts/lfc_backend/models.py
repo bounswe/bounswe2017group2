@@ -60,6 +60,9 @@ class RegisteredUser(AbstractBaseUser, PermissionsMixin):
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+    def __unicode__(self):
+        return '%s %s' % (self.first_name, self.last_name)
+
 
 class Location(models.Model):
     location_id = models.AutoField(primary_key=True)
@@ -91,7 +94,7 @@ class Concert(models.Model):
 
 class Comment(models.Model):
     comment_id = models.AutoField(primary_key=True)
-    #owner_id = models.ForeignKey(RegisteredUser, related_name = 'comments', on_delete = models.CASCADE , null = True) ----------> Needs session functionality
+    owner = models.ForeignKey(RegisteredUser, related_name = 'comments', on_delete = models.CASCADE , null = True) #----------> Needs session functionality
     concert_id = models.ForeignKey(Concert, related_name = 'comments', on_delete = models.CASCADE, null = True)
     content = models.CharField(max_length = 600, default = "")
 

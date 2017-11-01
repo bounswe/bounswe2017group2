@@ -39,6 +39,16 @@ def list_users(request):
     serializer = RegisteredUserSerializer(registered_users, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def user_detail(request,pk):
+    '''
+    returns all the registered users
+    most recently joined user is at the top
+    '''
+    registered_users = RegisteredUser.objects.get(pk=pk)
+    serializer = RegisteredUserSerializer(registered_users)
+    return Response(serializer.data)
+
 @api_view(['POST'])
 def signup(request):
     '''
@@ -242,6 +252,6 @@ def create_comment(request,pk):
     serializer.is_valid()
     #comment = serializer.save(owner = request.user)
     comment = serializer.save()
-    concert.comments.add(comment)
+    request.user.comments.add(comment)
     return Response(serializer.data)
     #need session data of the current user to relate the comment to him/her.

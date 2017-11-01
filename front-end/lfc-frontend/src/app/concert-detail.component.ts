@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import {Validators} from '@angular/forms';
 import {HttpClient,HttpHeaders} from '@angular/common/http';
+import {UserAndTokenService} from './user.token.service';
 @Component({
   selector: 'app-root',
   templateUrl: './concert-detail.component.html',
@@ -13,7 +14,7 @@ export class ConcertDetailComponent {
   isValid: boolean=false;
   concert: any;
   concertID: any;
-  constructor(private fb: FormBuilder,private http: HttpClient) { // <--- inject FormBuilder 
+  constructor(private fb: FormBuilder,private http: HttpClient, userAndToken: UserAndTokenService) { // <--- inject FormBuilder 
     this.concertID = 14;                                                                //ID of concert
     this.http.get('http://34.210.127.92:8000/concert/'+this.concertID+'/').subscribe( data => {
       this.concert=data;
