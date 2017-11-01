@@ -9,6 +9,8 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 
+import datetime
+
 # This code is triggered whenever a new user has been created and saved to the database
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -32,7 +34,7 @@ class RegisteredUser(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'email' # we use email as the username
     REQUIRED_FIELDS = []
 
     class Meta:
@@ -57,6 +59,9 @@ class RegisteredUser(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         '''
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    def __unicode__(self):
+        return '%s %s' % (self.first_name, self.last_name)
 
 
 class Location(models.Model):
@@ -83,12 +88,13 @@ class Concert(models.Model):
     #attendees -will be implemented in RegisteredUser --MANY TO MANY
     #ratings -implemented in Rating
     #concertReports -implemented in Report --ONE TO MANY
+
     class Meta: # artist and date_time combination should be unique for concerts!
         unique_together = ("artist", "date_time")
 
 class Comment(models.Model):
     comment_id = models.AutoField(primary_key=True)
-    #owner_id = models.ForeignKey(RegisteredUser, related_name = 'comments', on_delete = models.CASCADE , null = True) ----------> Needs session functionality
+    owner = models.ForeignKey(RegisteredUser, related_name = 'comments', on_delete = models.CASCADE , null = True) #----------> Needs session functionality
     concert_id = models.ForeignKey(Concert, related_name = 'comments', on_delete = models.CASCADE, null = True)
     content = models.CharField(max_length = 600, default = "")
 

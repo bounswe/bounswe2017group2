@@ -30,17 +30,18 @@ urlpatterns = [
     url(r'^login/$', views.registered_user_login, name='registered_user_login'),
     url(r'^logout/$', views.registered_user_logout, name='registered_user_logout'),
     url(r'^users/$',views.list_users), # lists all the users registered to our app
+    url(r'^user/(?P<pk>[0-9]+)/$', views.user_detail),
     url(r'^logged_in_user/$', views.get_logged_in_user),
     # CONCERT
     url(r'^concerts/$', views.list_concerts), # lists all concerts in DB
     url(r'^newconcert/$', views.create_concert), # creates a concert with provided info
     url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert
-    url(r'^concert/(?P<pk>[0-9]+)/newcomment/$', views.comment_create), #adds new comment to the concert specified by its primary key
+    # COMMENT
+    url(r'^concert/(?P<pk>[0-9]+)/newcomment/$', views.create_comment), #adds new comment to the concert specified by its primary key
     # LOCATION
     url(r'^locations/$',views.list_locations), # lists all locations in DB
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
     # TAG
-    # COMMENT
     # REPORT
     # RATING
     #TOKEN

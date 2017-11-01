@@ -3,21 +3,26 @@ package com.swegroup2.lookingforconcerts;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.LauncherActivity;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,7 +32,24 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +59,9 @@ import static android.Manifest.permission.READ_CONTACTS;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+    String email, password;
+
+
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -63,6 +88,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        email = "";
+        password="";
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -72,7 +99,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                    try {
+                        send();
+                    }catch(IOException e){
+                        e.printStackTrace();
+                    }
                     return true;
                 }
                 return false;
@@ -83,7 +114,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                try {
+                    send();
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -180,8 +215,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            // mAuthTask = new UserLoginTask(email, password);
+            //mAuthTask.execute((Void) null);
         }
     }
 
@@ -275,64 +310,118 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int IS_PRIMARY = 1;
     }
 
+
+
+    private String convertStreamToString(InputStream is) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<String, String, String> {
 
-        private final String mEmail;
-        private final String mPassword;
+        private String message;
+        String token;
+        Context mContext;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
+        UserLoginTask(Context context) {
+
+            mContext = context;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
+        protected String doInBackground(String... params) {
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+                token = tryLogin(email, password);
+            } catch (Exception e) {
+                e.printStackTrace();
+                message = e.getMessage();
             }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
+            return message;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                Intent intent = new Intent(LoginActivity.this, ConcertListActivity.class);
-                intent.putExtra("email", mEmail);
-                startActivity(intent);
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+        protected void onPostExecute(String result) {
+            if(token.equals("")){
+                Toast.makeText(mContext, "Yanlış bilgi girdiniz!", Toast.LENGTH_LONG).show();
             }
+            else{
+                Intent i = new Intent(LoginActivity.this, ConcertListActivity.class);
+                i.putExtra("json",token);
+                startActivity(i);
+            }
+
         }
 
         @Override
         protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
         }
     }
-}
 
+    protected void send() throws  MalformedURLException, IOException{
+        email = mEmailView.getText().toString();
+        password = mPasswordView.getText().toString();
+        new UserLoginTask(LoginActivity.this).execute();
+    }
+
+    protected String tryLogin(String email, String password)throws MalformedURLException, IOException {
+        HttpURLConnection urlConnection = (HttpURLConnection) ((new URL("http://34.210.127.92:8000/login/").openConnection()));
+        String info = "{\n" +
+                "\"email\":\"" + email + "\",\n" +
+                "\"password\":\"" + password + "\"\n" +
+                "\t\n" +
+                "}\n" +
+                "\n";
+        String result = "";
+        InputStream input = null;
+
+        try {
+
+            urlConnection.setDoOutput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("Accept", "application/json");
+
+            urlConnection.setRequestMethod("POST");
+            urlConnection.connect();
+
+            OutputStream outputStream = urlConnection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            writer.write(info);
+            writer.close();
+            outputStream.close();
+            if (urlConnection.getResponseCode() == 200) {
+                input = urlConnection.getInputStream();
+                result = convertStreamToString(input);
+
+            } else {
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+
+    }
+
+
+
+}

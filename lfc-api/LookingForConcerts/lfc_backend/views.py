@@ -14,16 +14,39 @@ from rest_framework.authtoken.models import Token
 # The actual python functions that do the backend work.
 
 '''
+TOKEN FUNCTIONS
+'''
+
+@api_view(['POST'])
+def get_token(request):
+    email = request.data['email']
+    password = request.data['password']
+    user = authenticate(request, username=email, password=password)
+    token, created = Token.objects.get_or_create(user=user)
+    return Response({'token': token.key})
+
+'''
 USER FUNCTIONS
 '''
 @api_view(['GET'])
 def list_users(request):
     '''
-    returns all registered users
+    returns all the registered users
+    most recently joined user is at the top
     '''
     print([f.name for f in RegisteredUser._meta.get_fields()]) # print all user fields for debug
-    registered_users = RegisteredUser.objects.all()
+    registered_users = RegisteredUser.objects.all().order_by('-date_joined')
     serializer = RegisteredUserSerializer(registered_users, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def user_detail(request,pk):
+    '''
+    returns all the registered users
+    most recently joined user is at the top
+    '''
+    registered_users = RegisteredUser.objects.get(pk=pk)
+    serializer = RegisteredUserSerializer(registered_users)
     return Response(serializer.data)
 
 @api_view(['POST'])
@@ -45,6 +68,7 @@ def signup(request):
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST) # something went wrong!
 
 @api_view(['DELETE'])
+@permission_required
 def delete_user(request,pk):
     '''
     deletes the user with the given primary key
@@ -57,6 +81,7 @@ def delete_user(request,pk):
     return Response(status = status.HTTP_204_NO_CONTENT)
 
 @api_view(['DELETE'])
+@permission_required
 def delete_all_users(request):
     '''
     deletes all users
@@ -78,14 +103,21 @@ def registered_user_login(request):
     password = request.data['password'] # unhashed password that the user entered
     print(email, password)
     user = authenticate(request, username=email, password=password) # authenticate() hashes the given function inside before checking
-    print(user)
+
     if user is not None:
         if user.is_active:
                 request.session.set_expiry(86400) #sets the exp. value of the session
-        login(request, user)
-        # Redirect to a success page.
-        print("logged in.")
-        return Response(status=status.HTTP_200_OK)
+                print("logged in.")
+                # Redirect to a success page.
+                serializer = RegisteredUserSerializer(user)
+                token, created = Token.objects.get_or_create(user=user)
+                data = serializer.data
+                data['token'] = token.key
+
+                return Response(data,status=status.HTTP_200_OK)
+        else:
+            print("User profile has been deleted.")
+            return Response(status=status.HTTP_404_NOT_FOUND)
     else:
         print("invalid login")
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -125,12 +157,16 @@ def list_concerts(request):
         return status.HTTP_400_BAD_REQUEST
 
 @api_view(['POST'])
-#@login_required
-#@permission_required('lfc_backend.can_create_concert', raise_exception=True)
+#@login_required()
+#@permission_required('IsAuthenticated')
 def create_concert(request):
     '''
     inserts a concert into the database
     '''
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    # user is logged in at this point
     if request.method =='POST':
         serializer = ConcertSerializer(data = request.data)
         if serializer.is_valid():
@@ -138,7 +174,7 @@ def create_concert(request):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
     else:
-        return status.HTTP_400_BAD_REQUEST
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 # also gets a primary key as a parameter
 @api_view(['GET','PUT','DELETE'])
@@ -203,7 +239,10 @@ COMMENT FUNCTIONS
 '''
 
 @api_view(['POST'])
-def comment_create(request,pk):
+def create_comment(request,pk):
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
     try:
         concert = Concert.objects.get(pk=pk)
     except:
@@ -213,20 +252,7 @@ def comment_create(request,pk):
     serializer.is_valid()
     #comment = serializer.save(owner = request.user)
     comment = serializer.save()
+    request.user.comments.add(comment)
     concert.comments.add(comment)
     return Response(serializer.data)
     #need session data of the current user to relate the comment to him/her.
-'''
-TOKEN FUNCTIONS
-'''
-
-@api_view(['POST'])
-def get_token(request):
-    email = request.data['email']
-    password = request.data['password']
-    user = authenticate(request, username=email, password=password)
-    print(user)
-    token, created = Token.objects.get_or_create(user=user)
-    
-    return Response({'token': token.key})
-
