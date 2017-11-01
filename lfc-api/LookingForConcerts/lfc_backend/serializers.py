@@ -17,7 +17,7 @@ class CommentSerializer(serializers.ModelSerializer):
     owner = RegisteredUserSerializer(read_only=True)
     class Meta:
         model = Comment
-        fields = ('content','owner')
+        fields = ('content','owner',)
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,7 +36,7 @@ class LocationSerializer(serializers.ModelSerializer):
 class ConcertSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     location = LocationSerializer()
-    comments = CommentSerializer(many=True)
+    comments = CommentSerializer(many=True, read_only=True)
     class Meta:
         model = Concert
         fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments')
@@ -46,7 +46,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tags_data = validated_data.pop('tags')
         location_data = validated_data.pop('location')
-        validated_data.pop('comments');
+        #validated_data.pop('comments');
         try:
             location = Location.objects.get(**location_data)
         except ObjectDoesNotExist:
