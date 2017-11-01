@@ -1,11 +1,8 @@
 package com.swegroup2.lookingforconcerts;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +11,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.lang3.SerializationUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +18,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -90,7 +85,7 @@ public class ConcertDetails extends Fragment {
             concertDto.location = loc;
 
 
-            concertDto.comments= SerializationUtils.deserialize((getArguments().getByteArray("comments")));
+            concertDto.comments= (List<ConcertComment>) deserialize((getArguments().getByteArray("comments")));
 
         }
 
