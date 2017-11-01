@@ -52,6 +52,9 @@ REST_FRAMEWORK = {
     )
 }
 
+BASE_URL = '127.0.0.1:8000/'
+LOGIN_URL = BASE_URL + 'login/'
+
 ADMIN_ENABLED = False
 
 '''
