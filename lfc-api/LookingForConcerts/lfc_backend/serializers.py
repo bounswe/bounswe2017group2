@@ -3,14 +3,21 @@ from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Ra
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 
+
 class RegisteredUserSerializer(serializers.ModelSerializer):
     class Meta:
         model=RegisteredUser
-        fields = ('email','password','first_name','last_name','age','date_joined','is_active','avatar')
+        fields = ('email','password','first_name','last_name','age','date_joined','is_active','avatar','comments')
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
         return registered_user
+
+class CommentSerializer(serializers.ModelSerializer):
+    owner = RegisteredUserSerializer(read_only=True)
+    class Meta:
+        model = Comment
+        fields = ('content','owner')
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,11 +28,6 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('venue','coordinates')
-
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = ('content',)
 
     def create(self, validated_data):
         comment = Comment.objects.create(**validated_data)
