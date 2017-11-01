@@ -1,8 +1,8 @@
-.LoginFormComponent{
+.registrationFormComponent{
     margin-left: auto;
     margin-right: auto;
     
 }
-.LoginFormComponent tbody tr td{
+.registrationFormComponent tbody tr td{
     padding-bottom: 3px;
 }

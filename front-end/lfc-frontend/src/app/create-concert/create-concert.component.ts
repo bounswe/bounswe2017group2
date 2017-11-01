@@ -1,13 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import {Validators} from '@angular/forms';
 import {HttpClient,HttpHeaders} from '@angular/common/http';
 @Component({
-  selector: 'app-root',
+  selector: 'app-create-concert',
   templateUrl: './create-concert.component.html',
   styleUrls: ['./create-concert.component.css']
 })
-export class CreateConcertComponent {
+export class CreateConcertComponent implements OnInit {
   title = 'app';
   concertForm: FormGroup;
   isValid: boolean=false;
@@ -28,6 +28,8 @@ export class CreateConcertComponent {
     });
     
   }
+  ngOnInit() {
+  }
   get tags(): FormArray {
     return this.concertForm.get('tags') as FormArray;
   }
@@ -41,7 +43,9 @@ export class CreateConcertComponent {
   {	
 	this.isValid=true;	
 	if(this.concertForm.valid){	
-		let formVal=JSON.stringify(this.concertForm.value); 
+    let formVal=JSON.stringify(this.concertForm.value); 
+    let header = new HttpHeaders().set('Content-Type', 'application/json');
+    //header = header.append('Authorization', 'Token ' +this.userAndToken.getUserAndToken());
 		this.http.post('http://localhost:8000/concert/', formVal, {headers: new HttpHeaders().set('Content-Type', 'application/json'),}).subscribe();
   	}else{
 		alert("Please fill the form correctly."); 
