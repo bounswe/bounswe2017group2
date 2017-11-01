@@ -35,10 +35,12 @@
         <div id="concertNameDiv">
             <h1 id="concertName">{{concert.name}}</h1>
         </div>
-        <div id="artistDiv"><b>Artist:</b>{{concert.artist}}</div>
-        <div id="dateDiv"><b>Date:</b>{{concert.date_time}}</div>
-        <div id="priceDiv"><b>Price:</b>{{concert.price_min}}-{{concert.price_max}}</div>
-        <div id="locationDiv"><b>Location:</b>{{concert.location.venue}}<br/></div>
+        <div id="concertInfoDiv">
+            <div id="artistDiv"><b>Artist:</b>{{concert.artist}}</div>
+            <div id="dateDiv"><b>Date:</b>{{concert.date_time}}</div>
+            <div id="priceDiv"><b>Price:</b>{{concert.price_min}}-{{concert.price_max}}</div>
+            <div id="locationDiv"><b>Location:</b>{{concert.location.venue}}</div>
+        </div>
         <div id="concertDescriptionDiv"><p>{{concert.description}}</p></div>
     </div>
     <div id="comments">

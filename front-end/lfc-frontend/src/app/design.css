@@ -7,32 +7,34 @@
     padding-bottom: 3px;
 }
 
+#concertInfoDiv{
+    border-bottom: 3px solid #800000;
+    border-top: 3px solid #800000;
+}
+
 #artistDiv {
     margin: 3px;
     margin-left: 5px;
     width: fit-content;
-    float: left;
 }
+
 
 #dateDiv{
     margin: 3px;
     margin-left: 5px;
     width: fit-content;
-    float: left;
 }
 
 #priceDiv {
     margin: 3px;
     margin-left: 5px;
     width: fit-content;
-    float: left;
 }
 
 #locationDiv {
     margin: 3px;
     margin-left: 5px;
     width: fit-content;
-    float: left;
 }
 
 ul {
@@ -43,9 +45,10 @@ ul {
 .commentDiv {
     color: white;
     font-size: 15pt;
-    border-bottom: #690606 solid 3px;
+    border: #a41313 solid 3px;
     width: 80%;
     margin: 5px auto 5px auto;
+    background-color: #400000;
 }
 
 #concertDetailsDiv{
@@ -59,18 +62,14 @@ ul {
     overflow: auto;
     margin: 3px;
     background-color: white;
+    font-size: 17pt;
 }
 
 #concertName{
+    text-align: center;
     margin: 3px;
-    margin-bottom: 10px;
     overflow: auto;
     color: black;
-}
-
-#concertDataDiv{
-    margin: 3px;
-    font-size: 20pt;
 }
 
 #concertDescriptionDiv{
@@ -88,7 +87,6 @@ ul {
     width: 80%;
     margin: auto;
     height: 140px;
-    /*border: solid black 1px;*/
     margin-bottom: 5px;
 }
 
