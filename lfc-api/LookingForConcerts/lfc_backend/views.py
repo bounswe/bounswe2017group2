@@ -248,6 +248,7 @@ def create_comment(request,pk):
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
+<<<<<<< HEAD
     serializer = CommentSerializer(data = request.data)
     serializer.is_valid()
     #comment = serializer.save(owner = request.user)
@@ -256,3 +257,14 @@ def create_comment(request,pk):
     concert.comments.add(comment)
     return Response(serializer.data)
     #need session data of the current user to relate the comment to him/her.
+=======
+def registered_user_logout(request):
+    logout(request)
+    # Redirect to a success page.
+
+def index(request):
+	concerts = Concert.objects.all()
+	return render(request, "index.html", {'concertlist':concerts})
+
+
+>>>>>>> 818031f39503e0272a06358cab8ef8d65659643c

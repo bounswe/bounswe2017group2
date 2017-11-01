@@ -1,11 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-<<<<<<< HEAD
 import { CreateConcertComponent } from './create-concert/create-concert.component';
-=======
-import { CreateConcertComponent } from './create-concert.component';
-import { ConcertDetailComponent } from './concert-detail.component';
->>>>>>> origin/master
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule} from '@angular/common/http';
 import { Headers, RequestOptions} from '@angular/http';
@@ -60,12 +55,11 @@ import { RouterModule }   from '@angular/router';
       }
       ])
   ],
-<<<<<<< HEAD
+
   providers: [UserAndTokenService],
   bootstrap: [AppComponent]
-=======
-  providers: [],
-  bootstrap: [ConcertDetailComponent]
->>>>>>> origin/master
+
+
+
 })
 export class AppModule { }
