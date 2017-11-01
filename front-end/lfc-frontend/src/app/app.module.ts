@@ -19,6 +19,6 @@ import { ListConcerts } from './app.component';
     HttpClientModule
   ],
   providers: [],
-  bootstrap: [ConcertDetailComponent,ListComponents]
+  bootstrap: [ConcertDetailComponent,ListConcerts]
 })
 export class AppModule { }
