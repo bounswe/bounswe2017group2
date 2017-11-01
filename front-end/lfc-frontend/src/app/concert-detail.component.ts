@@ -18,8 +18,9 @@ export class ConcertDetailComponent {
   constructor(private fb: FormBuilder,private http: HttpClient,private userAndToken: UserAndTokenService) { // <--- inject FormBuilder 
     this.concertID = 5;                                                                //ID of concert
     userAndToken=null;
+    var token="";
     if(userAndToken)
-      userAndToken.setUserAndToken("8231b4e8600d1322159fdb9e5ff5b2c6946a49e4");
+      userAndToken.setUserAndToken(token);
     this.http.get('http://34.210.127.92:8000/concert/'+this.concertID+'/').subscribe( data => {
       this.concert=data;
     });
