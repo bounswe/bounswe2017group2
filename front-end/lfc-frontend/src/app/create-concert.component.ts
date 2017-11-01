@@ -5,7 +5,7 @@ import {HttpClient,HttpHeaders} from '@angular/common/http';
 @Component({
   selector: 'app-root',
   templateUrl: './create-concert.component.html',
-  styleUrls: ['./create-concert.component.css']
+  styleUrls: ['./design.css']
 })
 export class CreateConcertComponent {
   title = 'app';
@@ -42,7 +42,7 @@ export class CreateConcertComponent {
 	this.isValid=true;	
 	if(this.concertForm.valid){	
 		let formVal=JSON.stringify(this.concertForm.value); 
-		this.http.post('http://localhost:8000/concert/', formVal, {headers: new HttpHeaders().set('Content-Type', 'application/json'),}).subscribe();
+		this.http.post('http://34.210.127.92:8000/concert/', formVal, {headers: new HttpHeaders().set('Content-Type', 'application/json'),}).subscribe();
   	}else{
 		alert("Please fill the form correctly."); 
   	}
