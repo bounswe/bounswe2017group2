@@ -9,8 +9,6 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 
-import datetime
-
 # This code is triggered whenever a new user has been created and saved to the database
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -34,7 +32,7 @@ class RegisteredUser(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email' # we use email as the username
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     class Meta:
@@ -85,7 +83,6 @@ class Concert(models.Model):
     #attendees -will be implemented in RegisteredUser --MANY TO MANY
     #ratings -implemented in Rating
     #concertReports -implemented in Report --ONE TO MANY
-
     class Meta: # artist and date_time combination should be unique for concerts!
         unique_together = ("artist", "date_time")
 
