@@ -1,0 +1,7 @@
+\beamer@endinputifotherversion {3.36pt}
+\select@language {english}
+\beamer@sectionintoc {1}{About LookingForConcerts}{3}{0}{1}
+\beamer@sectionintoc {2}{Milestone 1}{4}{0}{2}
+\beamer@sectionintoc {3}{Deliverables}{6}{0}{3}
+\beamer@sectionintoc {4}{Implications}{7}{0}{4}
+\beamer@sectionintoc {5}{Conclusion}{8}{0}{5}
