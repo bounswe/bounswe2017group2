@@ -46,10 +46,10 @@
     <div id="comments">
         <ul>
             <li *ngFor="let comment of concert.comments">
-            <div class="commentDiv">Username:<br/>{{comment.content}}</div>
+            <div class="commentDiv">{{comment.owner.first_name}} {{comment.owner.last_name}}:<br/>{{comment.content}}</div>
             </li>
         </ul>
-        <div id="commentFormDiv">
+        <div *ngIf="userAndToken.getUserAndToken()" id="commentFormDiv">
         <form id="commentForm" [formGroup]="commentForm" (submit)="sendComment()">
             <textarea rows="5" id="commentBox" class="form-control" formControlName="content"></textarea>
             <button id="addImageButton">Add Image...</button>
