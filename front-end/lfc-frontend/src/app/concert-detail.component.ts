@@ -6,7 +6,8 @@ import {UserAndTokenService} from './user.token.service';
 @Component({
   selector: 'app-root',
   templateUrl: './concert-detail.component.html',
-  styleUrls: ['./design.css']
+  styleUrls: ['./design.css'],
+  providers: [UserAndTokenService]
 })
 export class ConcertDetailComponent {
   title = 'Concert Detail';
@@ -14,12 +15,17 @@ export class ConcertDetailComponent {
   isValid: boolean=false;
   concert: any;
   concertID: any;
-  constructor(private fb: FormBuilder,private http: HttpClient, userAndToken: UserAndTokenService) { // <--- inject FormBuilder 
-    this.concertID = 14;                                                                //ID of concert
+  constructor(private fb: FormBuilder,private http: HttpClient,private userAndToken: UserAndTokenService) { // <--- inject FormBuilder 
+    this.concertID = 5;                                                                //ID of concert
+    userAndToken=null;
+    if(userAndToken)
+      userAndToken.setUserAndToken("8231b4e8600d1322159fdb9e5ff5b2c6946a49e4");
     this.http.get('http://34.210.127.92:8000/concert/'+this.concertID+'/').subscribe( data => {
       this.concert=data;
     });
-    this.createCommentForm();
+    if(userAndToken){
+      this.createCommentForm();
+    }
   }
 
   createCommentForm(){
@@ -29,7 +35,9 @@ export class ConcertDetailComponent {
   }
   sendComment(){
     let formVal=JSON.stringify(this.commentForm.value);
-    this.http.post('http://34.210.127.92:8000/concert/'+this.concertID+'/newcomment/',formVal,{headers: new HttpHeaders().set('Content-Type', 'application/json'),}).subscribe(
+    let header=new HttpHeaders().set('Content-Type', 'application/json');
+    header = header.append('Authorization','Token '+this.userAndToken.getUserAndToken());
+    this.http.post('http://34.210.127.92:8000/concert/'+this.concertID+'/newcomment/',formVal,{headers: header,}).subscribe(
       response => {
         window.location.reload();
     });
