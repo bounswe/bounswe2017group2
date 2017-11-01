@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -37,7 +38,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         recyclerView.setAdapter(adapter);
 
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
-        
+
         getConcerts();
     }
 
@@ -80,4 +81,5 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         startActivity(intent);
         finish();
     }
+
 }

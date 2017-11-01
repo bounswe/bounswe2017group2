@@ -22,22 +22,6 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
 
     public ConcertListAdapter(ConcertListAdapterOnClickHandler clickHandler) {
         mClickHandler = clickHandler;
-
-        // This is dummy data, if get request does not work, it will be appear on list
-        mConcertData = new ArrayList<ConcertDto>();
-        ConcertDto dto = new ConcertDto();
-        dto.name = "dummy";
-        dto.artistName = "dummy";
-        dto.date = "dummy";
-        dto.description = "dummy";
-        dto.minPrice = 1;
-        dto.maxPrice = 2;
-        ConcertLocation loc = new ConcertLocation();
-        loc.venue = "dummy";
-        loc.coordinates = "dummy";
-        dto.location = loc;
-        mConcertData.add(dto);
-        // This is dummy data, if get request does not work, it will be appear on list
     }
 
     public void setConcertData(List<ConcertDto> concertData) {
