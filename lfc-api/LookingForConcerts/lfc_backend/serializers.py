@@ -9,6 +9,7 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
         model=RegisteredUser
         fields = ('email','password','first_name','last_name','age','date_joined','is_active','avatar','comments')
     def create(self, validated_data):
+        validated_data.pop('comments')
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
         return registered_user
