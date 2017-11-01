@@ -125,6 +125,7 @@ public class CreateConcertActivity extends AppCompatActivity {
             public void onResponse(Call<ConcertResponse> call, Response<ConcertResponse> response) {
                 Intent intent = new Intent(CreateConcertActivity.this, ConcertListActivity.class);
                 startActivity(intent);
+                CreateConcertActivity.this.finish();
             }
 
             @Override

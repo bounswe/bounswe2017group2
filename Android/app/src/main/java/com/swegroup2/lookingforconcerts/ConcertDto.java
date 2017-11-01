@@ -51,7 +51,7 @@ public class ConcertDto {
 
     @SerializedName("comments")
     @Expose()
-    public List<String> comments;
+    public List<ConcertComment> comments;
 }
 
 class Tag {
@@ -68,4 +68,10 @@ class ConcertLocation {
     @SerializedName("coordinates")
     @Expose
     public String coordinates;
+}
+
+class ConcertComment {
+    @SerializedName("content")
+    @Expose
+    public String content;
 }
