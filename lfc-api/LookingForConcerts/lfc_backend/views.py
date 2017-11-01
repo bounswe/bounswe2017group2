@@ -253,5 +253,6 @@ def create_comment(request,pk):
     #comment = serializer.save(owner = request.user)
     comment = serializer.save()
     request.user.comments.add(comment)
+    concert.comments.add(comment)
     return Response(serializer.data)
     #need session data of the current user to relate the comment to him/her.
