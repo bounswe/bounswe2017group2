@@ -3,6 +3,7 @@ package com.swegroup2.lookingforconcerts;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 
@@ -70,7 +71,7 @@ class ConcertLocation {
     public String coordinates;
 }
 
-class ConcertComment {
+class ConcertComment implements Serializable {
     @SerializedName("content")
     @Expose
     public String content;

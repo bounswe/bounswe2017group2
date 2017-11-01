@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
         mClickHandler = clickHandler;
     }
 
-    public void setConcertData(List<ConcertDto> concertData){
+    public void setConcertData(List<ConcertDto> concertData) {
         mConcertData = concertData;
         notifyDataSetChanged();
     }
@@ -51,7 +52,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
 
     @Override
     public int getItemCount() {
-        if(mConcertData == null){
+        if (mConcertData == null) {
             return 0;
         }
 
@@ -64,7 +65,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
         public final TextView mConcertDate;
 
 
-        public ConcertListAdapterViewHolder(View view){
+        public ConcertListAdapterViewHolder(View view) {
             super(view);
 
             mConcertName = (TextView) view.findViewById(R.id.concert_name_tv);
