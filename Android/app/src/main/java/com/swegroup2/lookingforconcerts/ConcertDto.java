@@ -3,6 +3,7 @@ package com.swegroup2.lookingforconcerts;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 
@@ -13,6 +14,10 @@ import java.util.List;
 
 public class ConcertDto {
 
+    @SerializedName("concert_id")
+    @Expose()
+    public Integer id;
+
     @SerializedName("name")
     @Expose()
     public String name;
@@ -20,14 +25,6 @@ public class ConcertDto {
     @SerializedName("artist")
     @Expose()
     public String artistName;
-
-//    @SerializedName("latitude")
-//    @Expose()
-//    public Double latitude;
-//
-//    @SerializedName("longtitude")
-//    @Expose()
-//    public Double longtitude;
 
     @SerializedName("date_time")
     @Expose()
@@ -48,11 +45,34 @@ public class ConcertDto {
     @SerializedName("tags")
     @Expose()
     public List<Tag> tags;
+
+    @SerializedName("location")
+    @Expose()
+    public ConcertLocation location;
+
+    @SerializedName("comments")
+    @Expose()
+    public List<ConcertComment> comments;
 }
 
 class Tag {
-    @SerializedName("value")
+    @SerializedName("label")
     @Expose
-    public String value;
+    public String label;
+}
 
+class ConcertLocation {
+    @SerializedName("venue")
+    @Expose
+    public String venue;
+
+    @SerializedName("coordinates")
+    @Expose
+    public String coordinates;
+}
+
+class ConcertComment implements Serializable {
+    @SerializedName("content")
+    @Expose
+    public String content;
 }

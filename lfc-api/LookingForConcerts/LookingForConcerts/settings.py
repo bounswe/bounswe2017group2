@@ -26,12 +26,43 @@ SECRET_KEY = '_07*1$$@eyr(7e-my8phay&th0hgdzx=syk6#dh&f%epga9sjn'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+'''
+WE ADDED THESE
+'''
+
 ALLOWED_HOSTS = ['*']
 
 # our customized user model
 AUTH_USER_MODEL = "lfc_backend.RegisteredUser"
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        #"allauth.account.auth_backends.AuthenticationBackend", # for login with social accounts
+    )
+
+# We are using token authentication (instead of session)
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+    #    'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
+
+BASE_URL = '127.0.0.1:8000/'
+LOGIN_URL = BASE_URL + 'login/'
+
+ADMIN_ENABLED = False
+
+'''
+WE ADDED THESE
+'''
+
 # Application definition
+SITE_ID = 1
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,9 +71,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites', # added
+    # REST framework
     'rest_framework',
-    'lfc_backend.apps.LfcBackendConfig',
-    'corsheaders'
+    'rest_framework.authtoken',
+    'rest_auth',
+    'rest_auth.registration',
+    'lfc_backend.apps.LfcBackendConfig', # our app!
+    'corsheaders',
+    #'allauth',
+    #'allauth.account',
+    #'allauth.socialaccount',
+    #'allauth.socialaccount.providers.facebook', # authentication with Facebook account
+    #'allauth.socialaccount.providers.spotify', # authentication with Spotify account
 ]
 
 MIDDLEWARE = [
@@ -80,6 +121,8 @@ WSGI_APPLICATION = 'LookingForConcerts.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+# we are using sqllite
+# might change in the future if concurrent access or more scalability is required
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

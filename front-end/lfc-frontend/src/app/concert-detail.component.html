@@ -1,0 +1,61 @@
+<head>
+<!--meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<form class="form-wrapper cf">
+    <input type="text" placeholder="Search for a Concert or User" required>
+    <button type="submit">Search</button>
+</form>
+<title>Main Page</title>
+<{% load staticfiles %}>
+<link href="{% 'design.css' %}" rel="stylesheet" type="text/css" /-->
+</head>
+<body>
+<div id="wrapper">
+    <div id="header-wrapper">
+        <div id="header" class="container">
+            <div id="logo">
+                <h1><a href="#">Looking For Concerts</a></h1>
+                <!--{% load staticfiles %}
+                <!-img src="{% static 'concerts.jpg' %}" alt="Party" width="200" height="100"-->
+            </div>
+            <div id="menu">
+                <ul>
+                    <li class="current_page_item"><a href="#">Homepage</a></li>
+                    <li><a href="#">Login / Sign Up</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="concertDetailsDiv">
+    <div id="concertDataDiv">
+        <div id="concertNameDiv">
+            <h1 id="concertName">{{concert.name}}</h1>
+        </div>
+        <div id="concertInfoDiv">
+            <div id="artistDiv"><b>Artist:</b>{{concert.artist}}</div>
+            <div id="dateDiv"><b>Date:</b>{{concert.date_time}}</div>
+            <div id="priceDiv"><b>Price:</b>{{concert.price_min}}-{{concert.price_max}}</div>
+            <div id="locationDiv"><b>Location:</b>{{concert.location.venue}}</div>
+        </div>
+        <div id="concertDescriptionDiv"><p>{{concert.description}}</p></div>
+    </div>
+    <div id="comments">
+        <ul>
+            <li *ngFor="let comment of concert.comments">
+            <div class="commentDiv">{{comment.owner.first_name}} {{comment.owner.last_name}}:<br/>{{comment.content}}</div>
+            </li>
+        </ul>
+        <div *ngIf="userAndToken.getUserAndToken()" id="commentFormDiv">
+        <form id="commentForm" [formGroup]="commentForm" (submit)="sendComment()">
+            <textarea rows="5" id="commentBox" class="form-control" formControlName="content"></textarea>
+            <button id="addImageButton">Add Image...</button>
+            <button id="commentButton" type="submit">Comment</button>
+        </form>
+        </div>
+    </div>
+</div>
+</body>

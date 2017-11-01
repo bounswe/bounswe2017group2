@@ -1,37 +1,43 @@
 from rest_framework import serializers
 from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Rating, Comment
+from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ObjectDoesNotExist
+
 
 class RegisteredUserSerializer(serializers.ModelSerializer):
     class Meta:
         model=RegisteredUser
-        fields = ('username','password','email','first_name','last_name','age',)
+        fields = ('email','password','first_name','last_name','age','date_joined','is_active','avatar','comments')
     def create(self, validated_data):
+        validated_data.pop('comments')
+        validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
         return registered_user
+
+class CommentSerializer(serializers.ModelSerializer):
+    owner = RegisteredUserSerializer(read_only=True)
+    class Meta:
+        model = Comment
+        fields = ('content','owner',)
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('label',)
-        
+
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('venue','coordinates')
 
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = ('content',)
-        
     def create(self, validated_data):
         comment = Comment.objects.create(**validated_data)
         return comment
-    
+
 class ConcertSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     location = LocationSerializer()
-    comments = CommentSerializer(many=True)
+    comments = CommentSerializer(many=True, read_only=True)
     class Meta:
         model = Concert
         fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments')
@@ -41,8 +47,11 @@ class ConcertSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tags_data = validated_data.pop('tags')
         location_data = validated_data.pop('location')
-        validated_data.pop('comments');
-        location = Location.objects.create(**location_data)
+        #validated_data.pop('comments');
+        try:
+            location = Location.objects.get(**location_data)
+        except ObjectDoesNotExist:
+            location = Location.objects.create(**location_data)
         concert = Concert.objects.create(**validated_data)
         for tag_data in tags_data:
             tag = Tag.objects.create(**tag_data)#creates tag object without adding concert to the concerts field<------- NEEDS A CHANGE look at notes 1
