@@ -1,0 +1,8 @@
+.LoginFormComponent{
+    margin-left: auto;
+    margin-right: auto;
+    
+}
+.LoginFormComponent tbody tr td{
+    padding-bottom: 3px;
+}

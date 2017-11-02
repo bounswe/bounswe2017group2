@@ -1,0 +1,52 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    Welcome to {{title}}!
+  </h1>
+</div>
+<form [formGroup]="registrationForm" style="text-align:center" (submit)="register()">
+  <div style="text-align:center">
+  <table class="CreateUserTable">
+
+    <tr> 
+      <td> <label >Name:</label> </td>
+      <td> <input class="form-control" formControlName="first_name"> </td> 
+      <td> <div *ngIf="!registrationForm.get('first_name').valid && isValid">Required</div> </td>
+    </tr>
+
+    <tr> 
+      <td> <label >Surname:</label> </td>
+      <td> <input class="form-control" formControlName="last_name"> </td> 
+      <td> <div *ngIf="!registrationForm.get('last_name').valid && isValid">Required</div> </td>
+    </tr>
+
+    <tr> 
+      <td> <label >Age:</label> </td>
+      <td> <input class="form-control" formControlName="age"> </td> 
+      <td> <div *ngIf="!registrationForm.get('age').valid && isValid">Required</div> </td>
+    </tr>
+
+    <tr> 
+      <td> <label >Email:</label> </td>
+      <td> <input class="form-control" formControlName="email"> </td> 
+      <td> <div *ngIf="!registrationForm.get('email').valid && isValid">Required</div> </td>
+    </tr>
+    
+    <tr>
+      <td> <label >Password:</label> </td>
+      <td> <input class="form-control" formControlName="password"> </td>
+      <td> <div *ngIf="!registrationForm.get('password').valid && isValid">Required</div> </td>
+    </tr>
+
+<!--     
+    <tr>
+        <td> <label >re-Password:</label> </td>
+        <td> <input class="form-control" formControlName="repassword"> </td>
+        <td> <div *ngIf="!registrationForm.get('repassword').valid && isValid">Required</div> </td>
+    </tr> -->
+
+
+  </table>
+  <button type="submit">Submit</button> 
+  </div>
+</form>

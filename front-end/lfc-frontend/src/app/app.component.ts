@@ -1,4 +1,14 @@
 import { Component } from '@angular/core';
+<<<<<<< HEAD
+
+@Component({
+  selector: 'app-root',
+  template: '<h1>{{title}}</h1>   <nav> <a routerLink="/signup">Sign me up</a> <a routerLink="/login">Log me in</a></nav> <router-outlet></router-outlet>'
+})
+export class AppComponent {
+  title = 'Register';
+}
+=======
 import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import {Validators} from '@angular/forms';
 import {HttpClient,HttpHeaders} from '@angular/common/http';
@@ -29,3 +39,4 @@ export class ListConcerts {
 
 
 
+>>>>>>> origin/master
