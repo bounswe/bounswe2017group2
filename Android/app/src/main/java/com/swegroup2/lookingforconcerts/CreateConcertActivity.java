@@ -9,7 +9,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -119,7 +121,10 @@ public class CreateConcertActivity extends AppCompatActivity {
         concertDto.location = concertLocation;
         concertDto.comments = new ArrayList<>();
 
-        Call<ConcertResponse> call = controller.createConcert(concertDto);
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Token " + getIntent().getStringExtra("token"));
+
+        Call<ConcertResponse> call = controller.createConcert(concertDto, map);
         call.enqueue(new Callback<ConcertResponse>() {
             @Override
             public void onResponse(Call<ConcertResponse> call, Response<ConcertResponse> response) {
