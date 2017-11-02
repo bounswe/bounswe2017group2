@@ -18,7 +18,7 @@ import retrofit2.http.Path;
 public interface RestInterfaceController {
 
     @POST("/concert/{id}/newcomment/")
-    Call<ConcertResponse> makeComment(@Path("id") int id, @Body ConcertComment comment);
+    Call<ConcertResponse> makeComment(@Path("id") int id, @Body ConcertComment comment,@HeaderMap Map<String, String> headermap);
 
     @POST("/newconcert/")
     Call<ConcertResponse> createConcert(@Body ConcertDto concertDto, @HeaderMap Map<String, String> headermap);

@@ -1,8 +1,10 @@
 package com.swegroup2.lookingforconcerts;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,7 +23,9 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -152,7 +159,21 @@ public class ConcertDetails extends Fragment {
         ConcertComment concertComment=new ConcertComment();
         concertComment.content=comment;
 
-        Call<ConcertResponse> call = controller.makeComment(concertDto.id,concertComment);
+        String token="";
+        try {
+            JSONObject jsonObj = new JSONObject(getActivity().getIntent().getStringExtra("json"));
+            token = jsonObj.getString("token");
+            Log.v("myTag","tokenL: " + jsonObj.getString("token"));
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Token " + token);
+
+        Call<ConcertResponse> call = controller.makeComment(concertDto.id,concertComment,map);
         call.enqueue(new Callback<ConcertResponse>() {
             @Override
             public void onResponse(Call<ConcertResponse> call, Response<ConcertResponse> response) {
