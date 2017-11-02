@@ -5,11 +5,11 @@ import {HttpClient,HttpHeaders} from '@angular/common/http';
 import { UserAndTokenService } from '../user.token.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location }                 from '@angular/common';
-import 'rxjs/add/operator/switchMap';
+//import 'rxjs/add/operator/switchMap';
 //import {UserAndTokenService} from '../user.token.service';
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-concert-detail',
   templateUrl: './concert-detail.component.html',
   styleUrls: ['./design.css'],
   //providers: [UserAndTokenService]
@@ -23,7 +23,7 @@ export class ConcertDetailComponent implements OnInit{
   token: any=null;
   isLoggedIn: boolean=false;
   private sub: any;
-  constructor(private fb: FormBuilder,private http: HttpClient,private userAndToken: UserAndTokenService,private userService: UserAndTokenService,
+  constructor(private fb: FormBuilder,private http: HttpClient,private userAndToken: UserAndTokenService,
     private route: ActivatedRoute,
     private location: Location) { // <--- inject FormBuilder 
     //this.concertID = 5;                                                                //ID of concert

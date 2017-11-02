@@ -54,6 +54,7 @@ ul {
 #concertDetailsDiv{
     overflow: auto;
     margin: auto;
+    margin-top:20px;
     width: 70%;
     background-color: #800000;
 }

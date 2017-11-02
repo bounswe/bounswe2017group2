@@ -5,7 +5,7 @@ import {HttpClient,HttpHeaders} from '@angular/common/http';
 @Component({
   selector: 'app-create-concert',
   templateUrl: './create-concert.component.html',
-  styleUrls: ['./design.css']
+  styleUrls: ['./create-concert.component.css']
 })
 export class CreateConcertComponent implements OnInit {
   title = 'app';
