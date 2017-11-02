@@ -10,7 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -78,6 +80,17 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
     public void createConcert(View view) {
         Intent intent = new Intent(this, CreateConcertActivity.class);
+        String token="";
+        try {
+            JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("json"));
+            token = jsonObj.getString("token");
+            Log.v("myTag","tokenL: " + jsonObj.getString("token"));
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        intent.putExtra("token", token);
         startActivity(intent);
         finish();
     }
