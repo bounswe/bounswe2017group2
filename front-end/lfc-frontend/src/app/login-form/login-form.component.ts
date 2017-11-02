@@ -42,7 +42,6 @@ export class LoginFormComponent implements OnInit{
 
   register()
   {	
-
 	this.isValid=true;	
 	if(this.registrationForm.valid){	
     let formVal=JSON.stringify(this.registrationForm.value);
@@ -50,10 +49,7 @@ export class LoginFormComponent implements OnInit{
     this.http.post('http://34.210.127.92:8000/login/', formVal, {headers: new HttpHeaders().set('Content-Type', 'application/json'),}).subscribe(
       resp => {console.log(resp);
         this.userAndToken.setUserAndToken(resp["token"]);
-
-        
           this.route.navigate(['/mainpage']);
-        
   });
   	}else{
 		alert("Please fill the form correctly."); 

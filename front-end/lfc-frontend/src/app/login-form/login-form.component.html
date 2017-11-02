@@ -1,12 +1,12 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
+  <div style="text-align:center">
     <h1>
-      Welcome to {{title}}!
+      Welcome to Sign In Page!
     </h1>
   </div>
   <form [formGroup]="registrationForm" style="text-align:center" (submit)="register()">
     <div style="text-align:center">
-    <table class="CreateUserTable">
+    <table style="margin: auto;" class="CreateUserTable">
   
       <tr> 
         <td> <label >Email:</label> </td>
@@ -16,7 +16,7 @@
       
       <tr>
         <td> <label >Password:</label> </td>
-        <td> <input class="form-control" formControlName="password"> </td>
+        <td> <input class="form-control" type="password" formControlName="password"> </td>
         <td> <div *ngIf="!registrationForm.get('password').valid && isValid">Required</div> </td>
       </tr>
   

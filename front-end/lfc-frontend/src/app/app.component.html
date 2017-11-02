@@ -6,6 +6,24 @@
   <base href="/">
   
 </head> -->
-<h1>{{title}}</h1>   <nav> <a routerLink="/signup">Sign me up</a> <a routerLink="/login">Log me in</a><div *ngIf="isLoggedIn"><a routerLink="/signup">Create a concert</a></div> </nav> 
- 
+<!--<h1>{{title}}</h1>   <nav> <a routerLink="/signup">Sign me up</a> <a routerLink="/login">Log me in</a><div *ngIf="isLoggedIn"><a routerLink="/signup">Create a concert</a></div> </nav> 
+-->
+<div id="header-wrapper">
+  <div id="header" class="container">
+      <div id="logo">
+          <h1><a href="#">Looking For Concerts</a></h1>
+          <!--{% load staticfiles %}
+          <!-img src="{% static 'concerts.jpg' %}" alt="Party" width="200" height="100"-->
+      </div>
+      <div id="menu">
+          <ul>
+              <li class="current_page_item"><a href="#">Homepage</a></li>
+              <li><a routerLink="/signup">Sign Up</a></li>
+              <li><a routerLink="/login">Login</a></li>
+              <li><a href="#">Settings</a></li>
+              <li><a href="#">About</a></li>
+          </ul>
+      </div>
+  </div>
+</div>
 <router-outlet></router-outlet>
