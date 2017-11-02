@@ -1,87 +1,11 @@
-<<<<<<< HEAD
 <!--The content below is only a placeholder and can be replaced.-->
 <!-- <div id="fullPage">
   <app-login-form></app-login-form>
 </div> -->
-<head>
+<!-- <head>
   <base href="/">
-</head>
-=======
-<head>
-<!--meta name="keywords" content="" />
-<meta name="description" content="" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<form class="form-wrapper cf">
-    <input type="text" placeholder="Search for a Concert or User" required>
-    <button type="submit">Search</button>
-</form>
-<title>Main Page</title>
-<{% load staticfiles %}>
-<link href="{% 'app.component.css' %}" rel="stylesheet" type="text/css" /-->
-</head>
-<body>
-<div id="wrapper">
-    <div id="header-wrapper">
-        <div id="header" class="container">
-            <div id="logo">
-                <h1><a href="#">Looking For Concerts</a></h1>
-                <!--{% load staticfiles %}
-                <!-img src="{% static 'concerts.jpg' %}" alt="Party" width="200" height="100"-->
-            </div>
-            <div id="menu">
-                <ul>
-                    <li class="current_page_item"><a href="#">Homepage</a></li>
-                    <li><a href="#">Login / Sign Up</a></li>
-                    <li><a href="#">Settings</a></li>
-                    <li><a href="#">About</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-	<div id="page">
-		<div id="content">
-			<div class="post">
-				<h2 class="title"><a href="#">Welcome to LookingForConcerts </a></h2>
-				<div class="entry">
-					
-					<p>This is <strong>Looking For Concerts</strong>, a free application for concert lovers from all around the world. So let's join us and enjoy
-						interactive concert world. </p>
-					<p class="links"><a href="#" class="more">Read More</a><a href="#" title="b0x" class="comments">Comments</a></p>
-				</div>
-			</div>
-		</div>
-
-		<div id="sidebar">
-			<ul>
-				<li>
-					<h2>Categories</h2>
-					<ul>
-						<li><a href="#">My Profile</a></li>
-						<li><a href="#">Upcoming Events</a></li>
-						<li><a href="#">Advanced Search</a></li>
-						<li><a href="#">Create an Event</a></li>
-					</ul>
-				</li>
-			</ul>
-		</div>
-
-		<div id="featured-content">
-		 <li *ngFor="let con of concert">
-            
-		<div id="column1">
-			<h2><br>{{con.name}} {{con.date_time}}</h2>
-			
-			<p>{{con.description}}</p>
-			<p class="links"><a href="#" class="more">Read More</a><a href="#" title="b0x" class="comments">Comments</a></p>
-		</div>
-	
-            </li>
-		
-	</div>
-
-	<div id="footer">
-	<p>&copy; All rights reserved.</p>
-	</div>
-</div>
->>>>>>> origin/master
+  
+</head> -->
+<h1>{{title}}</h1>   <nav> <a routerLink="/signup">Sign me up</a> <a routerLink="/login">Log me in</a><div *ngIf="isLoggedIn"><a routerLink="/signup">Create a concert</a></div> </nav> 
+ 
+<router-outlet></router-outlet>
