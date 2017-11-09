@@ -36,7 +36,6 @@ urlpatterns = [
     url(r'^concerts/$', views.list_concerts), # lists all concerts in DB
     url(r'^newconcert/$', views.create_concert), # creates a concert with provided info
     url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert
-<<<<<<< HEAD
     # COMMENT
     url(r'^concert/(?P<pk>[0-9]+)/newcomment/$', views.create_comment), #adds new comment to the concert specified by its primary key
     # LOCATION
@@ -47,11 +46,6 @@ urlpatterns = [
     # RATING
     #TOKEN
     url(r'^get_token/$', views.get_token) #Returns users token given the email and password of the user
-=======
-    url(r'^users/$',views.list_users), # lists all the users registered to our app
-    url(r'^newuser/$',views.list_users), # creates a new user with provided info
-	url(r'^index/$',views.index, name='index'), # creates a new user with provided info
->>>>>>> 818031f39503e0272a06358cab8ef8d65659643c
     #url('^', include('django.contrib.auth.urls'))
     # auth.urls includes:
     # ^login/$ [name='login']

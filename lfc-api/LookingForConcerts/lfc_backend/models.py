@@ -25,7 +25,7 @@ class RegisteredUser(AbstractBaseUser, PermissionsMixin):
                               unique=True, db_index=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    age = models.IntegerField(_('age'), blank=True)
+    birth_date = models.DateTimeField(_('birth_date'), null=True, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     is_active = models.BooleanField(_('active'), default=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
@@ -78,9 +78,9 @@ class Concert(models.Model):
     artist = models.CharField(max_length= 50)
     location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.CASCADE,  null=True);
 
-    #location -implemented in location --ONE TO MANY
-    #tags -implemented in tag --MANY TO MANY
-    #date_time = models.DateTimeField()
+    # tags - implemented in tag --MANY TO MANY
+    # comments - implemented in comment - ONE TO MANY
+    # date_time = models.DateTimeField()
     date_time = models.CharField(max_length=50)
     description =  models.CharField(max_length=2000, blank=True)
     price_min = models.IntegerField()
