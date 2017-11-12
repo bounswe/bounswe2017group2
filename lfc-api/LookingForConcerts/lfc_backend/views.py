@@ -164,8 +164,8 @@ def create_concert(request):
     '''
     inserts a concert into the database
     '''
-    if (not request.user.is_authenticated):
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    #if (not request.user.is_authenticated):
+        #return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     # user is logged in at this point
     if request.method =='POST':
