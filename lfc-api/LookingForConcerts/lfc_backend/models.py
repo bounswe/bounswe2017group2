@@ -76,8 +76,8 @@ class Concert(models.Model):
     concert_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length= 150)
     artist = models.CharField(max_length= 50)
-    location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.CASCADE,  null=True);
-
+    location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.CASCADE,  null=True)
+    users = models.ManyToManyField(RegisteredUser, related_name = 'concerts')
     # tags - implemented in tag --MANY TO MANY
     # comments - implemented in comment - ONE TO MANY
     # date_time = models.DateTimeField()
@@ -131,6 +131,13 @@ class Rating(models.Model):
     '''
     '''
     rating_id = models.AutoField(primary_key=True)
-    owner = models.ForeignKey(RegisteredUser, related_name = 'concert_ratings', on_delete = models.CASCADE)
-    concert = models.ForeignKey(Concert, related_name = 'ratings', on_delete = models.CASCADE)
-    rating = models.IntegerField();
+    owner = models.ForeignKey(RegisteredUser, related_name = 'concert_ratings', on_delete = models.CASCADE, null=True)
+    concert = models.ForeignKey(Concert, related_name = 'ratings', on_delete = models.CASCADE, null=True)
+    concert_atmosphere = models.IntegerField(null=True)
+    artist_costumes = models.IntegerField(null=True)
+    music_quality = models.IntegerField(null=True)
+    stage_show = models.IntegerField(null=True)
+
+    class Meta: # a user can rate a concert only once.
+        unique_together = ("owner", "concert")
+

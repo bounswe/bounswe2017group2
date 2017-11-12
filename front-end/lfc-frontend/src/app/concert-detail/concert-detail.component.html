@@ -50,7 +50,7 @@
               <div class="commentDiv">{{comment.owner.first_name}} {{comment.owner.last_name}}:<br/>{{comment.content}}</div>
               </li>
           </ul>
-          <div *ngIf="userAndToken.getUserAndToken()" id="commentFormDiv">
+          <div *ngIf="userAndToken.getUserAndToken().token" id="commentFormDiv">
           <form id="commentForm" [formGroup]="commentForm" (submit)="sendComment()">
               <textarea rows="5" id="commentBox" class="form-control" formControlName="content"></textarea>
               <button id="addImageButton">Add Image...</button>

@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 export class UserAndTokenService {
     private userAndToken: Object;
     getUserAndToken(){
-        return this.userAndToken
+        return {token: this.userAndToken}
     }
     setUserAndToken(userAndToken){
         this.userAndToken = userAndToken;

@@ -3,13 +3,14 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment
-from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer
+from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer
 
 from django.contrib.auth import authenticate, login # for user authentication and login
 from django.contrib.auth import logout # for user logout
 from django.contrib.auth.decorators import login_required, permission_required # permissions
 from django.shortcuts import render, redirect
 from rest_framework.authtoken.models import Token
+from django.core.exceptions import ObjectDoesNotExist
 
 # The actual python functions that do the backend work.
 
@@ -89,7 +90,7 @@ def delete_all_users(request):
     print("Deleting all users...")
     try:
         users = RegisteredUser.objects.all()
-    except:
+    except ObjectDoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
     users.delete()
     return Response(status = status.HTTP_204_NO_CONTENT)
@@ -207,6 +208,37 @@ def concert_detail(request, pk):
         concert.delete()
         return Response(status = status.HTTP_204_NO_CONTENT)
 
+@api_view(['GET'])
+def subscribe_concert(request, pk):
+    '''
+    adds user to concerts user list
+    '''
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        concert = Concert.objects.get(pk=pk) 
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    concert.users.add(request.user)
+    return Response(status  = status.HTTP_200_OK)
+
+@api_view(['GET'])
+def unsubscribe_concert(request, pk):
+    '''
+    removes user from concerts user list
+    '''
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        concert = Concert.objects.get(pk=pk) 
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    concert.users.remove(request.user)
+    return Response(status  = status.HTTP_204_NO_CONTENT)
+
+
 '''
 LOCATION FUNCTIONS
 '''
@@ -234,6 +266,42 @@ def location_detail(request, pk):
     serializer = LocationSerializer(location)
     return Response(serializer.data)
 
+'''
+RATING FUNCTIONS
+'''
+
+@api_view(['POST'])
+def rate_concert(request,pk):
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    try:
+        concert = Concert.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    
+    try:
+        concert.users.get(pk=request.user.pk)
+    except:
+        return Response(status = status.HTTP_403_FORBIDDEN)
+
+    try:
+        rating = concert.ratings.get(concert = concert.pk, owner = request.user.pk)
+        serializer = RatingSerializer(rating, data = request.data)
+        if serializer.is_valid():
+            rating = serializer.save()
+            return Response(serializer.data, status = status.HTTP_200_OK)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    except ObjectDoesNotExist:    
+        serializer = RatingSerializer(data = request.data)
+        if serializer.is_valid():
+            rating = serializer.save()
+            request.user.concert_ratings.add(rating)
+            concert.ratings.add(rating)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+    
 '''
 COMMENT FUNCTIONS
 '''
