@@ -5,6 +5,7 @@ import {HttpClient,HttpHeaders} from '@angular/common/http';
 import { UserAndTokenService } from '../user.token.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Location }                 from '@angular/common';
+import { Router } from '@angular/router';
 //import 'rxjs/add/operator/switchMap';
 //import {UserAndTokenService} from '../user.token.service';
 
@@ -25,6 +26,7 @@ export class ConcertDetailComponent implements OnInit{
   private sub: any;
   constructor(private fb: FormBuilder,private http: HttpClient,private userAndToken: UserAndTokenService,
     private route: ActivatedRoute,
+    private router: Router,
     private location: Location) { // <--- inject FormBuilder 
     //this.concertID = 5;                                                                //ID of concert
     //userAndToken=null;
@@ -32,7 +34,7 @@ export class ConcertDetailComponent implements OnInit{
 
   }
   ngOnInit() {
-      this.token=this.userAndToken.getUserAndToken();
+      this.token=this.userAndToken.getUserAndToken().token;
       //this.route.paramMap.switchMap((params: ParamMap) => this.concertID=0+params.get('id'));
       this.sub = this.route.params.subscribe(params => {
         this.concertID = +params['id']; });// (+) converts string 'id' to a number
@@ -41,7 +43,7 @@ export class ConcertDetailComponent implements OnInit{
           this.isLoggedIn=true;
         }
         console.log('concert id is '+this.concertID);  
-        console.log('token is '+this.userAndToken.getUserAndToken());  
+        console.log('token is '+this.userAndToken.getUserAndToken().token);  
         this.http.get('http://34.210.127.92:8000/concert/'+this.concertID+'/').subscribe( data => {
           this.concert=data;
         });
@@ -57,10 +59,11 @@ export class ConcertDetailComponent implements OnInit{
   sendComment(){
     let formVal=JSON.stringify(this.commentForm.value);
     let header=new HttpHeaders().set('Content-Type', 'application/json');
-    header = header.append('Authorization','Token '+this.userAndToken.getUserAndToken());
+    header = header.append('Authorization','Token '+this.userAndToken.getUserAndToken().token);
     this.http.post('http://34.210.127.92:8000/concert/'+this.concertID+'/newcomment/',formVal,{headers: header,}).subscribe(
       response => {
-        window.location.reload();
+        this.router.navigate(['/concert/'+this.concertID]);
+        console.log(this.userAndToken.getUserAndToken().token)
     });
   }
 }
