@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import dj_database_url
-
+import datetime
+from datetime import timedelta
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,24 +39,63 @@ AUTH_USER_MODEL = "lfc_backend.RegisteredUser"
 # Authentication backends
 AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
-        #"allauth.account.auth_backends.AuthenticationBackend", # for login with social accounts
+        "allauth.account.auth_backends.AuthenticationBackend", # for login with social accounts
     )
 
 # We are using token authentication (instead of session)
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-    #    'rest_framework.permissions.IsAuthenticated',
+        #'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication', # for JWT auth
     )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
 BASE_URL = '127.0.0.1:8000/'
 LOGIN_URL = BASE_URL + 'login/'
+LOGIN_REDIRECT_URL = LOGIN_URL
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_PROVIDERS = {
+    'facebook': {
+        'SCOPE': ['email'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'METHOD': 'oauth2',
+        'VERIFIED_EMAIL': False
+    },
+    'spotify': {
+        'SCOPE': ['email'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'METHOD': 'oauth2',
+        'VERIFIED_EMAIL': False
+    }
+}
 
-ADMIN_ENABLED = False
+ADMIN_ENABLED = True
 
 '''
 WE ADDED THESE
@@ -79,11 +119,11 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'lfc_backend.apps.LfcBackendConfig', # our app!
     'corsheaders',
-    #'allauth',
-    #'allauth.account',
-    #'allauth.socialaccount',
-    #'allauth.socialaccount.providers.facebook', # authentication with Facebook account
-    #'allauth.socialaccount.providers.spotify', # authentication with Spotify account
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook', # authentication with Facebook account
+    'allauth.socialaccount.providers.spotify', # authentication with Spotify account
 ]
 
 MIDDLEWARE = [
@@ -106,10 +146,19 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
+                #'django.template.context_processors.debug',
+                #'django.template.context_processors.request',
+                #'django.contrib.auth.context_processors.auth',
+                #'django.contrib.messages.context_processors.messages',
+
             ],
         },
     },

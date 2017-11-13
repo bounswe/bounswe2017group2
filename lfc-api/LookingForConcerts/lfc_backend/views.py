@@ -43,11 +43,10 @@ def list_users(request):
 @api_view(['GET'])
 def user_detail(request,pk):
     '''
-    returns all the registered users
-    most recently joined user is at the top
+    returns a specific registered user
     '''
-    registered_users = RegisteredUser.objects.get(pk=pk)
-    serializer = RegisteredUserSerializer(registered_users)
+    registered_user = RegisteredUser.objects.get(pk=pk)
+    serializer = RegisteredUserSerializer(registered_user)
     return Response(serializer.data)
 
 @api_view(['POST'])
@@ -164,8 +163,9 @@ def create_concert(request):
     '''
     inserts a concert into the database
     '''
+    print(request.user)
     if (not request.user.is_authenticated):
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
 
     # user is logged in at this point
     if request.method =='POST':
@@ -217,7 +217,7 @@ def subscribe_concert(request, pk):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     try:
-        concert = Concert.objects.get(pk=pk) 
+        concert = Concert.objects.get(pk=pk)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
     concert.users.add(request.user)
@@ -232,7 +232,7 @@ def unsubscribe_concert(request, pk):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     try:
-        concert = Concert.objects.get(pk=pk) 
+        concert = Concert.objects.get(pk=pk)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
     concert.users.remove(request.user)
@@ -274,12 +274,12 @@ RATING FUNCTIONS
 def rate_concert(request,pk):
     if (not request.user.is_authenticated):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
-    
+
     try:
         concert = Concert.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    
+
     try:
         concert.users.get(pk=request.user.pk)
     except:
@@ -292,7 +292,7 @@ def rate_concert(request,pk):
             rating = serializer.save()
             return Response(serializer.data, status = status.HTTP_200_OK)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-    except ObjectDoesNotExist:    
+    except ObjectDoesNotExist:
         serializer = RatingSerializer(data = request.data)
         if serializer.is_valid():
             rating = serializer.save()
@@ -301,7 +301,7 @@ def rate_concert(request,pk):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-    
+
 '''
 COMMENT FUNCTIONS
 '''
