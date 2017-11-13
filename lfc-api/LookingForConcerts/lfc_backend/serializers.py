@@ -24,7 +24,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ('label',)
+        fields = ('value','context')
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:

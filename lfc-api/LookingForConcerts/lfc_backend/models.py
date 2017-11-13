@@ -31,7 +31,7 @@ class RegisteredUser(AbstractUser):
     # is_staff
     # first_name
     # last_name
-    birth_date = models.DateTimeField(_('birth_date'), null=True, blank=True)
+    birth_date = models.DateField(_('birth_date'), null=True, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
 
@@ -42,6 +42,12 @@ class Location(models.Model):
     venue = models.CharField(max_length = 200)
     coordinates = models.CharField(max_length=200)
 
+class Tag(models.Model):
+    '''
+    '''
+    tag_id = models.AutoField(primary_key=True)
+    value = models.CharField(max_length=20)
+    context = models.CharField(max_length=20)
 
 class Concert(models.Model):
     concert_id = models.AutoField(primary_key=True)
@@ -52,6 +58,7 @@ class Concert(models.Model):
     location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.CASCADE,  null=True)
     users = models.ManyToManyField(RegisteredUser, related_name = 'concerts')
     # tags - implemented in tag --MANY TO MANY
+    tags = models.ManyToManyField(Tag, related_name = 'concerts', blank=True)
     # comments - implemented in comment - ONE TO MANY
     # date_time = models.DateTimeField()
     date_time = models.CharField(max_length=50)
@@ -70,14 +77,6 @@ class Comment(models.Model):
     owner = models.ForeignKey(RegisteredUser, related_name = 'comments', on_delete = models.CASCADE , null = True) #----------> Needs session functionality
     concert_id = models.ForeignKey(Concert, related_name = 'comments', on_delete = models.CASCADE, null = True)
     content = models.CharField(max_length = 600, default = "")
-
-
-class Tag(models.Model):
-    '''
-    '''
-    tag_id = models.AutoField(primary_key=True)
-    concerts = models.ManyToManyField(Concert, related_name = 'tags') #might need on_delete = DO_NOTHING but couldn't find on_delete as a parameter in its documentation
-    label = models.CharField(max_length=50)
 
 
 class Report(models.Model):
