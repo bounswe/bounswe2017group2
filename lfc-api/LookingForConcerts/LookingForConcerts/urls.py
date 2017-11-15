@@ -18,11 +18,36 @@ from django.conf.urls import url
 from django.contrib import admin
 from rest_framework.authtoken import views as tokenviews #for acquiring token for a user
 from lfc_backend import views
+from django.conf.urls import include
+
+from django.views import generic
+from rest_framework.schemas import get_schema_view
 
 from LookingForConcerts import settings
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
+
+
 
 urlpatterns = [
+    # JWT AUTHENTICATION
+    #url(r'^api/token/$', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    #url(r'^api/token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
+
+    url(r'^$', generic.RedirectView.as_view(
+         url='/api/', permanent=False)),
+    url(r'^api/$', get_schema_view()),
+    url(r'^api/auth/', include(
+        'rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/auth/token/obtain/$', TokenObtainPairView.as_view()),
+    url(r'^api/auth/token/refresh/$', TokenRefreshView.as_view()),
+    url(r'^api/auth/token/verify/$', TokenVerifyView.as_view()),
+    #url(r'^accounts/', include('allauth.urls')),
+
     # USER
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^delete_user/(?P<pk>[0-9]+)/$', views.delete_user, name='delete_user'),
@@ -63,7 +88,7 @@ urlpatterns = [
 ]
 
 if settings.ADMIN_ENABLED:
-    urlpatterns += patterns('',
-        (r'^admin/(.*)', include(admin.site.urls)),
+    urlpatterns.append(
+        url(r'^admin/', include(admin.site.urls)),
         # ..maybe other stuff you want to be dev-only, etc...
         )

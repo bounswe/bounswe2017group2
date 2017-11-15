@@ -9,7 +9,7 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
     concerts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model=RegisteredUser
-        fields = ('email','password','first_name','last_name','birth_date','date_joined','is_active','avatar','comments','concerts')
+        fields = ('username','email','password','first_name','last_name','birth_date','date_joined','is_active','avatar','comments','concerts')
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
@@ -50,7 +50,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
-        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','users','ratings')
+        fields = ('concert_id','name','artist_name','date_time','description','price_min','price_max','tags','location','comments','users','ratings')
         # location should be retrieved from Google API
         # tags should be retrieved from a 3rd party semantic tag repository such as; Wikidata.
 
