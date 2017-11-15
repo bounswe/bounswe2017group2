@@ -26,10 +26,17 @@ public interface RestInterfaceController {
     @GET("/concerts/")
     Call<List<ConcertDto>> getAllConcerts();
 
+    @GET("/me/")
+    Call<UserDto> getUserProfile(@HeaderMap Map<String, String> headermap);
+
 
     @GET("/concert/{id}/subscribe/")
     Call<ConcertResponse> attend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
 
     @POST("/signup/")
     Call<UserResponse> signUp(@Body UserDto userDto);
+
+    @POST("/api/auth/token/refresh/")
+    Call<RefreshResponse> refresh(@Body RefreshDto refreshDto);
+
 }

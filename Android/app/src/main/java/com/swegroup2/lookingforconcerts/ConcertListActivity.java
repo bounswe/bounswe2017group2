@@ -13,7 +13,9 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,10 +29,30 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     private Button createConcertButton;
     private Button logoutButton;
 
+    private Button profile;
+
+    String refreshToken = "";
+    String accessToken = "";
+
+    UserDto userProfileInfo = new UserDto();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_concert_list);
+
+
+        try {
+            JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("json"));
+            refreshToken = jsonObj.getString("refresh");
+            accessToken = jsonObj.getString("access");
+            Log.v("myTag", "refresh: " + refreshToken);
+            Log.v("myTag", "access: " + accessToken);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         recyclerView = (RecyclerView) findViewById(R.id.concert_list_rv);
 
@@ -41,7 +63,9 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         recyclerView.setAdapter(adapter);
 
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
-        logoutButton = (Button) findViewById(R.id.logout_btn);
+        profile = (Button) findViewById(R.id.profile);
+
+        //logoutButton = (Button) findViewById(R.id.logout_btn);
 
         getConcerts();
     }
@@ -58,6 +82,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     }
 
     private void getConcerts() {
+        refresh();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -80,21 +105,72 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         });
     }
 
+    public void refresh() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Token " + refreshToken);
+
+        RefreshDto refreshDto = new RefreshDto();
+        refreshDto.refresh = refreshToken;
+
+        Call<RefreshResponse> call = controller.refresh(refreshDto);
+
+        call.enqueue(new Callback<RefreshResponse>() {
+            @Override
+            public void onResponse(Call<RefreshResponse> call, Response<RefreshResponse> response) {
+
+                if (accessToken != response.body().access) {
+
+                    accessToken = response.body().access;
+                    Log.d("FS", "accessToken " + accessToken);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<RefreshResponse> call, Throwable t) {
+                Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void profile(View view) {
+        refresh();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Token " + accessToken);
+
+        Call<UserDto> call = controller.getUserProfile(map);
+
+        call.enqueue(new Callback<UserDto>() {
+            @Override
+            public void onResponse(Call<UserDto> call, Response<UserDto> response) {
+
+                Toast.makeText(ConcertListActivity.this,response.body().username, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<UserDto> call, Throwable t) {
+                Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public void createConcert(View view) {
         Intent intent = new Intent(this, CreateConcertActivity.class);
-        String refreshToken="";
-        String accessToken="";
-        try {
-            JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("json"));
-            refreshToken = jsonObj.getString("refresh");
-            accessToken = jsonObj.getString("access");
-            Log.v("myTag","refresh: " + refreshToken);
-            Log.v("myTag","access: " + accessToken);
 
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         intent.putExtra("refresh", refreshToken);
         intent.putExtra("access", accessToken);
 
@@ -102,7 +178,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         finish();
     }
 
-    public void logoutFunc(View view){
+    public void logoutFunc(View view) {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();

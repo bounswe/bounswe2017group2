@@ -12,7 +12,6 @@ import java.util.List;
  */
 
 
-
 public class ConcertDto implements Serializable {
 
     @SerializedName("concert_id")
@@ -55,22 +54,22 @@ public class ConcertDto implements Serializable {
     @Expose()
     public List<ConcertComment> comments;
 
-    @SerializedName("users")
+    @SerializedName("attendees")
     @Expose()
-    public List<Integer> users;
+    public List<Integer> attendees;
 
     @SerializedName("ratings")
     @Expose()
-    public List<Integer> ratings;
+    public List<Ratings> ratings;
 }
 
-class Tag implements Serializable{
+class Tag implements Serializable {
     @SerializedName("label")
     @Expose
     public String label;
 }
 
-class ConcertLocation implements Serializable{
+class ConcertLocation implements Serializable {
     @SerializedName("venue")
     @Expose
     public String venue;
@@ -102,7 +101,7 @@ class Artist implements Serializable {
 
 }
 
-class Image implements Serializable{
+class Image implements Serializable {
     @SerializedName("url")
     @Expose
     public String url;
@@ -112,7 +111,27 @@ class Image implements Serializable{
     @SerializedName("width")
     @Expose
     public Integer width;
+}
 
+class Ratings implements Serializable {
+    @SerializedName("concert_atmosphere")
+    @Expose
+    public Integer concert_atmosphere;
+    @SerializedName("artist_costumes")
+    @Expose
+    public Integer artist_costumes;
+    @SerializedName("music_quality")
+    @Expose
+    public Integer music_quality;
+    @SerializedName("stage_show")
+    @Expose
+    public Integer stage_show;
+    @SerializedName("owner")
+    @Expose
+    public Integer owner;
+    @SerializedName("concert")
+    @Expose
+    public Integer concert;
 
 }
 
