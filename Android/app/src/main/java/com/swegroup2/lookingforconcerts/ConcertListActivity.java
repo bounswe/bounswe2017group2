@@ -25,6 +25,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     private RecyclerView recyclerView;
     private ConcertListAdapter adapter;
     private Button createConcertButton;
+    private Button logoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         recyclerView.setAdapter(adapter);
 
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
+        logoutButton = (Button) findViewById(R.id.logout_btn);
 
         getConcerts();
     }
@@ -80,19 +82,29 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
     public void createConcert(View view) {
         Intent intent = new Intent(this, CreateConcertActivity.class);
-        String token="";
+        String refreshToken="";
+        String accessToken="";
         try {
             JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("json"));
-            token = jsonObj.getString("token");
-            Log.v("myTag","tokenL: " + jsonObj.getString("token"));
+            refreshToken = jsonObj.getString("refresh");
+            accessToken = jsonObj.getString("access");
+            Log.v("myTag","refresh: " + refreshToken);
+            Log.v("myTag","access: " + accessToken);
 
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        intent.putExtra("token", token);
+        intent.putExtra("refresh", refreshToken);
+        intent.putExtra("access", accessToken);
+
         startActivity(intent);
         finish();
     }
 
+    public void logoutFunc(View view){
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

@@ -21,6 +21,15 @@
             android:onClick="createConcert"
             android:text="Create Concert" />
 
+        <Button
+            android:id="@+id/logout_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:onClick="logoutFunc"
+            android:text="Logout" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/concert_list_rv"
             android:layout_width="match_parent"
@@ -28,6 +37,9 @@
             android:layout_margin="8dp">
 
         </android.support.v7.widget.RecyclerView>
+
+
+
 
     </LinearLayout>
 </FrameLayout>

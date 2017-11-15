@@ -147,11 +147,14 @@ public class ConcertDetails extends Fragment {
         ConcertComment concertComment = new ConcertComment();
         concertComment.content = comment;
 
-        String token = "";
+        String refreshToken = "";
+        String accessToken = "";
         try {
             JSONObject jsonObj = new JSONObject(getActivity().getIntent().getStringExtra("json"));
-            token = jsonObj.getString("token");
-            Log.v("myTag", "tokenL: " + jsonObj.getString("token"));
+            refreshToken = jsonObj.getString("refresh");
+            accessToken = jsonObj.getString("access");
+            Log.v("myTag","refresh: " + refreshToken);
+            Log.v("myTag","access: " + accessToken);
 
 
         } catch (JSONException e) {
@@ -159,7 +162,7 @@ public class ConcertDetails extends Fragment {
         }
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Token " + token);
+        map.put("Authorization", "Token " + accessToken);
 
         Call<ConcertResponse> call = controller.makeComment(concertDto.id, concertComment, map);
         call.enqueue(new Callback<ConcertResponse>() {
