@@ -12,7 +12,7 @@ import java.util.List;
  */
 
 
-public class ConcertDto {
+public class ConcertDto implements Serializable {
 
     @SerializedName("concert_id")
     @Expose()
@@ -24,7 +24,7 @@ public class ConcertDto {
 
     @SerializedName("artist")
     @Expose()
-    public String artistName;
+    public Artist artist;
 
     @SerializedName("date_time")
     @Expose()
@@ -53,15 +53,23 @@ public class ConcertDto {
     @SerializedName("comments")
     @Expose()
     public List<ConcertComment> comments;
+
+    @SerializedName("users")
+    @Expose()
+    public List<Integer> users;
+
+    @SerializedName("ratings")
+    @Expose()
+    public List<Integer> ratings;
 }
 
-class Tag {
+class Tag implements Serializable{
     @SerializedName("label")
     @Expose
     public String label;
 }
 
-class ConcertLocation {
+class ConcertLocation implements Serializable{
     @SerializedName("venue")
     @Expose
     public String venue;
@@ -76,3 +84,34 @@ class ConcertComment implements Serializable {
     @Expose
     public String content;
 }
+
+class Artist implements Serializable {
+    @SerializedName("name")
+    @Expose
+    public String name;
+    @SerializedName("spotify_id")
+    @Expose
+    public String spotifyId;
+    @SerializedName("concerts")
+    @Expose
+    public List<Integer> concerts;
+    @SerializedName("images")
+    @Expose
+    public List<Image> images;
+
+}
+
+class Image implements Serializable{
+    @SerializedName("url")
+    @Expose
+    public String url;
+    @SerializedName("height")
+    @Expose
+    public Integer height;
+    @SerializedName("width")
+    @Expose
+    public Integer width;
+
+
+}
+

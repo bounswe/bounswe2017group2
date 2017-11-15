@@ -101,7 +101,7 @@ public class CreateConcertActivity extends AppCompatActivity {
 
         ConcertDto concertDto = new ConcertDto();
         concertDto.name = concertName;
-        concertDto.artistName = artistName;
+        concertDto.artist.name = artistName;
         concertDto.date = date;
         concertDto.description = description;
         concertDto.minPrice = minPrice;
