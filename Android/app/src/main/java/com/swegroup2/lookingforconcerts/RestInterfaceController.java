@@ -18,12 +18,15 @@ import retrofit2.http.Path;
 public interface RestInterfaceController {
 
     @POST("/concert/{id}/newcomment/")
-    Call<ConcertResponse> makeComment(@Path("id") int id, @Body ConcertComment comment,@HeaderMap Map<String, String> headermap);
+    Call<ConcertResponse> makeComment(@Path("id") int id, @Body ConcertComment comment, @HeaderMap Map<String, String> headermap);
 
     @POST("/newconcert/")
     Call<ConcertResponse> createConcert(@Body ConcertDto concertDto, @HeaderMap Map<String, String> headermap);
 
-    @GET("/concerts")
+    @GET("/concerts/")
     Call<List<ConcertDto>> getAllConcerts();
+
+    @GET("/concert/{id}/subscribe/")
+    Call<ConcertResponse> attend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
 
 }

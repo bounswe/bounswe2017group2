@@ -45,7 +45,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
     public void onBindViewHolder(ConcertListAdapterViewHolder holder, int position) {
         ConcertDto concert = mConcertData.get(position);
 
-        holder.mArtistName.setText(concert.artistName);
+        holder.mArtistName.setText(concert.artist.name);
         holder.mConcertName.setText(concert.name);
         holder.mConcertDate.setText(concert.date);
     }

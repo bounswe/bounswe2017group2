@@ -363,6 +363,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onPostExecute(String result) {
             if(token.equals("")){
                 Toast.makeText(mContext, "Yanlış bilgi girdiniz!", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(LoginActivity.this, ConcertListActivity.class);
+                i.putExtra("json",token);
+                startActivity(i);
             }
             else{
                 Intent i = new Intent(LoginActivity.this, ConcertListActivity.class);
