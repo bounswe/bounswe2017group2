@@ -31,6 +31,8 @@
         </activity>
         <activity android:name=".ConcertListActivity">
         </activity>
+        <activity android:name=".SignupActivity">
+        </activity>
 
     </application>
 

@@ -12,6 +12,7 @@ import java.util.List;
  */
 
 
+
 public class ConcertDto implements Serializable {
 
     @SerializedName("concert_id")

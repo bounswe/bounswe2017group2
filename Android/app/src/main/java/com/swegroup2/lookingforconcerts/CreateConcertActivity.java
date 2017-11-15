@@ -122,7 +122,7 @@ public class CreateConcertActivity extends AppCompatActivity {
         concertDto.comments = new ArrayList<>();
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Token " + getIntent().getStringExtra("token"));
+        map.put("Authorization", "Token " + getIntent().getStringExtra("refresh"));
 
         Call<ConcertResponse> call = controller.createConcert(concertDto, map);
         call.enqueue(new Callback<ConcertResponse>() {

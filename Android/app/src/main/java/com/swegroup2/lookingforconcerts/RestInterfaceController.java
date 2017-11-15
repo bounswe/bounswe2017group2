@@ -26,7 +26,10 @@ public interface RestInterfaceController {
     @GET("/concerts/")
     Call<List<ConcertDto>> getAllConcerts();
 
+
     @GET("/concert/{id}/subscribe/")
     Call<ConcertResponse> attend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
 
+    @POST("/signup/")
+    Call<UserResponse> signUp(@Body UserDto userDto);
 }
