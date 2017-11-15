@@ -39,7 +39,7 @@ AUTH_USER_MODEL = "lfc_backend.RegisteredUser"
 # Authentication backends
 AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
-        "allauth.account.auth_backends.AuthenticationBackend", # for login with social accounts
+        #"allauth.account.auth_backends.AuthenticationBackend", # for login with social accounts
     )
 
 # We are using token authentication (instead of session)
@@ -78,22 +78,22 @@ SIMPLE_JWT = {
 
 BASE_URL = '127.0.0.1:8000/'
 LOGIN_URL = BASE_URL + 'login/'
-LOGIN_REDIRECT_URL = LOGIN_URL
-SOCIALACCOUNT_QUERY_EMAIL = True
-SOCIALACCOUNT_PROVIDERS = {
-    'facebook': {
-        'SCOPE': ['email'],
-        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
-        'METHOD': 'oauth2',
-        'VERIFIED_EMAIL': False
-    },
-    'spotify': {
-        'SCOPE': ['email'],
-        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
-        'METHOD': 'oauth2',
-        'VERIFIED_EMAIL': False
-    }
-}
+#LOGIN_REDIRECT_URL = LOGIN_URL
+#SOCIALACCOUNT_QUERY_EMAIL = True
+#SOCIALACCOUNT_PROVIDERS = {
+#     'facebook': {
+#         'SCOPE': ['email'],
+#         'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+#         'METHOD': 'oauth2',
+#         'VERIFIED_EMAIL': False
+#     },
+#     'spotify': {
+#         'SCOPE': ['email'],
+#         'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+#         'METHOD': 'oauth2',
+#         'VERIFIED_EMAIL': False
+#     }
+# }
 
 ADMIN_ENABLED = True
 
@@ -119,11 +119,11 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'lfc_backend.apps.LfcBackendConfig', # our app!
     'corsheaders',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.facebook', # authentication with Facebook account
-    'allauth.socialaccount.providers.spotify', # authentication with Spotify account
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
+    # 'allauth.socialaccount.providers.facebook', # authentication with Facebook account
+    # 'allauth.socialaccount.providers.spotify', # authentication with Spotify account
 ]
 
 MIDDLEWARE = [
@@ -146,18 +146,18 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.contrib.auth.context_processors.auth',
+                # 'django.contrib.auth.context_processors.auth',
+                # 'django.template.context_processors.debug',
+                # 'django.template.context_processors.i18n',
+                # 'django.template.context_processors.media',
+                # 'django.template.context_processors.static',
+                # 'django.template.context_processors.tz',
+                # 'django.contrib.messages.context_processors.messages',
+                # 'django.template.context_processors.request',
                 'django.template.context_processors.debug',
-                'django.template.context_processors.i18n',
-                'django.template.context_processors.media',
-                'django.template.context_processors.static',
-                'django.template.context_processors.tz',
-                'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
-                #'django.template.context_processors.debug',
-                #'django.template.context_processors.request',
-                #'django.contrib.auth.context_processors.auth',
-                #'django.contrib.messages.context_processors.messages',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
 
             ],
         },

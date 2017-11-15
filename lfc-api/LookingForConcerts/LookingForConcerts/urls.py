@@ -35,9 +35,6 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     # JWT AUTHENTICATION
-    #url(r'^api/token/$', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    #url(r'^api/token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
-
     url(r'^$', generic.RedirectView.as_view(
          url='/api/', permanent=False)),
     url(r'^api/$', get_schema_view()),
@@ -46,8 +43,6 @@ urlpatterns = [
     url(r'^api/auth/token/obtain/$', TokenObtainPairView.as_view()),
     url(r'^api/auth/token/refresh/$', TokenRefreshView.as_view()),
     url(r'^api/auth/token/verify/$', TokenVerifyView.as_view()),
-    #url(r'^accounts/', include('allauth.urls')),
-
     # USER
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^delete_user/(?P<pk>[0-9]+)/$', views.delete_user, name='delete_user'),
@@ -75,8 +70,6 @@ urlpatterns = [
     # TAG
     # REPORT
     # RATING
-    #TOKEN
-    url(r'^get_token/$', views.get_token) #Returns users token given the email and password of the user
     #url('^', include('django.contrib.auth.urls'))
     # auth.urls includes:
     # ^login/$ [name='login']

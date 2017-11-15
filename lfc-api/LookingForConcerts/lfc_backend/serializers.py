@@ -63,7 +63,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
-        fields = ('concert_id','name','artist_name','date_time','description','price_min','price_max','tags','location','comments','users','ratings')
+        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','users','ratings')
         # location should be retrieved from Google API
         # tags should be retrieved from a 3rd party semantic tag repository such as; Wikidata.
 
