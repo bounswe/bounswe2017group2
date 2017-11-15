@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment
-from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer
+from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist
+from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
 
 from django.contrib.auth import authenticate, login # for user authentication and login
 from django.contrib.auth import logout # for user logout
@@ -11,6 +11,10 @@ from django.contrib.auth.decorators import login_required, permission_required #
 from django.shortcuts import render, redirect
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ObjectDoesNotExist
+import spotipy
+import traceback
+import json
+from spotipy.oauth2 import SpotifyClientCredentials
 
 # The actual python functions that do the backend work.
 
@@ -168,14 +172,42 @@ def create_concert(request):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     # user is logged in at this point
-    if request.method =='POST':
-        serializer = ConcertSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    artist_data = request.data.pop('artist')
+    images_data = artist_data.pop('images')
+    artist = None
+    #artist lookup in db
+    try:
+        artist = Artist.objects.get(spotify_id=artist_data['spotify_id'])
+    except:
+        #artist creation
+        try:
+            artist_serializer = ArtistSerializer(data = artist_data)
+            if artist_serializer.is_valid():
+                artist = artist_serializer.save()
+                print("2")
+        except:
+            print("1")
+            return Response(artist_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+        #images creation and relating with artist
+        for image_data in images_data:
+            try:
+                image_serializer = ImageSerializer(data = image_data)
+                if image_serializer.is_valid():
+                    image = image_serializer.save()
+                    artist.images.add(image) #Exception
+            except:
+                traceback.print_exc()
+                return Response(image_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+    #concert creation and relating with artist
+    serializer = ConcertSerializer(data = request.data)
+    if serializer.is_valid():
+        concert = serializer.save()
+        artist.concerts.add(concert)
+        return Response(serializer.data, status = status.HTTP_201_CREATED)
+    return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
 
 # also gets a primary key as a parameter
 @api_view(['GET','PUT','DELETE'])
@@ -240,9 +272,24 @@ def unsubscribe_concert(request, pk):
 
 
 '''
-LOCATION FUNCTIONS
+ARTIST FUNCTIONS
 '''
+@api_view(['POST'])
+def search_artists(request):
+    data = request.data
+    client_credentials_manager = SpotifyClientCredentials(client_id='60ab66df7413492bbc86150d7a3617d7', client_secret='007ccb30ee7e4eb98478b7a34fc869e4')
+    spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    spotifyresults = spotify.search(q='artist:'+data['name'], type='artist')
+    spotifyresults = spotifyresults['artists']['items']
+    results = []
+    for spotifyresult in spotifyresults:
+        result = {'images':spotifyresult['images'], 'spotify_id':spotifyresult['id'], 'name':spotifyresult['name']}
+        results.append(result)
+    return Response(results, status = status.HTTP_200_OK)
 
+'''
+LOCATION FUNCTIONS  
+'''
 @api_view(['GET'])
 def list_locations(request):
     '''

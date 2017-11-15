@@ -78,10 +78,22 @@ class Tag(models.Model):
     value = models.CharField(max_length=20)
     context = models.CharField(max_length=20)
 
+class Artist(models.Model):
+    #images - implemented in Image --ONE TO MANY
+    #concerts - implemented on Concert --ONE TO MANY
+    name = models.CharField(max_length= 150)
+    spotify_id = models.CharField(max_length= 150, unique=True)
+
+class Image(models.Model):
+    artist = models.ForeignKey(Artist, related_name = 'images', on_delete = models.CASCADE, null = True)
+    height  = models.IntegerField()
+    url = models.URLField()
+    width = models.IntegerField()
+
 class Concert(models.Model):
     concert_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length= 150)
-    artist = models.CharField(max_length= 50)
+    artist = models.ForeignKey(Artist, related_name = 'concerts', on_delete = models.DO_NOTHING, null = True)
     location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.CASCADE,  null=True)
     users = models.ManyToManyField(RegisteredUser, related_name = 'concerts')
     # tags - implemented in tag --MANY TO MANY

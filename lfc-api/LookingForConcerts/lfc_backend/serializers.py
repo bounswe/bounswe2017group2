@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Rating, Comment
+from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Rating, Comment, Image, Artist
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -42,9 +42,22 @@ class RatingSerializer(serializers.ModelSerializer):
         model = Rating
         fields = ('concert_atmosphere', 'artist_costumes', 'music_quality', 'stage_show', 'owner', 'concert')
 
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ('url','height','width')
+
+class ArtistSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True, read_only=True)
+    concerts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    class Meta:
+        model = Artist
+        fields = ('name','spotify_id','concerts','images')
+
 class ConcertSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     location = LocationSerializer()
+    artist = ArtistSerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     ratings = RatingSerializer(many=True, read_only=True)
     users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
