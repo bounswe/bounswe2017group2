@@ -19,18 +19,6 @@ from spotipy.oauth2 import SpotifyClientCredentials
 # The actual python functions that do the backend work.
 
 '''
-TOKEN FUNCTIONS
-'''
-
-@api_view(['POST'])
-def get_token(request):
-    email = request.data['email']
-    password = request.data['password']
-    user = authenticate(request, username=email, password=password)
-    token, created = Token.objects.get_or_create(user=user)
-    return Response({'token': token.key})
-
-'''
 USER FUNCTIONS
 '''
 @api_view(['GET'])
@@ -63,9 +51,12 @@ def signup(request):
         # SIGNUP
         registered_user = serializer.save() # save the user to the database
         # LOGIN
-        email = registered_user.email # username
+        username = registered_user.username # username
         password = request.data['password'] # unhashed password that the user entered
-        user = authenticate(username=email, password=password) # authenticate() hashes the given function inside before checking
+
+        # MIGHT ADD SOME REQUIREMENTS FOR PASSWORD. E.G. SHOULD CONTAIN AT LEAST A NUMBER, A CAPITAL AND SMALL LETTER ETC.
+
+        user = authenticate(username=username, password=password) # authenticate() hashes the given function inside before checking
         login(request,user) # log in the user right after signup
         return Response(serializer.data, status = status.HTTP_201_CREATED) # success!
     else:
@@ -103,10 +94,10 @@ def registered_user_login(request):
     '''
     logs in the user to the system
     '''
-    email = request.data['email']
+    username = request.data['username']
     password = request.data['password'] # unhashed password that the user entered
-    print(email, password)
-    user = authenticate(request, username=email, password=password) # authenticate() hashes the given function inside before checking
+    print(username, password)
+    user = authenticate(request, username=username, password=password) # authenticate() hashes the given function inside before checking
 
     if user is not None:
         if user.is_active:
@@ -288,7 +279,7 @@ def search_artists(request):
     return Response(results, status = status.HTTP_200_OK)
 
 '''
-LOCATION FUNCTIONS  
+LOCATION FUNCTIONS
 '''
 @api_view(['GET'])
 def list_locations(request):

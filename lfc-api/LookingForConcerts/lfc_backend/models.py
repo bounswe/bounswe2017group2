@@ -31,6 +31,12 @@ class RegisteredUser(AbstractUser):
     # is_staff
     # first_name
     # last_name
+    email = models.EmailField(
+        _('Email Address'), blank=False, unique=True,
+        error_messages={
+            'unique': _("A user with that email already exists."),
+        }
+    )
     birth_date = models.DateField(_('birth_date'), null=True, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
@@ -80,7 +86,7 @@ class Concert(models.Model):
     #concertReports -implemented in Report --ONE TO MANY
 
     class Meta: # artist and date_time combination should be unique for concerts!
-        unique_together = ("artist_name", "date_time")
+        unique_together = ("artist", "date_time")
 
 class Comment(models.Model):
     comment_id = models.AutoField(primary_key=True)
