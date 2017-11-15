@@ -72,16 +72,14 @@ class Concert(models.Model):
     name = models.CharField(max_length= 150)
     artist = models.ForeignKey(Artist, related_name = 'concerts', on_delete = models.DO_NOTHING, null = True)
     location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.CASCADE,  null=True)
-    users = models.ManyToManyField(RegisteredUser, related_name = 'concerts')
+    attendees = models.ManyToManyField(RegisteredUser, related_name = 'concerts')
     # tags - implemented in tag --MANY TO MANY
     tags = models.ManyToManyField(Tag, related_name = 'concerts', blank=True)
     # comments - implemented in comment - ONE TO MANY
-    # date_time = models.DateTimeField()
     date_time = models.CharField(max_length=50)
     description =  models.CharField(max_length=2000, blank=True)
     price_min = models.IntegerField()
     price_max = models.IntegerField()
-    #attendees -will be implemented in RegisteredUser --MANY TO MANY
     #ratings -implemented in Rating
     #concertReports -implemented in Report --ONE TO MANY
 

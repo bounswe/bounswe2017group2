@@ -9,7 +9,6 @@ from django.contrib.auth import authenticate, login # for user authentication an
 from django.contrib.auth import logout # for user logout
 from django.contrib.auth.decorators import login_required, permission_required # permissions
 from django.shortcuts import render, redirect
-from rest_framework.authtoken.models import Token
 from django.core.exceptions import ObjectDoesNotExist
 import spotipy
 import traceback
@@ -63,17 +62,30 @@ def signup(request):
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST) # something went wrong!
 
 @api_view(['DELETE'])
-@permission_required
-def delete_user(request,pk):
+def delete_user(request):
     '''
-    deletes the user with the given primary key
+    deletes the user
+    actually, deactivates his account.
     '''
+    if (request.user.is_authenticated):
+        pk = request.user.id
+        username = request.user.username
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
     try:
         user = RegisteredUser.objects.get(pk=pk)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    user.delete()
-    return Response(status = status.HTTP_204_NO_CONTENT)
+
+    print(user.email)
+
+    user.is_active=False
+    user.save(update_fields=['is_active'])
+
+    #user.delete()
+
+    return Response({"message": "Deleted User" + str(username)},status = status.HTTP_204_NO_CONTENT)
 
 @api_view(['DELETE'])
 @permission_required
@@ -89,34 +101,13 @@ def delete_all_users(request):
     users.delete()
     return Response(status = status.HTTP_204_NO_CONTENT)
 
-@api_view(['POST'])
-def registered_user_login(request):
-    '''
-    logs in the user to the system
-    '''
-    username = request.data['username']
-    password = request.data['password'] # unhashed password that the user entered
-    print(username, password)
-    user = authenticate(request, username=username, password=password) # authenticate() hashes the given function inside before checking
-
-    if user is not None:
-        if user.is_active:
-                request.session.set_expiry(86400) #sets the exp. value of the session
-                print("logged in.")
-                # Redirect to a success page.
-                serializer = RegisteredUserSerializer(user)
-                token, created = Token.objects.get_or_create(user=user)
-                data = serializer.data
-                data['token'] = token.key
-
-                return Response(data,status=status.HTTP_200_OK)
-        else:
-            print("User profile has been deleted.")
-            return Response(status=status.HTTP_404_NOT_FOUND)
+@api_view(['GET'])
+def get_user_info(request):
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
     else:
-        print("invalid login")
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-        # Return an 'invalid login' error message.
+        serializer = RegisteredUserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def registered_user_logout(request):
@@ -127,12 +118,6 @@ def registered_user_logout(request):
     print("Logged out.")
     return Response(status=status.HTTP_200_OK)
     # Redirect to a success page.
-
-
-@api_view(['GET'])
-def get_logged_in_user(request):
-    user = request.user
-    return Response(user,status=status.HTTP_200_OK)
 
 '''
 CONCERT FUNCTIONS
@@ -158,7 +143,6 @@ def create_concert(request):
     '''
     inserts a concert into the database
     '''
-    print(request.user)
     if (not request.user.is_authenticated):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
 
@@ -243,7 +227,7 @@ def subscribe_concert(request, pk):
         concert = Concert.objects.get(pk=pk)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    concert.users.add(request.user)
+    concert.attendees.add(request.user)
     return Response(status  = status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -258,8 +242,8 @@ def unsubscribe_concert(request, pk):
         concert = Concert.objects.get(pk=pk)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    concert.users.remove(request.user)
-    return Response(status  = status.HTTP_204_NO_CONTENT)
+    concert.attendees.remove(request.user)
+    return Response(status = status.HTTP_204_NO_CONTENT)
 
 
 '''
@@ -319,7 +303,7 @@ def rate_concert(request,pk):
         return Response(status = status.HTTP_404_NOT_FOUND)
 
     try:
-        concert.users.get(pk=request.user.pk)
+        concert.attendees.get(pk=request.user.pk)
     except:
         return Response(status = status.HTTP_403_FORBIDDEN)
 

@@ -9,11 +9,21 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
     concerts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model=RegisteredUser
-        fields = ('username','email','password','first_name','last_name','birth_date','date_joined','is_active','avatar','comments','concerts')
+        fields = ('username','email','password','first_name','last_name','birth_date','date_joined','is_active','avatar','comments','concerts','is_active')
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
         return registered_user
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get('username',instance.username)
+        instance.email = validated_data.get('email',instance.email)
+        instance.password = validated_data.get('password',instance.password)
+        instance.first_name = validated_data.get('first_name',instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.birth_date = validated_data.get('birth_date', instance.birth_date)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+        instance.avatar = validated_data.get('avatar', instance.avatar)
 
 class CommentSerializer(serializers.ModelSerializer):
     owner = RegisteredUserSerializer(read_only=True)
@@ -60,10 +70,10 @@ class ConcertSerializer(serializers.ModelSerializer):
     artist = ArtistSerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     ratings = RatingSerializer(many=True, read_only=True)
-    users = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
-        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','users','ratings')
+        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings')
         # location should be retrieved from Google API
         # tags should be retrieved from a 3rd party semantic tag repository such as; Wikidata.
 
