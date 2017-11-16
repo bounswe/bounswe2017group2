@@ -30,13 +30,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SignupActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-
     private EditText mEmailView;
+    private EditText mUsernameView;
     private EditText mPasswordView;
 
     String email;
+    String username;
     String password;
-
 
 
     @Override
@@ -44,7 +44,8 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        mEmailView = (EditText) findViewById(R.id.username);
+        mEmailView = (EditText) findViewById(R.id.email);
+        mUsernameView = (EditText) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
 
         Button mEmailSignUpButton = (Button) findViewById(R.id.email_sign_up_button);
@@ -53,15 +54,16 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
             @Override
             public void onClick(View v) {
                 email = mEmailView.getText().toString().trim();
+                username = mUsernameView.getText().toString().trim();
                 password = mPasswordView.getText().toString().trim();
                 postRequestMethod();
 
                 SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
-                String newUser = mEmailView.getText().toString();
+                //String newUser = mEmailView.getText().toString();
 
                 SharedPreferences.Editor editor = preferences.edit();
 
-                editor.putString(newUser, newUser);
+                //editor.putString(newUser, newUser);
                 editor.commit();
 
 
@@ -79,6 +81,7 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
 
         UserDto userDto = new UserDto();
         userDto.email = email;
+        userDto.username = username;
         userDto.password = password;
 
         Call<UserResponse> call = controller.signUp(userDto);
