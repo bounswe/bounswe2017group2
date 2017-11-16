@@ -44,11 +44,12 @@ public class UserDto {
 
     @SerializedName("avatar")
     @Expose()
-    public String avatar;
+    public Integer avatar;
 
     @SerializedName("comments")
     @Expose()
     public List<ConcertComment> comments;
+
 
     @SerializedName("concerts")
     @Expose()
