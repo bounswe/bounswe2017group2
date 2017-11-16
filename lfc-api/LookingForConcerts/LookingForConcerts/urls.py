@@ -68,6 +68,7 @@ urlpatterns = [
     url(r'^locations/$',views.list_locations), # lists all locations in DB
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
     # TAG
+    url(r'^tags/(?P<search_str>[\w\-]+)/$',views.get_tags)
     # REPORT
     # RATING
     #url('^', include('django.contrib.auth.urls'))

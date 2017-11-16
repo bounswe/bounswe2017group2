@@ -14,6 +14,9 @@ import spotipy
 import traceback
 import json
 from spotipy.oauth2 import SpotifyClientCredentials
+import requests
+import json
+import re
 
 # The actual python functions that do the backend work.
 
@@ -323,6 +326,41 @@ def rate_concert(request,pk):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
+
+'''
+TAG FUNCTIONS
+'''
+
+@api_view(['GET'])
+def get_tags(request, search_str):
+    if (not request.user.is_authenticated):
+        return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
+    
+    API_ENDPOINT = "https://www.wikidata.org/w/api.php"
+    query = search_str
+    params = {
+        'action' : 'wbsearchentities',
+        'format' : 'json',
+        'language' : ['en', 'tr'],
+        'search' : query,
+        'type':'item'
+    }
+    
+    r = requests.get(API_ENDPOINT, params = params)
+    json_response = r.json()['search']
+    lenght =  len(json_response)
+
+    tags = []
+    for i in range(lenght):
+        if 'description' in json_response[i]:
+            if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)):
+                value = json_response[i]['label']
+                context = json_response[i]['description']
+                t = '{"value":"'+value.replace('"','')+ '","context":"'+context.replace('"','')+'"}'
+                print(t)    
+                tags.append(json.loads(t))
+
+    return Response(tags, status.HTTP_200_OK)
 
 '''
 COMMENT FUNCTIONS
