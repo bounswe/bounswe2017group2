@@ -333,8 +333,8 @@ TAG FUNCTIONS
 
 @api_view(['GET'])
 def get_tags(request, search_str):
-    # if (not request.user.is_authenticated):
-    #     return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
+    if (not request.user.is_authenticated):
+        return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
     
     API_ENDPOINT = "https://www.wikidata.org/w/api.php"
     query = search_str
