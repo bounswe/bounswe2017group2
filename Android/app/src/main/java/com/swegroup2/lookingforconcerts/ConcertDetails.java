@@ -14,9 +14,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,7 +22,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -149,20 +145,13 @@ public class ConcertDetails extends Fragment {
 
         String refreshToken = "";
         String accessToken = "";
-        try {
-            JSONObject jsonObj = new JSONObject(getActivity().getIntent().getStringExtra("json"));
-            refreshToken = jsonObj.getString("refresh");
-            accessToken = jsonObj.getString("access");
-            Log.v("myTag","refresh: " + refreshToken);
-            Log.v("myTag","access: " + accessToken);
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        refreshToken = getActivity().getIntent().getStringExtra("refresh");
+        accessToken = getActivity().getIntent().getStringExtra("access");
+        Log.v("myTag","refresh: " + refreshToken);
+        Log.v("myTag","access: " + accessToken);
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Token " + accessToken);
+        map.put("Authorization", "Bearer " + accessToken);
 
         Call<ConcertResponse> call = controller.makeComment(concertDto.id, concertComment, map);
         call.enqueue(new Callback<ConcertResponse>() {
@@ -173,7 +162,7 @@ public class ConcertDetails extends Fragment {
 
             @Override
             public void onFailure(Call<ConcertResponse> call, Throwable t) {
-                Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -188,18 +177,11 @@ public class ConcertDetails extends Fragment {
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         String token = "";
-        try {
-            JSONObject jsonObj = new JSONObject(getActivity().getIntent().getStringExtra("json"));
-            token = jsonObj.getString("token");
-            Log.v("myTag", "tokenL: " + jsonObj.getString("token"));
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        token = getActivity().getIntent().getStringExtra("access");
+        Log.v("myTag", "tokenL: " + token);
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Token " + token);
+        map.put("Authorization", "Bearer " + token);
 
         Call<ConcertResponse> call = controller.attend(concertDto.id, map);
         call.enqueue(new Callback<ConcertResponse>() {
