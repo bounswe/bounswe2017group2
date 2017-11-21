@@ -60,6 +60,8 @@ urlpatterns = [
     url(r'^concerts/$', views.list_concerts), # lists all concerts in DB
     url(r'^newconcert/$', views.create_concert), # creates a concert with provided info
     url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert
+    #CONCERT SEARCH
+    url(r'^concerts/search/$', views.search_concerts), #searches concerts that matches with data on their name, location, artist and tags.
     #ARTIST
     url(r'^searchartists/', views.search_artists), #searches given artist string in spotify artists. Connects to spotify
     # COMMENT
