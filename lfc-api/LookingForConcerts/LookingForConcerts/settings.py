@@ -95,11 +95,16 @@ LOGIN_URL = BASE_URL + 'login/'
 #     }
 # }
 
-ADMIN_ENABLED = True
 
 '''
 WE ADDED THESE
 '''
+ADMIN_ENABLED = True
+
+ADMINS = [('Kemal Berk Kocabagli', 'kberkkocabagli@gmail.com'),
+          ('Haluk Alper Karaevli', 'hakaraevli@gmail.com'),
+          ('Enes Hecan', 'eneshecan@gmail.com'),
+         ]
 
 # Application definition
 SITE_ID = 1
@@ -113,7 +118,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites', # added
     # REST framework
-    #'rest_framework',
+    'rest_framework',
     #'rest_framework.authtoken',
     #'rest_auth',
     #'rest_auth.registration',

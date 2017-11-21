@@ -37,7 +37,7 @@ def list_users(request):
     returns all the registered users
     most recently joined user is at the top
     '''
-    print([f.name for f in RegisteredUser._meta.get_fields()]) # print all user fields for debug
+    #print([f.name for f in RegisteredUser._meta.get_fields()]) # print all user fields for debug
     registered_users = RegisteredUser.objects.all().order_by('-date_joined')
     serializer = RegisteredUserSerializer(registered_users, many=True)
     return Response(serializer.data)
@@ -158,7 +158,7 @@ def get_user_concerts(request):
     user = request.user
     if user.is_authenticated:
         concerts=user.concerts.all()
-        serializer = ConcertSerializer(concerts)
+        serializer = ConcertSerializer(concerts, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -173,7 +173,7 @@ def list_concerts(request):
     @params: None
     '''
     if request.method =='GET':
-        concerts = Concert.objects.all()
+        concerts = Concert.objects.all().order_by('-date_time')
         serializer = ConcertSerializer(concerts, many=True)
         return Response(serializer.data)
     else:
