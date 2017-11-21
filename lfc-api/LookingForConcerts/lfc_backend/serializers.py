@@ -3,13 +3,19 @@ from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Ra
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 
+class FollowedFollowingUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=RegisteredUser
+        fields = ('username','email','first_name','last_name','birth_date') #Will add image when it is implemented.
 
 class RegisteredUserSerializer(serializers.ModelSerializer):
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     concerts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    followers = FollowedFollowingUserSerializer(many=True, read_only=True)
+    following = FollowedFollowingUserSerializer(many=True, read_only=True)
     class Meta:
         model=RegisteredUser
-        fields = ('username','email','password','first_name','last_name','birth_date','date_joined','is_active','avatar','comments','concerts','is_active')
+        fields = ('id','username','email','password','first_name','last_name','birth_date','date_joined','is_active','avatar','comments','concerts','followers','following')
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
@@ -24,6 +30,7 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
         instance.birth_date = validated_data.get('birth_date', instance.birth_date)
         instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.avatar = validated_data.get('avatar', instance.avatar)
+
 
 class CommentSerializer(serializers.ModelSerializer):
     owner = RegisteredUserSerializer(read_only=True)

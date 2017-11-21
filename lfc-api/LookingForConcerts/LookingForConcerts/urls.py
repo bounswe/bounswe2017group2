@@ -52,6 +52,8 @@ urlpatterns = [
     url(r'^users/$',views.list_users), # lists all the users registered to our app
     url(r'^me/$', views.get_user_info),
     url(r'^user/(?P<pk>[0-9]+)/$', views.user_detail),
+    url(r'^user/(?P<pk>[0-9]+)/follow/$', views.follow_user),
+    url(r'^user/(?P<pk>[0-9]+)/unfollow/$', views.unfollow_user),
     # CONCERT
     url(r'^concert/(?P<pk>[0-9]+)/subscribe/$', views.subscribe_concert), #subscribes logged in user to concert
     url(r'^concert/(?P<pk>[0-9]+)/unsubscribe/$', views.unsubscribe_concert), #unsubscribes logged in user from concert

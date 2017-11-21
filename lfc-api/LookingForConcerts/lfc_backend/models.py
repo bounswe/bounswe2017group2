@@ -40,6 +40,7 @@ class RegisteredUser(AbstractUser):
     birth_date = models.DateField(_('birth_date'), null=True, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    followers = models.ManyToManyField("self", symmetrical=False, related_name = 'following')
 
 class Location(models.Model):
     location_id = models.AutoField(primary_key=True)
