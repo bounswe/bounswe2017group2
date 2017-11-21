@@ -113,12 +113,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites', # added
     # REST framework
-    'rest_framework',
-    'rest_framework.authtoken',
-    'rest_auth',
-    'rest_auth.registration',
+    #'rest_framework',
+    #'rest_framework.authtoken',
+    #'rest_auth',
+    #'rest_auth.registration',
     'lfc_backend.apps.LfcBackendConfig', # our app!
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist', # for JWT tracking and blacklisting
     # 'allauth',
     # 'allauth.account',
     # 'allauth.socialaccount',
