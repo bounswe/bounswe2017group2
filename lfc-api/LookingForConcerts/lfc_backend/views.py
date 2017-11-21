@@ -10,6 +10,7 @@ from django.contrib.auth import logout # for user logout
 from django.contrib.auth.decorators import login_required, permission_required # permissions
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 import spotipy
 import traceback
 import json
@@ -216,6 +217,22 @@ def create_concert(request):
         return Response(serializer.data, status = status.HTTP_201_CREATED)
     return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def search_concerts(request):
+    '''
+    searches the post data with concerts name, location, artist and tags
+    '''
+    searchString = request.data['search']
+    try:
+        concerts = Concert.objects.filter(Q(name__contains=searchString)|
+                                          Q(location__venue__contains=searchString)|
+                                          Q(artist__name__contains=searchString)|
+                                          Q(tags__value__contains=searchString))
+        serializer = ConcertSerializer(concerts,many=True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    except:
+        traceback.print_exc()
+        return Response(status = status.HTTP_400_BAD_REQUEST)
 
 # also gets a primary key as a parameter
 @api_view(['GET','PUT','DELETE'])
