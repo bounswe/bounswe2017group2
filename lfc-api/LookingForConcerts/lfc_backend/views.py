@@ -35,6 +35,36 @@ def list_users(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
+def follow_user(request,pk):
+    '''
+    follows the registered user with primary key value pk.
+    '''
+    if (not request.user.is_authenticated):
+        return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
+    me = request.user
+    try:
+        following_user = RegisteredUser.objects.get(pk=pk) #Following user is the user we wish to follow
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    me.following.add(following_user)
+    return Response(status = status.HTTP_200_OK)
+
+@api_view(['GET'])
+def unfollow_user(request,pk):
+    '''
+    unfollows the registered user with primary key value pk.
+    '''
+    if (not request.user.is_authenticated):
+        return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
+    me = request.user
+    try:
+        unfollowing_user = RegisteredUser.objects.get(pk=pk) #Unfollowing user is the user we wish to unfollow
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    me.following.remove(following_user)
+    return Response(status = status.HTTP_200_OK)
+
+@api_view(['GET'])
 def user_detail(request,pk):
     '''
     returns a specific registered user
