@@ -453,7 +453,7 @@ class ConcertImageView(FormView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('concert_image', kwargs={'pk': self.id})
+        return Response(json.loads('{"image_id":"'+str(self.id)+'"}'))
 
 @api_view(['GET'])
 def ConcertShowImage(request, pk):
