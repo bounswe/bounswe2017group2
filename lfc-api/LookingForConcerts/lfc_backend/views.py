@@ -4,6 +4,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist
 from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
+from django.views.generic import FormView, DetailView, ListView
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 
 from django.contrib.auth import authenticate, login # for user authentication and login
 from django.contrib.auth import logout # for user logout
@@ -19,6 +22,9 @@ import requests
 import json
 import re
 
+
+from .forms import ConcertImageForm
+from .models import ConcertImage
 # The actual python functions that do the backend work.
 
 '''
@@ -382,7 +388,7 @@ TAG FUNCTIONS
 def get_tags(request, search_str):
     if (not request.user.is_authenticated):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
-    
+
     API_ENDPOINT = "https://www.wikidata.org/w/api.php"
     query = search_str
     params = {
@@ -392,7 +398,7 @@ def get_tags(request, search_str):
         'search' : query,
         'type':'item'
     }
-    
+
     r = requests.get(API_ENDPOINT, params = params)
     json_response = r.json()['search']
     lenght =  len(json_response)
@@ -404,7 +410,7 @@ def get_tags(request, search_str):
                 value = json_response[i]['label']
                 context = json_response[i]['description']
                 t = '{"value":"'+value.replace('"','')+ '","context":"'+context.replace('"','')+'"}'
-                print(t)    
+                print(t)
                 tags.append(json.loads(t))
 
     return Response(tags, status.HTTP_200_OK)
@@ -430,3 +436,30 @@ def create_comment(request,pk):
     request.user.comments.add(comment)
     concert.comments.add(comment)
     return Response(serializer.data)
+
+class ConcertImageView(FormView):
+    template_name = 'concert_image_form.html'
+    form_class = ConcertImageForm
+
+    def form_valid(self, form):
+        concert_image = ConcertImage(
+            image=self.get_form_kwargs().get('files')['image'])
+        concert_image.save()
+        self.id = concert_image.id
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('concert_image', kwargs={'pk': self.id})
+
+class ConcertDetailView(DetailView):
+    model = ConcertImage
+    template_name = 'profile_image.html'
+    context_object_name = 'image'
+
+
+class ConcertImageIndexView(ListView):
+    model = ConcertImage
+    template_name = 'profile_image_view.html'
+    context_object_name = 'images'
+    queryset = ConcertImage.objects.all()

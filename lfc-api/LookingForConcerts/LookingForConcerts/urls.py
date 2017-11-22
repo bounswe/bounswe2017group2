@@ -19,8 +19,10 @@ from django.contrib import admin
 from rest_framework.authtoken import views as tokenviews #for acquiring token for a user
 from lfc_backend import views
 from django.conf.urls import include
+from django.conf.urls.static import static
 
 from django.views import generic
+from lfc_backend.views import ConcertImageView, ConcertDetailView
 from rest_framework.schemas import get_schema_view
 
 from LookingForConcerts import settings
@@ -30,8 +32,6 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-
-
 
 urlpatterns = [
     # JWT AUTHENTICATION
@@ -72,7 +72,13 @@ urlpatterns = [
     url(r'^locations/$',views.list_locations), # lists all locations in DB
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
     # TAG
-    url(r'^tags/(?P<search_str>[\w\-]+)/$',views.get_tags)
+    url(r'^tags/(?P<search_str>[\w\-]+)/$',views.get_tags),
+
+    # url(r'^$', ConcertImageIndexView.as_view(), name='home'),
+
+    url(r'^upload/', ConcertImageView.as_view(), name='concert_image_upload'),
+    url(r'^uploaded/(?P<pk>\d+)/$', ConcertDetailView.as_view(), name='concert_image')
+
     # REPORT
     # RATING
     #url('^', include('django.contrib.auth.urls'))
@@ -85,7 +91,7 @@ urlpatterns = [
     # ^password_reset/done/$ [name='password_reset_done']
     # ^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$ [name='password_reset_confirm']
     # ^reset/done/$ [name='password_reset_complete']
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.ADMIN_ENABLED:
     urlpatterns.append(

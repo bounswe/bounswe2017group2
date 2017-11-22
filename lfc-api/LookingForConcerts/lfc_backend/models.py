@@ -127,3 +127,6 @@ class Rating(models.Model):
 
     class Meta: # a user can rate a concert only once.
         unique_together = ("owner", "concert")
+
+class ConcertImage(models.Model):
+    image = models.FileField(upload_to='concert/%Y/%m/%d')
