@@ -68,6 +68,9 @@ class Image(models.Model):
     url = models.URLField()
     width = models.IntegerField()
 
+class ConcertImage(models.Model):
+    image = models.FileField(upload_to='concert/')
+
 class Concert(models.Model):
     concert_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length= 150)
@@ -81,6 +84,7 @@ class Concert(models.Model):
     description =  models.CharField(max_length=2000, blank=True)
     price_min = models.IntegerField()
     price_max = models.IntegerField()
+    image = models.ForeignKey(ConcertImage, related_name = "concerts", on_delete = models.CASCADE, null=True)
     #ratings -implemented in Rating
     #concertReports -implemented in Report --ONE TO MANY
 
@@ -127,6 +131,3 @@ class Rating(models.Model):
 
     class Meta: # a user can rate a concert only once.
         unique_together = ("owner", "concert")
-
-class ConcertImage(models.Model):
-    image = models.FileField(upload_to='concert/%Y/%m/%d')

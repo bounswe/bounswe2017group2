@@ -22,7 +22,7 @@ from django.conf.urls import include
 from django.conf.urls.static import static
 
 from django.views import generic
-from lfc_backend.views import ConcertImageView, ConcertDetailView
+from lfc_backend.views import ConcertImageView, ConcertShowImage, DeleteAllImages
 from rest_framework.schemas import get_schema_view
 
 from LookingForConcerts import settings
@@ -73,11 +73,10 @@ urlpatterns = [
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
     # TAG
     url(r'^tags/(?P<search_str>[\w\-]+)/$',views.get_tags),
-
-    # url(r'^$', ConcertImageIndexView.as_view(), name='home'),
-
+    # CONCERT IMAGE
     url(r'^upload/', ConcertImageView.as_view(), name='concert_image_upload'),
-    url(r'^uploaded/(?P<pk>\d+)/$', ConcertDetailView.as_view(), name='concert_image')
+    url(r'^concert_image/(?P<pk>\d+)/$', ConcertShowImage, name='concert_image'),
+    url(r'^delete_all_images/$', DeleteAllImages)
 
     # REPORT
     # RATING

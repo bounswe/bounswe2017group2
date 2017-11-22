@@ -7,6 +7,7 @@ from lfc_backend.serializers import ConcertSerializer,LocationSerializer, Regist
 from django.views.generic import FormView, DetailView, ListView
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.conf import settings
 
 from django.contrib.auth import authenticate, login # for user authentication and login
 from django.contrib.auth import logout # for user logout
@@ -441,6 +442,8 @@ class ConcertImageView(FormView):
     template_name = 'concert_image_form.html'
     form_class = ConcertImageForm
 
+    ConcertImage.objects.all().delete()
+
     def form_valid(self, form):
         concert_image = ConcertImage(
             image=self.get_form_kwargs().get('files')['image'])
@@ -452,14 +455,12 @@ class ConcertImageView(FormView):
     def get_success_url(self):
         return reverse('concert_image', kwargs={'pk': self.id})
 
-class ConcertDetailView(DetailView):
-    model = ConcertImage
-    template_name = 'profile_image.html'
-    context_object_name = 'image'
+@api_view(['GET'])
+def ConcertShowImage(request, pk):
+    img = ConcertImage.objects.get(pk=pk)
+    return render(request,'concert_image_show.html',{"img":img})
 
-
-class ConcertImageIndexView(ListView):
-    model = ConcertImage
-    template_name = 'profile_image_view.html'
-    context_object_name = 'images'
-    queryset = ConcertImage.objects.all()
+@api_view(['GET'])
+def DeleteAllImages(request):
+    ConcertImage.objects.all().delete()
+    return Response("Deleted all images")
