@@ -2,8 +2,9 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist
+from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist, ConcertImage, UserImage
 from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
+from lfc_backend.forms import ConcertImageForm, UserImageForm
 from django.views.generic import FormView, DetailView, ListView
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -22,8 +23,7 @@ import requests
 import json
 import re
 
-from .forms import ConcertImageForm
-from .models import ConcertImage
+
 
 from rest_framework_simplejwt.tokens import RefreshToken # for blacklisting tokens upon user logout
 
@@ -467,9 +467,20 @@ class ConcertImageView(FormView):
 @api_view(['GET'])
 def ConcertShowImage(request, pk):
     img = ConcertImage.objects.get(pk=pk)
-    return Response(img.image.url)
+    return HttpResponseRedirect(concert_image.image.url)
+
+class UserImageView(FormView):
+    template_name = 'user_image_form.html'
+    form_class = UserImageForm
+
+    def form_valid(self, form):
+        user_image = UserImage(
+            image=self.get_form_kwargs().get('files')['image'])
+        user_image.save()
+        self.id = user_image.id
+        return HttpResponse(user_image.image.url)
 
 @api_view(['GET'])
-def DeleteAllImages(request):
-    ConcertImage.objects.all().delete()
-    return Response("Deleted all images")
+def UserShowImage(request, pk):
+    img = UsserImage.objects.get(pk=pk)
+    return HttpResponseRedirect(user_image.image.url)

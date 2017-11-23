@@ -15,7 +15,7 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
     following = FollowedFollowingUserSerializer(many=True, read_only=True)
     class Meta:
         model=RegisteredUser
-        fields = ('id','username','email','password','first_name','last_name','birth_date','date_joined','is_active','avatar','comments','concerts','followers','following')
+        fields = ('id','username','email','password','first_name','last_name','birth_date','date_joined','is_active','image','comments','concerts','followers','following')
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)

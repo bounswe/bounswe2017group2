@@ -21,6 +21,9 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         Token.objects.create(user=instance)
 
 # Models in our Database.
+class UserImage(models.Model):
+    image = models.FileField(upload_to='user/')
+
 class RegisteredUser(AbstractUser):
     """Registered User class"""
     # FIELDS COMING FROM AbstracUser
@@ -39,7 +42,7 @@ class RegisteredUser(AbstractUser):
     )
     birth_date = models.DateField(_('birth_date'), null=True, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    image = models.CharField(max_length=300, blank=True)
     followers = models.ManyToManyField("self", symmetrical=False, related_name = 'following')
 
 class Location(models.Model):
