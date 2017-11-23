@@ -10,9 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,18 +38,10 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_concert_list);
 
-
-        try {
-            JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("json"));
-            refreshToken = jsonObj.getString("refresh");
-            accessToken = jsonObj.getString("access");
-            Log.v("myTag", "refresh: " + refreshToken);
-            Log.v("myTag", "access: " + accessToken);
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        refreshToken = getIntent().getStringExtra("refresh");
+        accessToken = getIntent().getStringExtra("access");
+        Log.v("myTag", "refresh: " + refreshToken);
+        Log.v("myTag", "access: " + accessToken);
 
         recyclerView = (RecyclerView) findViewById(R.id.concert_list_rv);
 
@@ -113,9 +102,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
-        Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Token " + refreshToken);
-
         RefreshDto refreshDto = new RefreshDto();
         refreshDto.refresh = refreshToken;
 
@@ -124,13 +110,10 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         call.enqueue(new Callback<RefreshResponse>() {
             @Override
             public void onResponse(Call<RefreshResponse> call, Response<RefreshResponse> response) {
-
-                if (accessToken != response.body().access) {
-
+                if (!accessToken.equals(response.body().access)) {
                     accessToken = response.body().access;
                     Log.d("FS", "accessToken " + accessToken);
                 }
-
             }
 
             @Override
@@ -150,7 +133,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Token " + accessToken);
+        map.put("Authorization", "Bearer " + accessToken);
 
         Call<UserDto> call = controller.getUserProfile(map);
 

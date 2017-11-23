@@ -84,7 +84,7 @@ class Concert(models.Model):
     description =  models.CharField(max_length=2000, blank=True)
     price_min = models.IntegerField()
     price_max = models.IntegerField()
-    image = models.ForeignKey(ConcertImage, related_name = "concerts", on_delete = models.CASCADE, null=True)
+    image = models.CharField(max_length=300, blank=True)
     #ratings -implemented in Rating
     #concertReports -implemented in Report --ONE TO MANY
 

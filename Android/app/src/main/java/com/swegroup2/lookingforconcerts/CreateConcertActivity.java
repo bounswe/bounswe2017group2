@@ -3,10 +3,17 @@ package com.swegroup2.lookingforconcerts;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +26,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class CreateConcertActivity extends AppCompatActivity {
+public class CreateConcertActivity extends AppCompatActivity implements ArtistListAdapter
+        .ArtistListAdapterOnClickHandler {
 
     EditText concertNameEditText;
     EditText artistNameEditText;
@@ -31,9 +39,15 @@ public class CreateConcertActivity extends AppCompatActivity {
     EditText venueEditText;
     EditText coordinatesEditText;
     Button submitButton;
+    Button artistButton;
+    private RecyclerView recyclerView;
+    private ArtistListAdapter adapter;
+    LinearLayout selectedArtistLayout;
+    ImageView selectedArtistPicture;
+    TextView selectedArtistName;
 
     String concertName;
-    String artistName;
+    Artist artist;
     String date;
     String description;
     Integer minPrice;
@@ -41,6 +55,9 @@ public class CreateConcertActivity extends AppCompatActivity {
     String[] tags;
     String venue;
     String coordinates;
+
+    String accessToken;
+    String refreshToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +73,16 @@ public class CreateConcertActivity extends AppCompatActivity {
         venueEditText = (EditText) findViewById(R.id.venue_edit);
         coordinatesEditText = (EditText) findViewById(R.id.coordinates_edit);
         submitButton = (Button) findViewById(R.id.submit_button);
+        artistButton = (Button) findViewById(R.id.artist_button);
+
+        selectedArtistLayout = (LinearLayout) findViewById(R.id.selected_artist);
+        selectedArtistName = (TextView) findViewById(R.id.artist_list_name_tv_selected);
+        selectedArtistPicture = (ImageView) findViewById(R.id.artist_list_image_selected);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 concertName = concertNameEditText.getText().toString().trim();
-                artistName = artistNameEditText.getText().toString().trim();
                 date = dateEditText.getText().toString();
                 description = descriptionEditText.getText().toString().trim();
                 //TODO: add validation for prices
@@ -76,14 +97,34 @@ public class CreateConcertActivity extends AppCompatActivity {
                 if (!isValid()) {
                     Toast.makeText(CreateConcertActivity.this, "Required fields can't be empty!", Toast.LENGTH_LONG).show();
                 } else {
+                    submitButton.setClickable(false);
                     postRequestMethod();
                 }
             }
         });
+
+        artistButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedArtistLayout.setVisibility(View.GONE);
+                searchArtist();
+            }
+        });
+
+        recyclerView = (RecyclerView) findViewById(R.id.artist_list_rv);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+
+        adapter = new ArtistListAdapter(this, this);
+        recyclerView.setAdapter(adapter);
+
+        accessToken = getIntent().getStringExtra("access");
+        refreshToken = getIntent().getStringExtra("refresh");
     }
 
     private boolean isValid() {
-        return !(concertName.isEmpty() || artistName.isEmpty() || date.isEmpty() || venue.isEmpty
+        return !(concertName.isEmpty() || artist == null || date.isEmpty() || venue.isEmpty
                 () || coordinates.isEmpty());
     }
 
@@ -97,11 +138,11 @@ public class CreateConcertActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+        final RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         ConcertDto concertDto = new ConcertDto();
         concertDto.name = concertName;
-        concertDto.artist.name = artistName;
+        concertDto.artist = artist;
         concertDto.date = date;
         concertDto.description = description;
         concertDto.minPrice = minPrice;
@@ -122,26 +163,95 @@ public class CreateConcertActivity extends AppCompatActivity {
         concertDto.comments = new ArrayList<>();
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Token " + getIntent().getStringExtra("refresh"));
+        map.put("Authorization", "Bearer " + accessToken);
 
         Call<ConcertResponse> call = controller.createConcert(concertDto, map);
         call.enqueue(new Callback<ConcertResponse>() {
             @Override
             public void onResponse(Call<ConcertResponse> call, Response<ConcertResponse> response) {
+                if (response.message().equals("Unauthorized")) {
+                    final RefreshDto refreshDto = new RefreshDto();
+                    refreshDto.refresh = refreshToken;
+                    Call<RefreshResponse> callRefresh = controller.refresh(refreshDto);
+                    callRefresh.enqueue(new Callback<RefreshResponse>() {
+                        @Override
+                        public void onResponse(Call<RefreshResponse> call, Response<RefreshResponse> response) {
+                            accessToken = response.body().access;
+                            postRequestMethod();
+                        }
+
+                        @Override
+                        public void onFailure(Call<RefreshResponse> call, Throwable t) {
+                            Toast.makeText(CreateConcertActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(CreateConcertActivity.this, ConcertListActivity.class);
+                            intent.putExtra("access", accessToken);
+                            intent.putExtra("refresh", refreshToken);
+                            startActivity(intent);
+                            CreateConcertActivity.this.finish();
+                        }
+                    });
+                }
+
                 Intent intent = new Intent(CreateConcertActivity.this, ConcertListActivity.class);
+                intent.putExtra("access", accessToken);
+                intent.putExtra("refresh", refreshToken);
                 startActivity(intent);
                 CreateConcertActivity.this.finish();
             }
 
             @Override
             public void onFailure(Call<ConcertResponse> call, Throwable t) {
-                Toast.makeText(CreateConcertActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(CreateConcertActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(CreateConcertActivity.this, ConcertListActivity.class);
+                intent.putExtra("access", accessToken);
+                intent.putExtra("refresh", refreshToken);
                 startActivity(intent);
                 CreateConcertActivity.this.finish();
             }
         });
+    }
+
+    private void searchArtist() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        Artist artist = new Artist();
+        artist.name = artistNameEditText.getText().toString();
+
+//        Map<String, String> map = new HashMap<>();
+//        map.put("Connection", "close");
+
+        Call<List<Artist>> call = controller.searchForArtist(artist);
+        call.enqueue(new Callback<List<Artist>>() {
+            @Override
+            public void onResponse(Call<List<Artist>> call, Response<List<Artist>> response) {
+                adapter.setArtistData(new ArrayList<Artist>());
+                adapter.setArtistData(response.body());
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(Call<List<Artist>> call, Throwable t) {
+                Toast.makeText(CreateConcertActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onClick(Artist artist) {
+        recyclerView.setVisibility(View.GONE);
+
+        if (!artist.images.isEmpty()) {
+            Picasso.with(this).load(artist.images.get(0).url).into(selectedArtistPicture);
+        }
+        selectedArtistName.setText(artist.name);
+        selectedArtistLayout.setVisibility(View.VISIBLE);
+
+        this.artist = artist;
     }
 }
 

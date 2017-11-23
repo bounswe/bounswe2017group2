@@ -6,11 +6,10 @@ from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, R
 from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
 from django.views.generic import FormView, DetailView, ListView
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from django.conf import settings
 
 from django.contrib.auth import authenticate, login # for user authentication and login
-from django.contrib.auth import logout # for user logout
 from django.contrib.auth.decorators import login_required, permission_required # permissions
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
@@ -23,9 +22,18 @@ import requests
 import json
 import re
 
-
 from .forms import ConcertImageForm
 from .models import ConcertImage
+
+from rest_framework_simplejwt.tokens import RefreshToken # for blacklisting tokens upon user logout
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
+
+
 # The actual python functions that do the backend work.
 
 '''
@@ -37,12 +45,12 @@ def list_users(request):
     returns all the registered users
     most recently joined user is at the top
     '''
-    print([f.name for f in RegisteredUser._meta.get_fields()]) # print all user fields for debug
+    #print([f.name for f in RegisteredUser._meta.get_fields()]) # print all user fields for debug
     registered_users = RegisteredUser.objects.all().order_by('-date_joined')
     serializer = RegisteredUserSerializer(registered_users, many=True)
     return Response(serializer.data)
 
-@api_view(['GET'])
+@api_view(['POST'])
 def follow_user(request,pk):
     '''
     follows the registered user with primary key value pk.
@@ -57,7 +65,7 @@ def follow_user(request,pk):
     me.following.add(following_user)
     return Response(status = status.HTTP_200_OK)
 
-@api_view(['GET'])
+@api_view(['POST'])
 def unfollow_user(request,pk):
     '''
     unfollows the registered user with primary key value pk.
@@ -72,15 +80,6 @@ def unfollow_user(request,pk):
     me.following.remove(following_user)
     return Response(status = status.HTTP_200_OK)
 
-@api_view(['GET'])
-def user_detail(request,pk):
-    '''
-    returns a specific registered user
-    '''
-    registered_user = RegisteredUser.objects.get(pk=pk)
-    serializer = RegisteredUserSerializer(registered_user)
-    return Response(serializer.data)
-
 @api_view(['POST'])
 def signup(request):
     '''
@@ -88,25 +87,18 @@ def signup(request):
     '''
     serializer = RegisteredUserSerializer(data = request.data) # create the user
     if serializer.is_valid():
+        # MIGHT ADD SOME REQUIREMENTS FOR PASSWORD.
+        # E.G. SHOULD CONTAIN AT LEAST A NUMBER, A CAPITAL AND SMALL LETTER ETC.
         # SIGNUP
         registered_user = serializer.save() # save the user to the database
-        # LOGIN
-        username = registered_user.username # username
-        password = request.data['password'] # unhashed password that the user entered
-
-        # MIGHT ADD SOME REQUIREMENTS FOR PASSWORD. E.G. SHOULD CONTAIN AT LEAST A NUMBER, A CAPITAL AND SMALL LETTER ETC.
-
-        user = authenticate(username=username, password=password) # authenticate() hashes the given function inside before checking
-        login(request,user) # log in the user right after signup
         return Response(serializer.data, status = status.HTTP_201_CREATED) # success!
     else:
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST) # something went wrong!
 
 @api_view(['DELETE'])
-def delete_user(request):
+def deactivate_user(request):
     '''
-    deletes the user
-    actually, deactivates his account.
+    deactivates the account of this user
     '''
     if (request.user.is_authenticated):
         pk = request.user.id
@@ -119,14 +111,27 @@ def delete_user(request):
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
-    print(user.email)
-
     user.is_active=False
     user.save(update_fields=['is_active'])
+    return Response({"message": "Deactivated user " + str(username)},status = status.HTTP_204_NO_CONTENT)
 
-    #user.delete()
+@api_view(['DELETE'])
+def delete_user(request):
+    '''
+    deletes the user with the given username.
+    only admins are authorized.
+    '''
+    if (request.user.is_staff == False):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        try:
+            username = request.data['username']
+            user = RegisteredUser.objects.get(username=username)
+        except:
+            return Response(status = status.HTTP_404_NOT_FOUND)
 
-    return Response({"message": "Deleted User" + str(username)},status = status.HTTP_204_NO_CONTENT)
+        user.delete()
+        return Response({"message": "Deleted user " + str(username)},status = status.HTTP_204_NO_CONTENT)
 
 @api_view(['DELETE'])
 @permission_required
@@ -134,13 +139,16 @@ def delete_all_users(request):
     '''
     deletes all users
     '''
-    print("Deleting all users...")
-    try:
-        users = RegisteredUser.objects.all()
-    except ObjectDoesNotExist:
-        return Response(status = status.HTTP_404_NOT_FOUND)
-    users.delete()
-    return Response(status = status.HTTP_204_NO_CONTENT)
+    if (request.user.is_staff == False):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        print("Deleting all users...")
+        try:
+            users = RegisteredUser.objects.all()
+        except ObjectDoesNotExist:
+            return Response(status = status.HTTP_404_NOT_FOUND)
+        users.delete()
+        return Response(status = status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
 def get_user_info(request):
@@ -150,36 +158,36 @@ def get_user_info(request):
         serializer = RegisteredUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-@api_view(['POST'])
-def registered_user_logout(request):
+@api_view(['GET'])
+def get_user_concerts(request):
     '''
-    logs out the user
+    returns all the concerts of a user
     '''
-    logout(request)
-    print("Logged out.")
-    return Response(status=status.HTTP_200_OK)
-    # Redirect to a success page.
+    user = request.user
+    if user.is_authenticated:
+        concerts=user.concerts.all()
+        serializer = ConcertSerializer(concerts, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 '''
 CONCERT FUNCTIONS
 '''
-
 @api_view(['GET'])
 def list_concerts(request):
     '''
-    returns all concerts
+    returns all concerts in the system
     @params: None
     '''
     if request.method =='GET':
-        concerts = Concert.objects.all()
+        concerts = Concert.objects.all().order_by('-date_time')
         serializer = ConcertSerializer(concerts, many=True)
         return Response(serializer.data)
     else:
         return status.HTTP_400_BAD_REQUEST
 
 @api_view(['POST'])
-#@login_required()
-#@permission_required('IsAuthenticated')
 def create_concert(request):
     '''
     inserts a concert into the database
@@ -224,7 +232,7 @@ def create_concert(request):
         return Response(serializer.data, status = status.HTTP_201_CREATED)
     return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
+@api_view(['GET'])
 def search_concerts(request):
     '''
     searches the post data with concerts name, location, artist and tags
@@ -272,7 +280,7 @@ def concert_detail(request, pk):
         concert.delete()
         return Response(status = status.HTTP_204_NO_CONTENT)
 
-@api_view(['GET'])
+@api_view(['POST'])
 def subscribe_concert(request, pk):
     '''
     adds user to concerts user list
@@ -287,7 +295,7 @@ def subscribe_concert(request, pk):
     concert.attendees.add(request.user)
     return Response(status  = status.HTTP_200_OK)
 
-@api_view(['GET'])
+@api_view(['POST'])
 def unsubscribe_concert(request, pk):
     '''
     removes user from concerts user list
@@ -306,7 +314,7 @@ def unsubscribe_concert(request, pk):
 '''
 ARTIST FUNCTIONS
 '''
-@api_view(['POST'])
+@api_view(['GET'])
 def search_artists(request):
     data = request.data
     client_credentials_manager = SpotifyClientCredentials(client_id='60ab66df7413492bbc86150d7a3617d7', client_secret='007ccb30ee7e4eb98478b7a34fc869e4')
@@ -341,7 +349,6 @@ def location_detail(request, pk):
         location = Location.objects.get(pk=pk) # <-- this pk might be location_id, I'm not sure. <--- It is
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    # returns the concert with the given primary key
     serializer = LocationSerializer(location)
     return Response(serializer.data)
 
@@ -351,6 +358,9 @@ RATING FUNCTIONS
 
 @api_view(['POST'])
 def rate_concert(request,pk):
+    '''
+    Adds ratings by the logged in user to the concert with given pk
+    '''
     if (not request.user.is_authenticated):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -422,6 +432,9 @@ COMMENT FUNCTIONS
 
 @api_view(['POST'])
 def create_comment(request,pk):
+    '''
+    Adds a comment by the logged in user to the concert with given pk
+    '''
     if (not request.user.is_authenticated):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -432,33 +445,29 @@ def create_comment(request,pk):
 
     serializer = CommentSerializer(data = request.data)
     serializer.is_valid()
-    #comment = serializer.save(owner = request.user)
     comment = serializer.save()
     request.user.comments.add(comment)
     concert.comments.add(comment)
     return Response(serializer.data)
 
+'''
+IMAGE FUNCTIONS
+'''
 class ConcertImageView(FormView):
     template_name = 'concert_image_form.html'
     form_class = ConcertImageForm
-
-    ConcertImage.objects.all().delete()
 
     def form_valid(self, form):
         concert_image = ConcertImage(
             image=self.get_form_kwargs().get('files')['image'])
         concert_image.save()
         self.id = concert_image.id
-
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return Response(json.loads('{"image_id":"'+str(self.id)+'"}'))
+        return HttpResponse(concert_image.image.url)
 
 @api_view(['GET'])
 def ConcertShowImage(request, pk):
     img = ConcertImage.objects.get(pk=pk)
-    return render(request,'concert_image_show.html',{"img":img})
+    return Response(img.image.url)
 
 @api_view(['GET'])
 def DeleteAllImages(request):
