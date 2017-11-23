@@ -75,12 +75,11 @@ urlpatterns = [
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
     # TAG
     url(r'^tags/(?P<search_str>[\w\-]+)/$',views.get_tags),
-    # CONCERT IMAGE
+    # IMAGE
     url(r'^upload_concert_image/', ConcertImageView.as_view(), name='concert_image_upload'),
     url(r'^concert_image/(?P<pk>\d+)/$', ConcertShowImage, name='concert_image'),
     url(r'^upload_user_image/', UserImageView.as_view(), name='user_image_upload'),
     url(r'^user_image/(?P<pk>\d+)/$', UserShowImage, name='user_image'),
-    #url(r'^delete_all_images/$', DeleteAllImages)
 
     # REPORT
     #url('^', include('django.contrib.auth.urls'))
