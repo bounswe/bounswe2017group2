@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,7 +44,9 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
     public void onBindViewHolder(ConcertListAdapterViewHolder holder, int position) {
         ConcertDto concert = mConcertData.get(position);
 
-        holder.mArtistName.setText(concert.artist.name);
+        if (concert.artist != null) {
+            holder.mArtistName.setText(concert.artist.name);
+        }
         holder.mConcertName.setText(concert.name);
         holder.mConcertDate.setText(concert.date);
     }
