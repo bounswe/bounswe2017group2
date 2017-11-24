@@ -6,6 +6,8 @@ import HomePage from "./components/pages/HomePage";
 import LoginPage from "./components/pages/LoginPage";
 import DashboardPage from "./components/pages/DashboardPage";
 import SignupPage from "./components/pages/SignupPage";
+import ConcertDetailPage from "./components/pages/ConcertDetailPage";
+import ProfilePage from "./components/pages/ProfilePage";
 import UserRoute from "./components/routes/UserRoute";
 import GuestRoute from "./components/routes/GuestRoute";
 // import TopNavigation from "./components/navigation/TopNavigation";
@@ -13,6 +15,8 @@ import GuestRoute from "./components/routes/GuestRoute";
 const App = ({ location, isAuthenticated }) => (
   <div className="ui container">
     <Route location={location} path="/" exact component={HomePage} />
+    <Route location={location} path="/concert/:concertID" exact component={ConcertDetailPage} />
+    <Route location={location} path="/user/:userID" exact component={ProfilePage} />
     <GuestRoute location={location} path="/login" exact component={LoginPage} />
     <GuestRoute
       location={location}
