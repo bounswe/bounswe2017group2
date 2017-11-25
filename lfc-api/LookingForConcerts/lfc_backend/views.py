@@ -248,7 +248,7 @@ def search_concerts(request):
     '''
     searches the get data with concerts name, location, artist and tags
     '''
-    searchString = request.data['search']
+    searchString = request.GET.get('search')
     try:
         concerts = Concert.objects.filter(Q(name__contains=searchString)|
                                           Q(location__venue__contains=searchString)|
