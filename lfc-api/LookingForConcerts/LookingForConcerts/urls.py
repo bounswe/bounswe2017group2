@@ -69,7 +69,8 @@ urlpatterns = [
     url(r'^newconcert/$', views.create_concert), # creates a concert with provided info; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert
     # CONCERT SEARCH
-    url(r'^concerts/search/$', views.search_concerts), # returns a list of concerts by matching with data on their name, location, artist and tags.
+    url(r'^concerts/search/$', views.search_concerts), # returns a list of concerts matching with data on their name, location, artist and tags.
+    url(r'^concerts/advanced_search/$', views.advanced_search) 
     #ARTIST
     url(r'^searchartists/', views.search_artists), # returns a list of artists by doing a search on Spotify given a query string
     # COMMENT
