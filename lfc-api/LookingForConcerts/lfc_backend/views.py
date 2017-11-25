@@ -64,7 +64,7 @@ def get_user_with_pk(request, pk):
     returns  the registered user with the given primary key.
     '''
     try:
-        user = RegisteredUser.objects.get(pk=pk) 
+        user = RegisteredUser.objects.get(pk=pk)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
     serializer = RegisteredUserSerializer(user)
@@ -276,10 +276,10 @@ def search_concerts(request):
 def advanced_search(request):
     '''
     Searches the concerts with the strings given for concert's name, location, artist and tag.
-    For each of the fields above, endpoint requires a different string. If string is not given or equal to '' search is not filtered for that field. 
+    For each of the fields above, endpoint requires a different string. If string is not given or equal to '' search is not filtered for that field.
     ---For now search can only be done for one tag.
     ---DateTime needs to be implemented
-    ''' 
+    '''
     data = request.GET
     concert_name = data.get('concert_name','')
     location_venue = data.get('location_venue','')
@@ -288,7 +288,7 @@ def advanced_search(request):
     max_value = data.get('max_price','')
     min_value = data.get('min_price','')
 
-    
+
 
     concerts = Concert.objects.all()
     if concert_name !='' :
@@ -303,7 +303,7 @@ def advanced_search(request):
         concerts = concerts.filter(Q(price_max__lte=max_value))
     if min_value.isnumeric() :
         concerts = concerts.filter(Q(price_min__gte=min_value))
-    
+
     try:
         serializer = ConcertSerializer(concerts,many=True)
         return Response(serializer.data, status = status.HTTP_200_OK)
@@ -462,6 +462,10 @@ TAG FUNCTIONS
 
 @api_view(['GET'])
 def get_tags(request, search_str):
+    '''
+    @param: search_str
+    @return: json list of found tags
+    '''
     if (not request.user.is_authenticated):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
 
@@ -519,6 +523,10 @@ def create_comment(request,pk):
 IMAGE FUNCTIONS
 '''
 class ConcertImageView(FormView):
+    '''
+    Uploads a concert image to the database
+    @return: url of the uploaded image
+    '''
     template_name = 'concert_image_form.html'
     form_class = ConcertImageForm
 
@@ -531,10 +539,18 @@ class ConcertImageView(FormView):
 
 @api_view(['GET'])
 def ConcertShowImage(request, pk):
+    '''
+    @param: pk, id of the cocert image
+    @return: url of that image
+    '''
     img = ConcertImage.objects.get(pk=pk)
     return HttpResponseRedirect(concert_image.image.url)
 
 class UserImageView(FormView):
+    '''
+    Uploads a user image to the database
+    @return: url of the uploaded image
+    '''
     template_name = 'user_image_form.html'
     form_class = UserImageForm
 
@@ -547,5 +563,9 @@ class UserImageView(FormView):
 
 @api_view(['GET'])
 def UserShowImage(request, pk):
+    '''
+    @param: pk, id of the user image
+    @return: url of the image
+    '''
     img = UsserImage.objects.get(pk=pk)
     return HttpResponseRedirect(user_image.image.url)
