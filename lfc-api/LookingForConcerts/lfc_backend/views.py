@@ -272,10 +272,16 @@ def advanced_search(request):
     location_venue = data.get('location_venue','')
     artist_name = data.get('artist_name','')
     tag_value = data.get('tag_value','')
+    
+    #Version 2
+    #max_value = data.get('max_value','')
+    #min_value = data.get('min_value','')
+    
+    
     concerts = Concert.objects.all()
     if concert_name !='' :
         concerts = concerts.filter(Q(name__contains=concert_name))
-    if location_vanue !='' :
+    if location_venue !='' :
         concerts = concerts.filter(Q(location__venue__contains=location_venue))
     if artist_name !='' :
         concerts = concerts.filter(Q(artist__name__contains=artist_name))
