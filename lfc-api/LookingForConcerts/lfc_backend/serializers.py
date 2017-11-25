@@ -2,6 +2,8 @@ from rest_framework import serializers
 from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Rating, Comment, Image, Artist
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import status
+
 
 class FollowedFollowingUserSerializer(serializers.ModelSerializer):
     class Meta:

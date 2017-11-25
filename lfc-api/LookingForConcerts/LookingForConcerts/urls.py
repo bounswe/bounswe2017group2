@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 from django.views import generic
 from lfc_backend.views import ConcertImageView, ConcertShowImage, UserImageView, UserShowImage
 from rest_framework.schemas import get_schema_view
+from rest_framework_swagger.views import get_swagger_view # for API Documentation with Swagger
 
 from LookingForConcerts import settings
 
@@ -34,10 +35,15 @@ from rest_framework_simplejwt.views import (
 
 from django.contrib.auth.views import logout # for user logout
 
+#API_PREFIX = r'^v(?P<version>[0-9]+\.[0-9]+)'
+
 urlpatterns = [
     url(r'^$', generic.RedirectView.as_view(
-         url='/api/', permanent=False)),
-    url(r'^api/$', get_schema_view()),
+         url='/api/', permanent=False)), # redirect to /api/ if no matches are found
+    url(r'^api/$', get_swagger_view(title='Looking for Concerts API')), # our API Documentation
+    # for drf Open API - if we want to switch to it later
+    #url(f'{API_PREFIX}/schema/', views.MySchemaView.as_view(title='Looking For Concerts API'), name='api_schema'),
+
     # JWT AUTHENTICATION
     url(r'^api/auth/', include(
         'rest_framework.urls', namespace='rest_framework')),

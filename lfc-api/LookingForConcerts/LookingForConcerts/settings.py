@@ -53,7 +53,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication', # for JWT auth
-    )
+    ),
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning'
+
 }
 
 SIMPLE_JWT = {
@@ -78,8 +80,18 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-BASE_URL = '127.0.0.1:8000/'
+HOST = '34.210.127.92'
+PORT = '8000'
+BASE_URL = HOST+':'+PORT +'/'
+HOME_URL = BASE_URL + 'home/'
 LOGIN_URL = BASE_URL + 'login/'
+
+SOCIALACCOUNT_PROVIDERS= {
+    'spotify': {
+        'client_id': 'f868164aafa94586aa37fa23926f1830',
+        'client_secret':'fcad57195d6144fa82959e7516a0e07e'
+    }
+}
 #LOGIN_REDIRECT_URL = LOGIN_URL
 #SOCIALACCOUNT_QUERY_EMAIL = True
 #SOCIALACCOUNT_PROVIDERS = {
@@ -121,6 +133,9 @@ INSTALLED_APPS = [
     'django.contrib.sites', # added
     # REST framework
     'rest_framework',
+    # Swagger for API Documentation
+    'rest_framework_swagger',
+    #'drf_openapi',
     #'rest_framework.authtoken',
     #'rest_auth',
     #'rest_auth.registration',
@@ -154,14 +169,6 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                # 'django.contrib.auth.context_processors.auth',
-                # 'django.template.context_processors.debug',
-                # 'django.template.context_processors.i18n',
-                # 'django.template.context_processors.media',
-                # 'django.template.context_processors.static',
-                # 'django.template.context_processors.tz',
-                # 'django.contrib.messages.context_processors.messages',
-                # 'django.template.context_processors.request',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
