@@ -266,18 +266,18 @@ def advanced_search(request):
     Searches the concerts with the strings given for concert's name, location, artist and tag.
     For each of the fields above, endpoint requires a different string. If string is not given or equal to '' search is not filtered for that field. 
     ---For now search can only be done for one tag.
+    ---DateTime needs to be implemented
     ''' 
     data = request.GET
     concert_name = data.get('concert_name','')
     location_venue = data.get('location_venue','')
     artist_name = data.get('artist_name','')
     tag_value = data.get('tag_value','')
+    max_value = data.get('max_price','')
+    min_value = data.get('min_price','')
+
     
-    #Version 2
-    #max_value = data.get('max_value','')
-    #min_value = data.get('min_value','')
-    
-    
+
     concerts = Concert.objects.all()
     if concert_name !='' :
         concerts = concerts.filter(Q(name__contains=concert_name))
@@ -285,8 +285,12 @@ def advanced_search(request):
         concerts = concerts.filter(Q(location__venue__contains=location_venue))
     if artist_name !='' :
         concerts = concerts.filter(Q(artist__name__contains=artist_name))
-    if tag_value !='':
+    if tag_value !='' :
         concerts = concerts.filter(Q(tags__value__contains=tag_value))
+    if max_value.isnumeric() :
+        concerts = concerts.filter(Q(price_max__lte=max_value))
+    if min_value.isnumeric() :
+        concerts = concerts.filter(Q(price_min__gte=min_value))
     
     try:
         serializer = ConcertSerializer(concerts,many=True)
