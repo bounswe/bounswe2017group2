@@ -6,11 +6,24 @@ from django.contrib.auth.models import AbstractUser
 
 from django.utils.translation import ugettext_lazy as _
 from .managers import UserManager
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 from django.conf import settings
 
 import datetime
 
+# This code is triggered whenever a new user has been created and saved to the database
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+
 # Models in our Database.
+class UserImage(models.Model):
+    image = models.FileField(upload_to='user/')
+
 class RegisteredUser(AbstractUser):
     """Registered User class"""
     # FIELDS COMING FROM AbstracUser
@@ -29,7 +42,7 @@ class RegisteredUser(AbstractUser):
     )
     birth_date = models.DateField(_('birth_date'), null=True, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    image = models.CharField(max_length=300, blank=True)
     followers = models.ManyToManyField("self", symmetrical=False, related_name = 'following')
 
 class Location(models.Model):
@@ -58,6 +71,9 @@ class Image(models.Model):
     url = models.URLField()
     width = models.IntegerField()
 
+class ConcertImage(models.Model):
+    image = models.FileField(upload_to='concert/')
+
 class Concert(models.Model):
     concert_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length= 150)
@@ -71,6 +87,7 @@ class Concert(models.Model):
     description =  models.CharField(max_length=2000, blank=True)
     price_min = models.IntegerField()
     price_max = models.IntegerField()
+    image = models.CharField(max_length=300, blank=True)
     #ratings -implemented in Rating
     #concertReports -implemented in Report --ONE TO MANY
 
