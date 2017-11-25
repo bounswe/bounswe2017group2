@@ -56,6 +56,7 @@ urlpatterns = [
     url(r'^logout/$', logout, name='logout'), # logs the user out
     url(r'^users/$',views.list_users), # lists all the users registered to our app
     url(r'^user/me/$', views.get_user_info), # returns the logged in user object; requires authorization
+    url(r'^user/(?P<pk>[0-9]+)/', views.get_user_with_pk), #returns the user information of the user with the pk as its id
     url(r'^user/(?P<pk>[0-9]+)/follow/$', views.follow_user), # the logged in user follows the one with given pk; requires authorization
     url(r'^user/(?P<pk>[0-9]+)/unfollow/$', views.unfollow_user), # the logged in user unfollows the one with given pk; requires authorization
     url(r'^user/get_concerts/$',views.get_user_concerts), # returns all the concerts of the logged in user; requires authorization

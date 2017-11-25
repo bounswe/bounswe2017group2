@@ -58,6 +58,18 @@ def list_users(request):
     serializer = RegisteredUserSerializer(registered_users, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def get_user_with_pk(request, pk):
+    '''
+    returns  the registered user with the given primary key.
+    '''
+    try:
+        user = RegisteredUser.objects.get(pk=pk) 
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    serializer = RegisteredUserSerializer(user)
+    return Response(serializer.data)
+
 @api_view(['POST'])
 def follow_user(request,pk):
     '''
