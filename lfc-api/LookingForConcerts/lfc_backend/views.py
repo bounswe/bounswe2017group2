@@ -14,14 +14,16 @@ from django.contrib.auth import authenticate, login # for user authentication an
 from django.contrib.auth.decorators import login_required, permission_required # permissions
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
-import spotipy
+from django.db.models import Q # used in basic search
+
+import spotipy # Lightweight Python library for the Spotify Web API
 import traceback
-import json
-from spotipy.oauth2 import SpotifyClientCredentials
-import requests
-import json
-import re
+from spotipy.oauth2 import SpotifyClientCredentials # for connecting Spotify when doing artist search
+import requests # for sending requests
+import json # for getting the response body as json
+import re # for regular expressions
+import uuid # to generate random string for state in spotify_connect
+
 
 
 
@@ -33,6 +35,12 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
+from rest_framework import permissions
+
+#from drf_openapi.views import SchemaView
+
+# class MySchemaView(SchemaView):
+#     permission_classes = (permissions.AllowAny, )
 
 # The actual python functions that do the backend work.
 
@@ -181,7 +189,7 @@ def list_concerts(request):
     @params: None
     '''
     if request.method =='GET':
-        concerts = Concert.objects.all().order_by('-date_time')
+        concerts = Concert.objects.all().order_by('-date_time') # sort by decreasing date_time
         serializer = ConcertSerializer(concerts, many=True)
         return Response(serializer.data)
     else:
@@ -360,6 +368,7 @@ RATING FUNCTIONS
 def rate_concert(request,pk):
     '''
     Adds ratings by the logged in user to the concert with given pk
+    @params
     '''
     if (not request.user.is_authenticated):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -374,14 +383,14 @@ def rate_concert(request,pk):
     except:
         return Response(status = status.HTTP_403_FORBIDDEN)
 
-    try:
+    try: # if this user has already rated this concert
         rating = concert.ratings.get(concert = concert.pk, owner = request.user.pk)
         serializer = RatingSerializer(rating, data = request.data)
         if serializer.is_valid():
             rating = serializer.save()
             return Response(serializer.data, status = status.HTTP_200_OK)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-    except ObjectDoesNotExist:
+    except ObjectDoesNotExist: # if this user is rating this concert for the first time
         serializer = RatingSerializer(data = request.data)
         if serializer.is_valid():
             rating = serializer.save()
