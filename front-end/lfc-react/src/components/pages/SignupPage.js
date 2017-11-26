@@ -11,6 +11,8 @@ class SignupPage extends React.Component {
   render() {
     return (
       <div>
+        <h1>Signup to LookingForConcerts</h1>
+
         <SignupForm submit={this.submit} />
       </div>
     );

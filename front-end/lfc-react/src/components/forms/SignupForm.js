@@ -64,41 +64,60 @@ class SignupForm extends React.Component {
             <p>{errors.global}</p>
           </Message>
         )}
-        <Form.Field error={!!errors.username}>
-          <label htmlFor="username">User Name</label>
-          <input
-            type="username"
-            id="username"
-            name="username"
-            placeholder="username"
-            value={data.username}
-            onChange={this.onChange}
-          />
+
+        <Form.Group widths={1}>
+          <Form.Input label="First name">
+            <input
+              name="first_name"
+              value={data.first_name}
+              onChange={this.onChange}
+            />
+          </Form.Input>
+          <Form.Input label="Last name">
+            <input
+              name="last_name"
+              value={data.last_name}
+              onChange={this.onChange}
+            />
+          </Form.Input>
+        </Form.Group>
+
+        <Form.Field error={!!errors.username} width={5}>
+          <label htmlFor="username">
+            User name
+            <input
+              name="username"
+              value={data.username}
+              onChange={this.onChange}
+            />
+          </label>
           {errors.username && <InlineError text={errors.username} />}
         </Form.Field>
 
-        <Form.Field error={!!errors.email}>
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="email@email.com"
-            value={data.email}
-            onChange={this.onChange}
-          />
+        <Form.Field error={!!errors.email} width={5}>
+          <label htmlFor="email">
+            Email
+            <input
+              type="email"
+              name="email"
+              value={data.email}
+              onChange={this.onChange}
+            />
+          </label>
           {errors.email && <InlineError text={errors.email} />}
         </Form.Field>
 
-        <Form.Field error={!!errors.password}>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={data.password}
-            onChange={this.onChange}
-          />
+        <Form.Field error={!!errors.password} width={5}>
+          <label htmlFor="password">
+            Password
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={data.password}
+              onChange={this.onChange}
+            />
+          </label>
           {errors.password && <InlineError text={errors.password} />}
         </Form.Field>
 
