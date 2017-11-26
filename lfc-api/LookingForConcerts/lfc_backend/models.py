@@ -34,6 +34,12 @@ class RegisteredUser(AbstractUser):
     # is_staff
     # first_name
     # last_name
+
+    # For recommendations
+    # if the user connects his account with Spotify
+    spotify_id = models.CharField(_('spotify_id'), max_length=50,null=True, blank=True)
+    spotify_refresh_token = models.CharField(_('spotify_refresh_token'),max_length=50,null=True, blank=True)
+
     email = models.EmailField(
         _('Email Address'), blank=False, unique=True,
         error_messages={
@@ -42,7 +48,7 @@ class RegisteredUser(AbstractUser):
     )
     birth_date = models.DateField(_('birth_date'), null=True, blank=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
-    image = models.CharField(max_length=300, blank=True)
+    image = models.CharField(max_length=300, null=True, blank=True)
     followers = models.ManyToManyField("self", symmetrical=False, related_name = 'following')
 
 class Location(models.Model):
@@ -87,7 +93,7 @@ class Concert(models.Model):
     description =  models.CharField(max_length=2000, blank=True)
     price_min = models.IntegerField()
     price_max = models.IntegerField()
-    image = models.CharField(max_length=300, blank=True)
+    image = models.CharField(max_length=300, null=True, blank=True)
     #ratings -implemented in Rating
     #concertReports -implemented in Report --ONE TO MANY
 
