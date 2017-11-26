@@ -24,12 +24,58 @@
                 android:hint="Concert Name (*)"
                 android:id="@+id/name_edit" />
 
-            <EditText
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="Artist Name (*)"
-                android:id="@+id/artist_edit" />
+                android:orientation="horizontal">
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="Artist Name (*)"
+                    android:id="@+id/artist_edit" />
+
+                <Button
+                    android:id="@+id/artist_button"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="go"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/selected_artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_centerVertical="true"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/artist_list_image_selected"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/artist_list_name_tv_selected"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/artist_list_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:visibility="gone">
+
+            </android.support.v7.widget.RecyclerView>
 
             <EditText
                 android:layout_width="match_parent"
@@ -72,7 +118,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Tags (Seperated by commas)"
+                android:hint="Tags (Separated by commas)"
                 android:id="@+id/tags_edit" />
 
             <EditText

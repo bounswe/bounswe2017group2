@@ -17,6 +17,8 @@ from datetime import timedelta
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL  = '/media/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -51,11 +53,13 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication', # for JWT auth
-    )
+    ),
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning'
+
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -72,12 +76,24 @@ SIMPLE_JWT = {
     'TOKEN_TYPE_CLAIM': 'token_type',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=30),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-BASE_URL = '127.0.0.1:8000/'
+HOST = '34.210.127.92'
+PORT = '8000'
+BASE_URL = HOST+':'+PORT +'/'
+HOME_URL = BASE_URL + 'home/'
 LOGIN_URL = BASE_URL + 'login/'
+
+
+SOCIALACCOUNT_PROVIDERS= {
+    'spotify': {
+        'client_id': 'f868164aafa94586aa37fa23926f1830',
+        'client_secret':'fcad57195d6144fa82959e7516a0e07e',
+        'redirect_uri':'http://localhost:8000/spotify/redirect',
+    }
+}
 #LOGIN_REDIRECT_URL = LOGIN_URL
 #SOCIALACCOUNT_QUERY_EMAIL = True
 #SOCIALACCOUNT_PROVIDERS = {
@@ -95,11 +111,16 @@ LOGIN_URL = BASE_URL + 'login/'
 #     }
 # }
 
-ADMIN_ENABLED = True
 
 '''
 WE ADDED THESE
 '''
+ADMIN_ENABLED = True
+
+ADMINS = [('Kemal Berk Kocabagli', 'kberkkocabagli@gmail.com'),
+          ('Haluk Alper Karaevli', 'hakaraevli@gmail.com'),
+          ('Enes Hecan', 'eneshecan@gmail.com'),
+         ]
 
 # Application definition
 SITE_ID = 1
@@ -114,16 +135,14 @@ INSTALLED_APPS = [
     'django.contrib.sites', # added
     # REST framework
     'rest_framework',
+    # Swagger for API Documentation
+    'rest_framework_swagger',
+    #'drf_openapi',
     'rest_framework.authtoken',
     'rest_auth',
     'rest_auth.registration',
     'lfc_backend.apps.LfcBackendConfig', # our app!
     'corsheaders',
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.facebook', # authentication with Facebook account
-    # 'allauth.socialaccount.providers.spotify', # authentication with Spotify account
 ]
 
 MIDDLEWARE = [
@@ -142,18 +161,10 @@ ROOT_URLCONF = 'LookingForConcerts.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                # 'django.contrib.auth.context_processors.auth',
-                # 'django.template.context_processors.debug',
-                # 'django.template.context_processors.i18n',
-                # 'django.template.context_processors.media',
-                # 'django.template.context_processors.static',
-                # 'django.template.context_processors.tz',
-                # 'django.contrib.messages.context_processors.messages',
-                # 'django.template.context_processors.request',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',

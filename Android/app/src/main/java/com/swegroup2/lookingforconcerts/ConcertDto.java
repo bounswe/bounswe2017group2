@@ -67,6 +67,7 @@ class Tag implements Serializable {
     @SerializedName("label")
     @Expose
     public String label;
+
 }
 
 class ConcertLocation implements Serializable {
@@ -83,6 +84,7 @@ class ConcertComment implements Serializable {
     @SerializedName("content")
     @Expose
     public String content;
+
 }
 
 class Artist implements Serializable {
@@ -92,9 +94,6 @@ class Artist implements Serializable {
     @SerializedName("spotify_id")
     @Expose
     public String spotifyId;
-    @SerializedName("concerts")
-    @Expose
-    public List<Integer> concerts;
     @SerializedName("images")
     @Expose
     public List<Image> images;
@@ -112,6 +111,7 @@ class Image implements Serializable {
     @Expose
     public Integer width;
 }
+
 
 class Ratings implements Serializable {
     @SerializedName("concert_atmosphere")

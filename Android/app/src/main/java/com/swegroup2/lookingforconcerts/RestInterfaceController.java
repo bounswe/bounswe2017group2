@@ -26,9 +26,8 @@ public interface RestInterfaceController {
     @GET("/concerts/")
     Call<List<ConcertDto>> getAllConcerts();
 
-    @GET("/me/")
+    @GET("/user/me/")
     Call<UserDto> getUserProfile(@HeaderMap Map<String, String> headermap);
-
 
     @GET("/concert/{id}/subscribe/")
     Call<ConcertResponse> attend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
@@ -38,5 +37,8 @@ public interface RestInterfaceController {
 
     @POST("/api/auth/token/refresh/")
     Call<RefreshResponse> refresh(@Body RefreshDto refreshDto);
+
+    @POST("/searchartists/")
+    Call<List<Artist>> searchForArtist(@Body Artist artist);
 
 }

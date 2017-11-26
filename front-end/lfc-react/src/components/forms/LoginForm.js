@@ -54,28 +54,27 @@ class LoginForm extends React.Component {
             <p>{errors.global}</p>
           </Message>
         )}
-        <Form.Field error={!!errors.username}>
-          <label htmlFor="username">User Name</label>
-          <input
-            type="username"
-            id="username"
-            name="username"
-            placeholder="username"
-            value={data.username}
-            onChange={this.onChange}
-          />
+        <Form.Field error={!!errors.username} width={5}>
+          <label htmlFor="username">
+            User Name
+            <input
+              name="username"
+              value={data.username}
+              onChange={this.onChange}
+            />
+          </label>
           {errors.username && <InlineError text={errors.username} />}
         </Form.Field>
-        <Form.Field error={!!errors.password}>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Make it secure"
-            value={data.password}
-            onChange={this.onChange}
-          />
+        <Form.Field error={!!errors.password} width={5}>
+          <label htmlFor="password">
+            Password
+            <input
+              type="password"
+              name="password"
+              value={data.password}
+              onChange={this.onChange}
+            />
+          </label>
           {errors.password && <InlineError text={errors.password} />}
         </Form.Field>
         <Button primary>Login</Button>

@@ -2,20 +2,30 @@ from rest_framework import serializers
 from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Rating, Comment, Image, Artist
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import status
 
+
+class FollowedFollowingUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=RegisteredUser
+        fields = ('id','username','email','first_name','last_name','birth_date') #Will add image when it is implemented.
 
 class RegisteredUserSerializer(serializers.ModelSerializer):
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     concerts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    followers = FollowedFollowingUserSerializer(many=True, read_only=True)
+    following = FollowedFollowingUserSerializer(many=True, read_only=True)
     class Meta:
         model=RegisteredUser
-        fields = ('username','email','password','first_name','last_name','birth_date','date_joined','is_active','avatar','comments','concerts','is_active')
+        fields = ('id','spotify_id','username','email','password','first_name','last_name','birth_date','date_joined','is_active','image','comments','concerts','followers','following')
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
         return registered_user
 
     def update(self, instance, validated_data):
+        instance.spotify_id = validated_data.get('spotify_id',instance.spotify_id)
+        instance.spotify_refresh_token = validated_data.get('spotify_refresh_token',instance.spotify_refresh_token)
         instance.username = validated_data.get('username',instance.username)
         instance.email = validated_data.get('email',instance.email)
         instance.password = validated_data.get('password',instance.password)
@@ -23,7 +33,8 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.birth_date = validated_data.get('birth_date', instance.birth_date)
         instance.is_active = validated_data.get('is_active', instance.is_active)
-        instance.avatar = validated_data.get('avatar', instance.avatar)
+        instance.image = validated_data.get('image', instance.image)
+
 
 class CommentSerializer(serializers.ModelSerializer):
     owner = RegisteredUserSerializer(read_only=True)
@@ -73,7 +84,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
-        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings')
+        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings', 'image', 'seller_url')
         # location should be retrieved from Google API
         # tags should be retrieved from a 3rd party semantic tag repository such as; Wikidata.
 
@@ -98,7 +109,7 @@ class ConcertSerializer(serializers.ModelSerializer):
         instance.date_time = validated_data.get('date_time',instance.date_time)
         instance.description = validated_data.get('description',instance.description)
         instance.price_min = validated_data.get('price_min', instance.price_min)
-        instance.price_max = validated_data.get('prica_max', instance.price_max)
+        instance.price_max = validated_data.get('price_max', instance.price_max)
         #needs implementing for updating tags. Note 3
         #needs implementing for updating location. Also need the outcome of Google Maps API
 
