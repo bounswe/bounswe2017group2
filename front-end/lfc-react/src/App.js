@@ -5,7 +5,7 @@ import { Route } from "react-router-dom";
 import HomePage from "./components/pages/HomePage";
 import LoginPage from "./components/pages/LoginPage";
 import DashboardPage from "./components/pages/DashboardPage";
-import ConcertDetailPage from "./components/pages/ConcertDetailPage";
+import ConcertDetailPage from "./components/pages/ConcertDetailPage/ConcertDetailPage";
 import SignupPage from "./components/pages/SignupPage";
 import UserRoute from "./components/routes/UserRoute";
 import GuestRoute from "./components/routes/GuestRoute";
