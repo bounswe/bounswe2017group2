@@ -5,8 +5,6 @@ function DashboardPage() {
   return (
     <div>
       <p>Youre in the DashboardPage!</p>
-
-      <Link to="concert/1">Adamlar Concert</Link>
     </div>
   );
 }
