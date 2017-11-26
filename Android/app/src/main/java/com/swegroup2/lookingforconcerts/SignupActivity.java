@@ -5,14 +5,18 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,13 +34,24 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SignupActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int PICK_IMAGE = 100;
+    Uri imageURI;
     private EditText mEmailView;
     private EditText mUsernameView;
     private EditText mPasswordView;
+    private EditText mFirstName;
+    private EditText mLastName;
+    private EditText mBirthDate;
+    private ImageView mProfilePic;
 
     String email;
     String username;
     String password;
+    String firstname;
+    String lastname;
+    String birthdate;
+    String profilepic;
+
 
 
     @Override
@@ -47,6 +62,21 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         mEmailView = (EditText) findViewById(R.id.email);
         mUsernameView = (EditText) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
+        mFirstName = (EditText) findViewById(R.id.firstname);
+        mLastName = (EditText) findViewById(R.id.lastname);
+        //mBirthDate = (EditText) findViewById(R.id.birthdate);
+        mProfilePic = (ImageView) findViewById(R.id.profilepic);
+
+        Button mProfilePicButton = (Button) findViewById(R.id.profilepicbutton);
+
+        mProfilePicButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                openGallery();
+
+                uploadImage();
+            }
+        });
 
         Button mEmailSignUpButton = (Button) findViewById(R.id.email_sign_up_button);
 
@@ -56,17 +86,53 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
                 email = mEmailView.getText().toString().trim();
                 username = mUsernameView.getText().toString().trim();
                 password = mPasswordView.getText().toString().trim();
+                firstname = mFirstName.getText().toString().trim();
+                lastname = mLastName.getText().toString().trim();
+                //birthdate = mBirthDate.getText().toString().trim();
                 postRequestMethod();
 
-                SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
-                //String newUser = mEmailView.getText().toString();
 
-                SharedPreferences.Editor editor = preferences.edit();
+            }
+        });
+    }
 
-                //editor.putString(newUser, newUser);
-                editor.commit();
+    private void openGallery(){
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        startActivityForResult(gallery, PICK_IMAGE);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK && requestCode == PICK_IMAGE){
+            imageURI = data.getData();
+            mProfilePic.setImageURI(imageURI);
+            Log.d("tag",imageURI.getPath());
+        }
+    }
 
+    public void uploadImage(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        UserDto userDto = new UserDto();
+        userDto.image = profilepic;
+
+        Call<UserResponse> call = controller.uploadImage(userDto);
+        call.enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                Toast.makeText(SignupActivity.this, "UPLOADED", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+
+                Toast.makeText(SignupActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -83,6 +149,10 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         userDto.email = email;
         userDto.username = username;
         userDto.password = password;
+        userDto.firstName = firstname;
+        userDto.lastName = lastname;
+        //userDto.birthDate = birthdate;
+        //userDto.image = profilepic;
 
         Call<UserResponse> call = controller.signUp(userDto);
         call.enqueue(new Callback<UserResponse>() {
