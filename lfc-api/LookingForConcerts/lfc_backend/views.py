@@ -19,15 +19,12 @@ from django.db.models import Q # used in basic search
 import spotipy # Lightweight Python library for the Spotify Web API
 import traceback
 from spotipy.oauth2 import SpotifyClientCredentials # for connecting Spotify when doing artist search
+
+
 import requests # for sending requests
 import json # for getting the response body as json
 import re # for regular expressions
 import uuid # to generate random string for state in spotify_connect
-
-
-
-
-from rest_framework_simplejwt.tokens import RefreshToken # for blacklisting tokens upon user logout
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -114,6 +111,121 @@ def signup(request):
         return Response(serializer.data, status = status.HTTP_201_CREATED) # success!
     else:
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST) # something went wrong!
+
+def spotify_get_access_token(spotify_refresh_token):
+    print(spotify_refresh_token)
+
+
+
+
+# I'm using this to test it without the front-end.
+@api_view(['GET'])
+def spotify_redirect(request):
+    # check state to make sure it is the same user.
+    if 'spotify_state' in request.session:
+        if request.GET.get('state')==request.session['spotify_state']:
+            print("Spotify connect: states matched.")
+    else:
+        return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
+
+    if request.GET.get('error') is not None:
+        return Response({'error':'The user did not give authorization for connecting to Spotify'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    code = request.GET.get('code') # got the authorization code.
+
+    client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
+    client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
+    #redirect_uri = request.GET.get('redirect_uri') # normally, front-end will provide this as a parameter.
+    # Now, since I know the redirect uri I hard coded it.
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']
+
+    TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
+
+    params = {
+        'grant_type' : 'authorization_code',
+        'code' : code,
+        'redirect_uri' : redirect_uri,
+        'client_id':client_id,
+        'client_secret':client_secret,
+    }
+
+    headers = {
+         "Content-Type": "application/x-www-form-urlencoded",
+     }
+
+    r = requests.post(TOKEN_ENDPOINT, params= params, headers=headers)
+
+    if r.status_code == 200: # SUCCESS!
+        spotify_access_token = r.json()['access_token']
+        # token type is always "Bearer"
+        spotify_refresh_token = r.json()['refresh_token']
+        spotify_scope = r.json()['scope']
+
+        #print("USERNAME: " + str(request.user['username']))
+        print("ACCESS TOKEN: " + str(spotify_access_token))
+        print("REFRESH TOKEN: " + str(spotify_refresh_token))
+        user = request.user
+        user.spotify_refresh_token = spotify_refresh_token
+        user.save(update_fields=['spotify_refresh_token']) # save the Spotify refresh token for this user.
+
+        return Response({'message':'Successfully connected the account with Spotify!'}, status = status.HTTP_200_OK)
+    else:
+        Response(status = r.status_code)
+
+# This will be used with the front-end
+@api_view(['POST'])
+def spotify_connect(request):
+    return Response(request.data['code'],status = status.HTTP_200_OK)
+
+@api_view(['POST'])
+def spotify_authorize(request):
+    if not request.user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    elif request.user.spotify_refresh_token is not None:
+        return Response({'error':'The account is already connected to Spotify.'}, status = status.HTTP_400_BAD_REQUEST)
+
+    ### STEP 1
+    print("building request for Spotify connect step 1...")
+    AUTHORIZATION_ENDPOINT = "https://accounts.spotify.com/authorize"
+    scope= 'playlist-read-private' # Read access to user's private playlists.
+    scope+= ' playlist-read-collaborative' # Include collaborative playlists when requesting a user's playlists.
+    scope+= ' user-follow-read' # Read access to the list of artists and other users that the user follows.
+    scope+= ' user-library-read' # Read access to a user's "Your Music" library.
+    scope+= ' user-read-email' # Read access to user’s email address.
+    scope+= ' user-top-read' # Read access to a user's top artists and tracks.
+
+    client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
+    client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']  # redirect URL should normally be the login page.
+
+    # If you generate a random string or encode the hash of some client state (e.g., a cookie)
+    # in this state variable, you can validate the response to additionally ensure that the
+    # request and response originated in the same browser.
+    state = uuid.uuid4().hex
+    request.session['spotify_state'] = state
+    params = {
+        'client_id' : client_id,
+        'response_type' : 'code',
+        'redirect_uri' : redirect_uri ,
+        'state': state,
+        'scope' : scope,
+        'show_dialog':False
+    }
+    print("sending request for Spotify connect step 1...")
+    r = requests.get(AUTHORIZATION_ENDPOINT, params = params, allow_redirects=True)
+    return Response({'url':r.url,'state':state},status = r.status_code)
+
+@api_view(['POST'])
+def spotify_disconnect(request):
+    if not request.user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    elif request.user.spotify_refresh_token is None:
+        return Response({'error':'The account is not connected to Spotify.'}, status = status.HTTP_400_BAD_REQUEST)
+
+    user = request.user
+    user.spotify_refresh_token = None
+    user.save(update_fields=['spotify_refresh_token'])
+    return Response({'message':'Account successfully disconnected from Spotify.'},status = status.HTTP_200_OK)
 
 @api_view(['DELETE'])
 def deactivate_user(request):
