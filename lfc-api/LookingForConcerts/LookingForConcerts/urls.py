@@ -52,6 +52,13 @@ urlpatterns = [
     url(r'^api/auth/token/verify/$', TokenVerifyView.as_view()), # verifies a JWT Access Token
     # USER
     url(r'^signup/$', views.signup, name='signup'), # registers a new user
+
+    url(r'^spotify/authorize$', views.spotify_authorize, name='spotify_authorize'), # sets up the scope and sends the uri to the Spotify connect page
+    url(r'^spotify/connect$', views.spotify_connect, name='spotify_connect'), # connects the Spotify account of the user to his LFC account
+    url(r'^spotify/redirect$', views.spotify_redirect, name='spotify_redirect'),
+    url(r'^spotify/disconnect$', views.spotify_disconnect, name='spotify_disconnect'), # disconnects the account from Spotify
+
+
     url(r'^login/$', TokenObtainPairView.as_view()), # logs the user in
     url(r'^logout/$', logout, name='logout'), # logs the user out
     url(r'^users/$',views.list_users), # lists all the users registered to our app
