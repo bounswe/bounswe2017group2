@@ -84,7 +84,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
-        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings', 'image')
+        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings', 'image', 'seller_url')
         # location should be retrieved from Google API
         # tags should be retrieved from a 3rd party semantic tag repository such as; Wikidata.
 
@@ -109,7 +109,7 @@ class ConcertSerializer(serializers.ModelSerializer):
         instance.date_time = validated_data.get('date_time',instance.date_time)
         instance.description = validated_data.get('description',instance.description)
         instance.price_min = validated_data.get('price_min', instance.price_min)
-        instance.price_max = validated_data.get('prica_max', instance.price_max)
+        instance.price_max = validated_data.get('price_max', instance.price_max)
         #needs implementing for updating tags. Note 3
         #needs implementing for updating location. Also need the outcome of Google Maps API
 

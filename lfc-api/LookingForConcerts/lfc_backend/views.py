@@ -55,6 +55,18 @@ def list_users(request):
     serializer = RegisteredUserSerializer(registered_users, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def get_user_with_pk(request, pk):
+    '''
+    returns  the registered user with the given primary key.
+    '''
+    try:
+        user = RegisteredUser.objects.get(pk=pk) 
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    serializer = RegisteredUserSerializer(user)
+    return Response(serializer.data)
+
 @api_view(['POST'])
 def follow_user(request,pk):
     '''
@@ -316,8 +328,11 @@ def create_concert(request):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
 
     # user is logged in at this point
-    artist_data = request.data.pop('artist')
-    images_data = artist_data.pop('images')
+    try:
+        artist_data = request.data.pop('artist')
+        images_data = artist_data.pop('images')
+    except:
+        return Response({'Error':'Artist field\'s structure should be identical to the results in searchartist endpoint'},status=status.HTTP_400_BAD_REQUEST)
     artist = None
     #artist lookup in db
     try:
@@ -355,9 +370,9 @@ def create_concert(request):
 @api_view(['GET'])
 def search_concerts(request):
     '''
-    searches the post data with concerts name, location, artist and tags
+    searches the get data with concerts name, location, artist and tags
     '''
-    searchString = request.data['search']
+    searchString = request.GET.get('search')
     try:
         concerts = Concert.objects.filter(Q(name__contains=searchString)|
                                           Q(location__venue__contains=searchString)|
@@ -368,6 +383,47 @@ def search_concerts(request):
     except:
         traceback.print_exc()
         return Response(status = status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def advanced_search(request):
+    '''
+    Searches the concerts with the strings given for concert's name, location, artist and tag.
+    For each of the fields above, endpoint requires a different string. If string is not given or equal to '' search is not filtered for that field. 
+    ---For now search can only be done for one tag.
+    ---DateTime needs to be implemented
+    ''' 
+    data = request.GET
+    concert_name = data.get('concert_name','')
+    location_venue = data.get('location_venue','')
+    artist_name = data.get('artist_name','')
+    tag_value = data.get('tag_value','')
+    max_value = data.get('max_price','')
+    min_value = data.get('min_price','')
+
+    
+
+    concerts = Concert.objects.all()
+    if concert_name !='' :
+        concerts = concerts.filter(Q(name__contains=concert_name))
+    if location_venue !='' :
+        concerts = concerts.filter(Q(location__venue__contains=location_venue))
+    if artist_name !='' :
+        concerts = concerts.filter(Q(artist__name__contains=artist_name))
+    if tag_value !='' :
+        concerts = concerts.filter(Q(tags__value__contains=tag_value))
+    if max_value.isnumeric() :
+        concerts = concerts.filter(Q(price_max__lte=max_value))
+    if min_value.isnumeric() :
+        concerts = concerts.filter(Q(price_min__gte=min_value))
+    
+    try:
+        serializer = ConcertSerializer(concerts,many=True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    except:
+        traceback.print_exc()
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+
+
 
 # also gets a primary key as a parameter
 @api_view(['GET','PUT','DELETE'])
@@ -436,10 +492,10 @@ ARTIST FUNCTIONS
 '''
 @api_view(['GET'])
 def search_artists(request):
-    data = request.data
+    data = request.GET
     client_credentials_manager = SpotifyClientCredentials(client_id='60ab66df7413492bbc86150d7a3617d7', client_secret='007ccb30ee7e4eb98478b7a34fc869e4')
     spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-    spotifyresults = spotify.search(q='artist:'+data['name'], type='artist')
+    spotifyresults = spotify.search(q='artist:'+data.get('name'), type='artist')
     spotifyresults = spotifyresults['artists']['items']
     results = []
     for spotifyresult in spotifyresults:
