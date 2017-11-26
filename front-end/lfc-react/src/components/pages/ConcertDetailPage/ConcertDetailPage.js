@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Button } from 'semantic-ui-react';
-//import './design.css';
+import './design.css';
 import $ from 'jquery';
 import decode from "jwt-decode";
 
