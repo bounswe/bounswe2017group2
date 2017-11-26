@@ -173,6 +173,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putString("token", token);
                     editor.commit();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

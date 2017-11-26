@@ -41,4 +41,7 @@ public interface RestInterfaceController {
     @POST("/searchartists/")
     Call<List<Artist>> searchForArtist(@Body Artist artist);
 
+    @POST("/upload_user_image/")
+    Call<UserResponse> uploadImage(@Body UserDto userDto );
+
 }

@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +30,8 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     private Button logoutButton;
 
     private Button profile;
+
+    private SearchView mSearch;
 
     String refreshToken = "";
     String accessToken = "";
