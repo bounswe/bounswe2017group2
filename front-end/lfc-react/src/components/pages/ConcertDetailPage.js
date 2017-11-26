@@ -97,8 +97,40 @@ class Concert extends React.PureComponent {
     }
 
     render() {
+
+
         userID = decode(localStorage.lfcJWT).user_id;
         console.log(userID);
+
+
+        var coor = this.state.concert.location.coordinates;
+        this.state.concert.location.lat = parseFloat(coor.substring(0, coor.indexOf(" ")), 10);
+        this.state.concert.location.lng = parseFloat(coor.substring(coor.indexOf(" ")), 10);
+        var ConcertLocationMap = compose(
+            withProps({
+                googleMapURL: "https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=" + googleMapKey,
+                loadingElement: <div style={{ height: `100%` }} />,
+                containerElement: <div style={{ height: `300px` }} />,
+                mapElement: <div style={{ height: `100%` }} />,
+            }),
+            withScriptjs,
+            withGoogleMap,
+        )((props) =>
+            <GoogleMap
+                defaultZoom={12}
+                defaultCenter={{ lat: this.state.concert.location.lat, lng: this.state.concert.location.lng }}
+            >
+                <Marker position={{ lat: this.state.concert.location.lat, lng: this.state.concert.location.lng }} onClick={props.onMarkerClick}>
+                    {<InfoWindow>
+                        <h3><b>{this.state.concert.location.venue}</b></h3>
+                    </InfoWindow>}
+                </Marker>
+            </GoogleMap>
+            )
+
+
+
+
         return (
             <div className="ui grid segment start">
                 <div className="row">
@@ -115,7 +147,11 @@ class Concert extends React.PureComponent {
 
                 <div className="row">
                     <img className="ui image five wide column" height="300px" src={this.state.concert.artist.images[0].url} />
-
+                    <div className="eleven wide column" >
+                        <ConcertLocationMap
+                            isMarkerShown={true}
+                        />
+                    </div>
                 </div>
 
 
@@ -124,7 +160,7 @@ class Concert extends React.PureComponent {
                     <div className="sixteen wide column">
                         <p>{this.state.concert.description}</p>
 
-                        
+
                     </div>
                 </div>
 
