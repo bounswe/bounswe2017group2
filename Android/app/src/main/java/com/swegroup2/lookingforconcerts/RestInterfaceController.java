@@ -26,7 +26,7 @@ public interface RestInterfaceController {
     @GET("/concerts/")
     Call<List<ConcertDto>> getAllConcerts();
 
-    @GET("/me/")
+    @GET("/user/me/")
     Call<UserDto> getUserProfile(@HeaderMap Map<String, String> headermap);
 
     @GET("/concert/{id}/subscribe/")
