@@ -42,9 +42,9 @@ public class UserDto {
     @Expose()
     public Boolean isActive;
 
-    @SerializedName("avatar")
+    @SerializedName("image")
     @Expose()
-    public Integer avatar;
+    public String image;
 
     @SerializedName("comments")
     @Expose()

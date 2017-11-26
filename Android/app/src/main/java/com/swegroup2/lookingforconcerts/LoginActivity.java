@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -373,6 +374,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     JSONObject json = new JSONObject(token);
                     i.putExtra("access", json.getString("access"));
                     i.putExtra("refresh", json.getString("refresh"));
+
+                    SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
+                    String accToken = json.getString("access");
+                    String refToken = json.getString("refresh");
+
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(accToken, accToken);
+                    editor.putString(refToken, refToken);
+                    editor.commit();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
