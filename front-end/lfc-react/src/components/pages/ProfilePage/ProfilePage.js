@@ -67,20 +67,42 @@ class ProfilePage extends React.Component {
                 comments: [],
                 concerts: [],
                 date_joined: '',
+                followers: [],
+                following: [],
             },
             willAttend: [],
             attended: [],
-            followers: [],
-            following: [],
             accessToken: theToken,
         };
         this.handleTab = this.handleTab.bind(this);
+        this.handleFollow = this.handleFollow.bind(this);
     }
 
-    removeActive(tabName){
-        if (document.getElementById(tabName).classList.contains("active")){
+    handleFollow(isFollow) {
+        if (isFollow) {
+            axios.get('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/follow/', {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + theToken
+            })
+                .then(response => {
+                    window.location.reload();
+                })
+        }
+        else {
+            axios.get('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/unfollow/', {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + theToken
+            })
+                .then(response => {
+                    window.location.reload();
+                })
+        }
+    }
+
+    removeActive(tabName) {
+        if (document.getElementById(tabName).classList.contains("active")) {
             document.getElementById(tabName).classList.remove("active");
-            document.getElementById(tabName+"Tab").classList.remove("active");
+            document.getElementById(tabName + "Tab").classList.remove("active");
         }
     }
 
@@ -90,7 +112,7 @@ class ProfilePage extends React.Component {
         this.removeActive("followedUsers");
         this.removeActive("followers");
         document.getElementById(tabName).classList.add("active");
-        document.getElementById(tabName+"Tab").classList.add("active");
+        document.getElementById(tabName + "Tab").classList.add("active");
     }
 
     componentWillMount() {
@@ -120,7 +142,6 @@ class ProfilePage extends React.Component {
                     }, error => {
                         console.log("refresh concert");
                     });
-                console.log(userData);
                 this.setState({
                     user: userData,
                 })
@@ -131,7 +152,24 @@ class ProfilePage extends React.Component {
 
 
     render() {
-        console.log(userID + " " + this.props.match.params.concertID);
+        let editFollowButton;
+        if (userID == this.props.match.params.userID) {
+            editFollowButton = (<button className="ui  floated button">
+                Edit Profile
+            </button>);
+        }
+        else {
+            if (this.state.user.following.indexOf(this.props.match.params.userID) == -1) {
+                editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(1)}>
+                    Follow
+                </button>);
+            }
+            else {
+                editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(0)}>
+                    Unfollow
+                </button>);
+            }
+        }
         var attendedConcerts = this.state.attended.map((cncrt) =>
             <MiniConcertDetail concert={cncrt} isCurrentUser={userID == this.props.match.params.userID} />
         );
@@ -147,18 +185,16 @@ class ProfilePage extends React.Component {
                         <div className="ui grid">
                             <div className="row usersName">{this.state.user.first_name + ' ' + this.state.user.last_name}</div>
                             <div className="row username"><b>username</b> &nbsp; {this.state.user.username}</div>
-                            <div className="row followCounters"><b>followers</b> &nbsp; {this.state.followers.length} &nbsp; <b>following</b> &nbsp; {this.state.following.length}</div>
+                            <div className="row followCounters"><b>followers</b> &nbsp; {this.state.user.followers.length} &nbsp; <b>following</b> &nbsp; {this.state.user.following.length}</div>
                         </div>
                     </div>
                     <div className="two wide column">
-                        <button className="ui  floated button">
-                            Edit Profile
-                        </button>
+                        {editFollowButton}
                     </div>
                 </div>
                 <div className="row">
                     <div className="ui top attached tabular menu">
-                        <a className="active item" id="concerts" onClick={() => this.handleTab("concerts") }> Concerts</a>
+                        <a className="active item" id="concerts" onClick={() => this.handleTab("concerts")}> Concerts</a>
                         <a className="item" id="generalInfo" onClick={() => this.handleTab("generalInfo")}>General Information</a>
                         <a className="item" id="followedUsers" onClick={() => this.handleTab("followedUsers")} > Followed Users</a>
                         <a className="item" id="followers" onClick={() => this.handleTab("followers")} > Followers</a>
@@ -182,6 +218,12 @@ class ProfilePage extends React.Component {
                             <div className="item userData"><b>comments</b> &nbsp; {this.state.user.comments.length}</div>
                             <div className="item userData"><b>concerts</b> &nbsp; {this.state.user.concerts.length}</div>
                         </div>
+                    </div>
+                    <div className="ui bottom attached tab segment" id="followedUsersTab">
+                        <div>{this.state.user.following.length}</div>
+                    </div>
+                    <div className="ui bottom attached tab segment" id="followersTab">
+                        <div>{this.state.user.followers.length}</div>
                     </div>
                 </div>
             </div>
