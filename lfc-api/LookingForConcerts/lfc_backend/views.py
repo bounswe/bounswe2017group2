@@ -744,9 +744,8 @@ def get_tags(request, search_str):
     r = requests.get(API_ENDPOINT, params = params)
     json_response = r.json()['search']
     lenght =  len(json_response)
-
-    print(json_response)
-
+    #print(json_response)
+    
     tags = []
     for i in range(lenght):
         if 'description' in json_response[i]:
