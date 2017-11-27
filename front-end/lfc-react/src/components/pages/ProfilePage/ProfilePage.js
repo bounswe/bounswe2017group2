@@ -19,11 +19,9 @@ class MiniConcertDetail extends React.Component {
     }
     render() {
         let removeButton;
-        console.log("oz");
-        console.log(this.props);
         if (this.props.isCurrentUser) {
             removeButton = (
-                <button className=" circular mini ui icon right floated button" onClick={()=>this.handleRemove()}>
+                <button className=" circular mini ui icon right floated button" onClick={() => this.handleRemove()}>
                     <i className="remove icon"></i>
                 </button>
             );
@@ -48,7 +46,7 @@ class MiniConcertDetail extends React.Component {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + theToken
             }).then(response => {
-               window.location.reload();
+                window.location.reload();
             }, error => {
                 console.log("refresh");
             });
@@ -68,11 +66,31 @@ class ProfilePage extends React.Component {
                 age: 0,
                 comments: [],
                 concerts: [],
+                date_joined: '',
             },
             willAttend: [],
             attended: [],
+            followers: [],
+            following: [],
             accessToken: theToken,
         };
+        this.handleTab = this.handleTab.bind(this);
+    }
+
+    removeActive(tabName){
+        if (document.getElementById(tabName).classList.contains("active")){
+            document.getElementById(tabName).classList.remove("active");
+            document.getElementById(tabName+"Tab").classList.remove("active");
+        }
+    }
+
+    handleTab(tabName) {
+        this.removeActive("concerts");
+        this.removeActive("generalInfo");
+        this.removeActive("followedUsers");
+        this.removeActive("followers");
+        document.getElementById(tabName).classList.add("active");
+        document.getElementById(tabName+"Tab").classList.add("active");
     }
 
     componentWillMount() {
@@ -111,33 +129,41 @@ class ProfilePage extends React.Component {
             });
     }
 
-    handleSubmit() {
-
-    }
 
     render() {
-        console.log(userID+" "+this.props.match.params.concertID);
+        console.log(userID + " " + this.props.match.params.concertID);
         var attendedConcerts = this.state.attended.map((cncrt) =>
-            <MiniConcertDetail concert={cncrt} isCurrentUser={userID==this.props.match.params.userID}  />
+            <MiniConcertDetail concert={cncrt} isCurrentUser={userID == this.props.match.params.userID} />
         );
         var willAttendConcerts = this.state.willAttend.map((cncrt) =>
-            <MiniConcertDetail concert={cncrt} isCurrentUser={userID==this.props.match.params.userID} />
+            <MiniConcertDetail concert={cncrt} isCurrentUser={userID == this.props.match.params.userID} />
         );
         var age = Math.floor((Date.now() - (new Date(this.state.user.birth_date))) / (1000 * 60 * 60 * 24 * 365));
         return (
             <div className="ui grid" id="profilePage">
                 <div className="row">
-                    <div className="sixteen wide column">
-                        <div className="item usersName">{this.state.user.first_name + ' ' + this.state.user.last_name}</div>
+                    <img className="ui image two wide column" height="130px" src={"http://34.210.127.92:8000" + this.state.user.image} />
+                    <div className="twelve wide column">
+                        <div className="ui grid">
+                            <div className="row usersName">{this.state.user.first_name + ' ' + this.state.user.last_name}</div>
+                            <div className="row username"><b>username</b> &nbsp; {this.state.user.username}</div>
+                            <div className="row followCounters"><b>followers</b> &nbsp; {this.state.followers.length} &nbsp; <b>following</b> &nbsp; {this.state.following.length}</div>
+                        </div>
+                    </div>
+                    <div className="two wide column">
+                        <button className="ui  floated button">
+                            Edit Profile
+                        </button>
                     </div>
                 </div>
                 <div className="row">
                     <div className="ui top attached tabular menu">
-                        <a className="active item" data-tab="concerts">Concerts</a>
-                        <a className="item" data-tab="followedUsers">Followed Users</a>
-                        <a className="item" data-tab="followers">Followers</a>
+                        <a className="active item" id="concerts" onClick={() => this.handleTab("concerts") }> Concerts</a>
+                        <a className="item" id="generalInfo" onClick={() => this.handleTab("generalInfo")}>General Information</a>
+                        <a className="item" id="followedUsers" onClick={() => this.handleTab("followedUsers")} > Followed Users</a>
+                        <a className="item" id="followers" onClick={() => this.handleTab("followers")} > Followers</a>
                     </div>
-                    <div className="ui bottom attached active tab segment" data-tab="concerts">
+                    <div className="ui bottom attached active tab segment" id="concertsTab">
                         <div className="ui grid">
                             <div className="eight wide column center">
                                 <h3>Future Concerts</h3>
@@ -147,6 +173,14 @@ class ProfilePage extends React.Component {
                                 <h3>Concert History</h3>
                                 {attendedConcerts}
                             </div>
+                        </div>
+                    </div>
+                    <div className="ui bottom attached tab segment" id="generalInfoTab">
+                        <div className="ui list">
+                            <div className="item userData"><b>e-mail</b> &nbsp; {this.state.user.email}</div>
+                            <div className="item userData"><b>birth date</b> &nbsp; {this.state.user.birth_date}</div>
+                            <div className="item userData"><b>comments</b> &nbsp; {this.state.user.comments.length}</div>
+                            <div className="item userData"><b>concerts</b> &nbsp; {this.state.user.concerts.length}</div>
                         </div>
                     </div>
                 </div>
