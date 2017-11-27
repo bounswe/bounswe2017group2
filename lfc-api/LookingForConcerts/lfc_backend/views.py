@@ -464,7 +464,7 @@ TAG FUNCTIONS
 def get_tags(request, search_str):
     '''
     @param: search_str
-    @return: json list of found tags
+    @return: json list of tags found
     '''
     if (not request.user.is_authenticated):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
@@ -476,7 +476,7 @@ def get_tags(request, search_str):
         'format' : 'json',
         'language' : ['en', 'tr'],
         'search' : query,
-        'type':'item'
+        'type'   :'item'
     }
 
     r = requests.get(API_ENDPOINT, params = params)
