@@ -58,7 +58,8 @@ class Tag(models.Model):
     '''
     tag_id = models.AutoField(primary_key=True)
     value = models.CharField(max_length=20)
-    context = models.CharField(max_length=20)
+    context = models.CharField(max_length=200, blank=True)
+    uri = models.CharField(max_length=50, blank=True)
 
 class Artist(models.Model):
     #images - implemented in Image --ONE TO MANY
