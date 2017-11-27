@@ -17,13 +17,16 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
     following = FollowedFollowingUserSerializer(many=True, read_only=True)
     class Meta:
         model=RegisteredUser
-        fields = ('id','username','email','password','first_name','last_name','birth_date','date_joined','is_active','image','comments','concerts','followers','following')
+        fields = ('id','username','email','password','first_name','last_name','spotify_display_name','birth_date','date_joined','is_active','image','comments','concerts','followers','following')
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
         return registered_user
 
     def update(self, instance, validated_data):
+        instance.spotify_id = validated_data.get('spotify_id',instance.spotify_id)
+        instance.spotify_display_name = validated_data.get('spotify_display_name',instance.spotify_display_name)
+        instance.spotify_refresh_token = validated_data.get('spotify_refresh_token',instance.spotify_refresh_token)
         instance.username = validated_data.get('username',instance.username)
         instance.email = validated_data.get('email',instance.email)
         instance.password = validated_data.get('password',instance.password)
@@ -31,7 +34,7 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.birth_date = validated_data.get('birth_date', instance.birth_date)
         instance.is_active = validated_data.get('is_active', instance.is_active)
-        instance.avatar = validated_data.get('avatar', instance.avatar)
+        instance.image = validated_data.get('image', instance.image)
 
 
 class CommentSerializer(serializers.ModelSerializer):

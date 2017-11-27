@@ -12,6 +12,10 @@
         android:orientation="vertical"
         tools:context="com.swegroup2.lookingforconcerts.ConcertListActivity">
 
+        <SearchView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <Button
             android:id="@+id/create_concert_btn"
             android:layout_width="match_parent"

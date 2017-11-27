@@ -59,7 +59,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -76,7 +76,7 @@ SIMPLE_JWT = {
     'TOKEN_TYPE_CLAIM': 'token_type',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=30),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
@@ -86,10 +86,12 @@ BASE_URL = HOST+':'+PORT +'/'
 HOME_URL = BASE_URL + 'home/'
 LOGIN_URL = BASE_URL + 'login/'
 
+
 SOCIALACCOUNT_PROVIDERS= {
     'spotify': {
         'client_id': 'f868164aafa94586aa37fa23926f1830',
-        'client_secret':'fcad57195d6144fa82959e7516a0e07e'
+        'client_secret':'fcad57195d6144fa82959e7516a0e07e',
+        'redirect_uri':'http://localhost:8000/spotify/redirect',
     }
 }
 #LOGIN_REDIRECT_URL = LOGIN_URL
@@ -136,17 +138,11 @@ INSTALLED_APPS = [
     # Swagger for API Documentation
     'rest_framework_swagger',
     #'drf_openapi',
-    #'rest_framework.authtoken',
-    #'rest_auth',
-    #'rest_auth.registration',
+    'rest_framework.authtoken',
+    'rest_auth',
+    'rest_auth.registration',
     'lfc_backend.apps.LfcBackendConfig', # our app!
     'corsheaders',
-    'rest_framework_simplejwt.token_blacklist', # for JWT tracking and blacklisting
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.facebook', # authentication with Facebook account
-    # 'allauth.socialaccount.providers.spotify', # authentication with Spotify account
 ]
 
 MIDDLEWARE = [
