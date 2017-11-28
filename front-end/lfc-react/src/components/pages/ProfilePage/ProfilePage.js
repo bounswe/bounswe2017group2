@@ -169,7 +169,7 @@ class ProfilePage extends React.Component {
             </button>);
             }
             else {
-                if (!this.state.user.following.find(function (user) { return user.id === userID })) {
+                if (!this.state.user.followers.find(function (user) { return user.id === userID })) {
                     editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(1)}>
                         Follow
                 </button>);
