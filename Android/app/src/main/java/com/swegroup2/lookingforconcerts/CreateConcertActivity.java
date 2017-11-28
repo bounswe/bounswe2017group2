@@ -13,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CreateConcertActivity extends AppCompatActivity implements ArtistListAdapter
-        .ArtistListAdapterOnClickHandler {
+        .ArtistListAdapterOnClickHandler, VenueListAdapter.VenueListAdapterOnClickHandler {
 
     EditText concertNameEditText;
     EditText artistNameEditText;
@@ -37,14 +39,22 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
     EditText maxPriceEditText;
     EditText tagsEditText;
     EditText venueEditText;
-    EditText coordinatesEditText;
+    EditText ticketLinkEditText;
     Button submitButton;
     Button artistButton;
-    private RecyclerView recyclerView;
-    private ArtistListAdapter adapter;
+    Button venueButton;
+
+    RecyclerView artistRecyclerView;
+    ArtistListAdapter artistAdapter;
     LinearLayout selectedArtistLayout;
     ImageView selectedArtistPicture;
     TextView selectedArtistName;
+
+    RecyclerView venueRecyclerView;
+    VenueListAdapter venueAdapter;
+    LinearLayout selectedVenueLayout;
+    TextView selectedVenueName;
+    TextView selectedVenueLocation;
 
     String concertName;
     Artist artist;
@@ -55,6 +65,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
     String[] tags;
     String venue;
     String coordinates;
+    String ticketLink;
 
     String accessToken;
     String refreshToken;
@@ -71,13 +82,18 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         maxPriceEditText = (EditText) findViewById(R.id.max_price_edit);
         tagsEditText = (EditText) findViewById(R.id.tags_edit);
         venueEditText = (EditText) findViewById(R.id.venue_edit);
-        coordinatesEditText = (EditText) findViewById(R.id.coordinates_edit);
+        ticketLinkEditText = (EditText) findViewById(R.id.link_edit);
         submitButton = (Button) findViewById(R.id.submit_button);
         artistButton = (Button) findViewById(R.id.artist_button);
+        venueButton = (Button) findViewById(R.id.venue_button);
 
         selectedArtistLayout = (LinearLayout) findViewById(R.id.selected_artist);
         selectedArtistName = (TextView) findViewById(R.id.artist_list_name_tv_selected);
         selectedArtistPicture = (ImageView) findViewById(R.id.artist_list_image_selected);
+
+        selectedVenueLayout = (LinearLayout) findViewById(R.id.selected_venue);
+        selectedVenueName = (TextView) findViewById(R.id.venue_list_venue_selected);
+        selectedVenueLocation = (TextView) findViewById(R.id.venue_list_address_selected);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +108,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
                         maxPriceEditText.getText().toString());
                 tags = tagsEditText.getText().toString().trim().split(",");
                 venue = venueEditText.getText().toString().trim();
-                coordinates = coordinatesEditText.getText().toString().trim();
+                ticketLink = ticketLinkEditText.getText().toString().trim();
 
                 if (!isValid()) {
                     Toast.makeText(CreateConcertActivity.this, "Required fields can't be empty!", Toast.LENGTH_LONG).show();
@@ -111,13 +127,29 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
             }
         });
 
-        recyclerView = (RecyclerView) findViewById(R.id.artist_list_rv);
+        venueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedVenueLayout.setVisibility(View.GONE);
+                searchVenue();
+            }
+        });
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(layoutManager);
+        artistRecyclerView = (RecyclerView) findViewById(R.id.artist_list_rv);
+        venueRecyclerView = (RecyclerView) findViewById(R.id.venue_list_rv);
 
-        adapter = new ArtistListAdapter(this, this);
-        recyclerView.setAdapter(adapter);
+        LinearLayoutManager artistLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        artistRecyclerView.setLayoutManager(artistLayoutManager);
+
+        LinearLayoutManager venueLayoutManager = new LinearLayoutManager(this,
+                LinearLayoutManager.VERTICAL, false);
+        venueRecyclerView.setLayoutManager(venueLayoutManager);
+
+        artistAdapter = new ArtistListAdapter(this, this);
+        artistRecyclerView.setAdapter(artistAdapter);
+
+        venueAdapter = new VenueListAdapter(this, this);
+        venueRecyclerView.setAdapter(venueAdapter);
 
         accessToken = getIntent().getStringExtra("access");
         refreshToken = getIntent().getStringExtra("refresh");
@@ -151,7 +183,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         for (String tag : tags) {
             if (!tag.isEmpty()) {
                 Tag temp = new Tag();
-                temp.label = tag;
+                temp.value = tag;
                 tagList.add(temp);
             }
         }
@@ -161,6 +193,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         concertLocation.coordinates = coordinates;
         concertDto.location = concertLocation;
         concertDto.comments = new ArrayList<>();
+        concertDto.sellerUrl = ticketLink;
 
         Map<String, String> map = new HashMap<>();
         map.put("Authorization", "Bearer " + accessToken);
@@ -219,19 +252,15 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
 
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
-        Artist artist = new Artist();
-        artist.name = artistNameEditText.getText().toString();
+        String name = artistNameEditText.getText().toString();
 
-//        Map<String, String> map = new HashMap<>();
-//        map.put("Connection", "close");
-
-        Call<List<Artist>> call = controller.searchForArtist(artist);
+        Call<List<Artist>> call = controller.searchForArtist(name);
         call.enqueue(new Callback<List<Artist>>() {
             @Override
             public void onResponse(Call<List<Artist>> call, Response<List<Artist>> response) {
-                adapter.setArtistData(new ArrayList<Artist>());
-                adapter.setArtistData(response.body());
-                recyclerView.setVisibility(View.VISIBLE);
+                artistAdapter.setArtistData(new ArrayList<Artist>());
+                artistAdapter.setArtistData(response.body());
+                artistRecyclerView.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -241,9 +270,66 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         });
     }
 
+    private void searchVenue() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://maps.googleapis.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("query", venueEditText.getText().toString().trim());
+        map.put("key", Secret.GOOGLE_PLACES_API_KEY);
+
+        Call<JsonObject> call = controller.searchForVenue(map);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                List<ConcertLocation> list = getLocationFromJSON(response.body());
+                venueAdapter.setVenueData(new ArrayList<ConcertLocation>());
+                venueAdapter.setVenueData(list);
+                venueRecyclerView.setVisibility(View.VISIBLE);
+            }
+
+            private List<ConcertLocation> getLocationFromJSON(JsonObject body) {
+                List<ConcertLocation> list = new ArrayList<>();
+
+                try {
+                    JsonArray results = body.getAsJsonArray("results");
+
+                    for (int i = 0; i < results.size(); i++) {
+                        JsonObject result = results.get(i).getAsJsonObject();
+
+                        ConcertLocation location = new ConcertLocation();
+                        location.address = result.get("formatted_address").getAsString();
+                        location.venue = result.get("name").getAsString();
+
+                        JsonObject geometry = result.get("geometry").getAsJsonObject();
+                        JsonObject loc = geometry.get("location").getAsJsonObject();
+                        double lat = loc.get("lat").getAsDouble();
+                        double lng = loc.get("lng").getAsDouble();
+                        location.coordinates = "" + lat + " " + lng;
+
+                        list.add(location);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return list;
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(CreateConcertActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onClick(Artist artist) {
-        recyclerView.setVisibility(View.GONE);
+        artistRecyclerView.setVisibility(View.GONE);
 
         if (!artist.images.isEmpty()) {
             Picasso.with(this).load(artist.images.get(0).url).into(selectedArtistPicture);
@@ -252,6 +338,18 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         selectedArtistLayout.setVisibility(View.VISIBLE);
 
         this.artist = artist;
+    }
+
+    @Override
+    public void onClick(ConcertLocation location) {
+        venueRecyclerView.setVisibility(View.GONE);
+
+        selectedVenueName.setText(location.venue);
+        selectedVenueLocation.setText(location.address);
+        selectedVenueLayout.setVisibility(View.VISIBLE);
+
+        this.venue = location.venue;
+        this.coordinates = location.coordinates;
     }
 }
 

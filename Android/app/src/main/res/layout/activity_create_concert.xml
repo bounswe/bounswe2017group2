@@ -51,7 +51,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_centerVertical="true"
                 android:visibility="gone">
 
                 <ImageView
@@ -71,7 +70,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/artist_list_rv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="200dp"
                 android:layout_margin="8dp"
                 android:visibility="gone">
 
@@ -121,17 +120,62 @@
                 android:hint="Tags (Separated by commas)"
                 android:id="@+id/tags_edit" />
 
-            <EditText
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Venue (*)"
-                android:id="@+id/venue_edit" />
+                android:orientation="horizontal">
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="Venue (*)"
+                    android:id="@+id/venue_edit" />
+
+                <Button
+                    android:id="@+id/venue_button"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="go"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/selected_venue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/venue_list_venue_selected"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/venue_list_address_selected"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/venue_list_rv"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_margin="8dp"
+                android:visibility="gone">
+
+            </android.support.v7.widget.RecyclerView>
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Coordinates (*)"
-                android:id="@+id/coordinates_edit" />
+                android:hint="Ticket Link"
+                android:id="@+id/link_edit" />
 
             <Button
                 android:text="Submit"
