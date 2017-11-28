@@ -214,7 +214,7 @@ class Concert extends React.PureComponent {
 
 
         return (
-            <div className="ui grid segment start">
+            <div className="ui grid segment">
                 <div className="row">
                     <h1 className="sixteen wide column">{this.state.concert.name}</h1>
                 </div>
@@ -260,7 +260,11 @@ class Concert extends React.PureComponent {
                                 this.state.concert.comments.map((comment) =>
                                     <div className="ui comment">
                                         <div className="content">
-                                            <a className="author">{comment.owner.first_name} {comment.owner.last_name}</a>
+                                            <a className="author">
+                                                <Link className="Link" to={"/user/" + comment.owner.id}>
+                                                    {comment.owner.first_name} {comment.owner.last_name}
+                                                </Link>
+                                            </a>
                                             <div className="text">
                                                 {comment.content}
                                             </div>
