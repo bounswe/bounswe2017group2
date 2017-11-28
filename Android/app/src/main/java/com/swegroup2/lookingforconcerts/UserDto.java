@@ -10,6 +10,11 @@ import java.util.List;
  */
 
 public class UserDto {
+
+    @SerializedName("id")
+    @Expose()
+    public Integer id;
+
     @SerializedName("username")
     @Expose()
     public String username;
@@ -42,9 +47,9 @@ public class UserDto {
     @Expose()
     public Boolean isActive;
 
-    @SerializedName("avatar")
+    @SerializedName("image")
     @Expose()
-    public String avatar;
+    public String image;
 
     @SerializedName("comments")
     @Expose()
@@ -53,4 +58,12 @@ public class UserDto {
     @SerializedName("concerts")
     @Expose()
     public List<Integer> concerts;
+
+    @SerializedName("followers")
+    @Expose()
+    public List<Integer> followers;
+
+    @SerializedName("following")
+    @Expose()
+    public List<Integer> following;
 }

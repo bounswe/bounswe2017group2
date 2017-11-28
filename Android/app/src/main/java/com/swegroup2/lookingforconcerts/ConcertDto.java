@@ -75,7 +75,7 @@ class Tag implements Serializable {
     @SerializedName("value")
     @Expose
     public String value;
-
+  
     @SerializedName("context")
     @Expose
     public String context;
@@ -97,6 +97,7 @@ class ConcertComment implements Serializable {
     @SerializedName("content")
     @Expose
     public String content;
+
 }
 
 class Artist implements Serializable {
@@ -123,6 +124,7 @@ class Image implements Serializable {
     @Expose
     public Integer width;
 }
+
 
 class Ratings implements Serializable {
     @SerializedName("concert_atmosphere")
