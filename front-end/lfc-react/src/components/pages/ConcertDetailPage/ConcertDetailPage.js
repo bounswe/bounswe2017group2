@@ -15,7 +15,7 @@ import decode from "jwt-decode";
 
 
 const googleMapKey = "AIzaSyCrs1xLdXw8y4rfXc4tiJZZIWcwjmOR7BM";
-var userID;
+let userID;
 const theToken = localStorage.getItem("lfcJWT");
 //lat: 41.015, lng: 28.979
 
@@ -117,7 +117,7 @@ class Concert extends React.PureComponent {
     }
 
     componentWillMount() {
-        axios.get('http://34.210.127.92:8000/concert/' + this.props.match.params.concertID + '/')
+        axios.get('http://34.210.127.92:8000/concert/' + this.props.match.params.concertID+'/')
             .then(response => {
                 this.setState({
                     concert: response.data,

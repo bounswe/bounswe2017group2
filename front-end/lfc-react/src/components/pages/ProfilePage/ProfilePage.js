@@ -80,7 +80,7 @@ class ProfilePage extends React.Component {
 
     handleFollow(isFollow) {
         if (isFollow) {
-            axios.get('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/follow/', {
+            axios.post('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/follow/',{}, {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + theToken
             })
@@ -89,7 +89,7 @@ class ProfilePage extends React.Component {
                 })
         }
         else {
-            axios.get('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/unfollow/', {
+            axios.post('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/unfollow/',{}, {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + theToken
             })
@@ -153,13 +153,14 @@ class ProfilePage extends React.Component {
 
     render() {
         let editFollowButton;
-        if (userID == this.props.match.params.userID) {
+        let profileID = this.props.match.params.userID;
+        if (userID == profileID) {
             editFollowButton = (<button className="ui  floated button">
                 Edit Profile
             </button>);
         }
-        else {
-            if (this.state.user.following.indexOf(this.props.match.params.userID) == -1) {
+        else {  
+            if (!this.state.user.following.find(function(user){return user.id===userID})) {
                 editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(1)}>
                     Follow
                 </button>);
