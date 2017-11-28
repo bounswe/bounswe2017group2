@@ -8,7 +8,7 @@ from rest_framework import status
 class FollowedFollowingUserSerializer(serializers.ModelSerializer):
     class Meta:
         model=RegisteredUser
-        fields = ('id','username','email','first_name','last_name','birth_date') #Will add image when it is implemented.
+        fields = ('id','username','email','first_name','last_name','birth_date', 'image') #Will add image when it is implemented.
 
 class RegisteredUserSerializer(serializers.ModelSerializer):
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
