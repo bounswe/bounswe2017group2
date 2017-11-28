@@ -453,6 +453,20 @@ def get_user_concerts(request):
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+@api_view(['GET'])
+def get_user_concerts_with_pk(request, pk):
+    '''
+    returns the subscribed concerts of the registered user that have the pk value as the primary key value.
+    '''
+    try:
+        user = RegisteredUser.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+    
+    concerts = user.concerts.all()
+    serializer = ConcertSerializer(concerts, many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
+     
 '''
 CONCERT FUNCTIONS
 '''
