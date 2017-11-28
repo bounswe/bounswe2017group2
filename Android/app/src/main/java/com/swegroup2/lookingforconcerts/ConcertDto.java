@@ -61,13 +61,24 @@ public class ConcertDto implements Serializable {
     @SerializedName("ratings")
     @Expose()
     public List<Ratings> ratings;
+
+    @SerializedName("seller_url")
+    @Expose()
+    public String sellerUrl;
+
+    @SerializedName("image")
+    @Expose()
+    public String image;
 }
 
 class Tag implements Serializable {
-    @SerializedName("label")
+    @SerializedName("value")
     @Expose
-    public String label;
-
+    public String value;
+  
+    @SerializedName("context")
+    @Expose
+    public String context;
 }
 
 class ConcertLocation implements Serializable {
@@ -78,6 +89,8 @@ class ConcertLocation implements Serializable {
     @SerializedName("coordinates")
     @Expose
     public String coordinates;
+
+    public String address;
 }
 
 class ConcertComment implements Serializable {
