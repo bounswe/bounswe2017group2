@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.11.1)  28 NOV 2017 16:57
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.11.1)  28 NOV 2017 17:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1159,17 +1159,17 @@ Overfull \hbox (325.3125pt too wide) in paragraph at lines 103--103
 [7
 
 ]
-Overfull \hbox (17.12282pt too wide) detected at line 115
+Overfull \hbox (17.12282pt too wide) detected at line 116
 []
  []
 
 
-Overfull \hbox (332.5125pt too wide) in paragraph at lines 115--115
+Overfull \hbox (332.5125pt too wide) in paragraph at lines 116--116
 [][] 
  []
 
 
-Overfull \hbox (325.3125pt too wide) in paragraph at lines 115--115
+Overfull \hbox (325.3125pt too wide) in paragraph at lines 116--116
 []
  []
 
@@ -1217,18 +1217,18 @@ Here is how much of TeX's memory you used:
  24158 words of font info for 69 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  57i,18n,91p,384b,1040s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc} </home/xeco/.texm
-f-var/fonts/pk/ljfour/public/bbding/bbding10.600pk></usr/share/texlive/texmf-di
+ </home/xeco/.texmf-var/fonts/pk/ljfour/public/bbding/bbding10.600pk>{/usr/sh
+are/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc}</usr/share/texlive/texmf-di
 st/fonts/type1/public/amsfonts/symbols/msam7.pfb></usr/share/texmf/fonts/type1/
 public/cm-super/sfss0600.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfss
 0800.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfss1000.pfb></usr/share
-/texmf/fonts/type1/public/cm-super/sfss1095.pfb></usr/share/texmf/fonts/type1/p
-ublic/cm-super/sfsx0800.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfsx1
-095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfsx1440.pfb>
-Output written on demo.pdf (10 pages, 493684 bytes).
+/texmf/fonts/type1/public/cm-super/sfsx0800.pfb></usr/share/texmf/fonts/type1/p
+ublic/cm-super/sfsx1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfsx1
+440.pfb>
+Output written on demo.pdf (10 pages, 551701 bytes).
 PDF statistics:
- 195 PDF objects out of 1000 (max. 8388607)
- 140 compressed objects within 2 object streams
+ 191 PDF objects out of 1000 (max. 8388607)
+ 137 compressed objects within 2 object streams
  26 named destinations out of 1000 (max. 500000)
  206 words of extra memory for PDF output out of 10000 (max. 10000000)
 
