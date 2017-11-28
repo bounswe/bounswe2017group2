@@ -57,8 +57,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication', # for JWT auth
     ),
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
-    'DEFAULT_RENDERER_CLASSES': 'rest_framework_swagger.renderers.SwaggerUIRenderer',
-
 }
 
 SIMPLE_JWT = {

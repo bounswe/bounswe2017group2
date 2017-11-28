@@ -195,7 +195,7 @@ def spotify_redirect(request):
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
     #redirect_uri = request.GET.get('redirect_uri') # normally, front-end will provide this as a parameter.
     # Now, since I know the redirect uri I hard coded it.
-    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['backend_redirect_uri']
 
     TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 
@@ -266,9 +266,10 @@ def spotify_connect(request):
 
     client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
-    #redirect_uri = request.GET.get('redirect_uri') # normally, front-end will provide this as a parameter.
-    # Now, since I know the redirect uri I hard coded it.
-    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']
+
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['frontend_redirect_uri']
+    if request.data['redirect_type'] =='android':
+            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
 
     TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 
