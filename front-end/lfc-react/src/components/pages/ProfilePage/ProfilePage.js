@@ -54,6 +54,53 @@ class MiniConcertDetail extends React.Component {
     }
 }
 
+
+class MiniUserDetail extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleRemove = this.handleRemove.bind(this);
+        this.refreshPage = this.refreshPage.bind(this);
+    }
+    render() {
+        let removeButton;
+        if (this.props.isRemovable) {
+            removeButton = (
+                <button className=" circular mini ui icon right floated button" onClick={() => this.handleRemove()}>
+                    <i className="remove icon"></i>
+                </button>
+            );
+        }
+        return (
+            <div className="ui grid segment">
+                <img className="ui image three wide column" height="100px" src={this.props.user.image} />
+                <div className="ten wide column">
+                    <h3><Link className="Link" to={"/user/" + this.props.user.id} onClick={this.refreshPage}>{this.props.user.username}</Link></h3>
+                    <h4>{this.props.user.first_name} {this.props.user.last_name}</h4>
+                </div>
+                <div className="three wide column">
+                    {removeButton}
+                </div>
+            </div>
+        )
+    }
+
+    refreshPage(){
+        window.location.reload();
+    }
+
+    handleRemove(event) {
+        axios.post('http://34.210.127.92:8000/user/' + this.props.user.id + '/unfollow/', {
+        }, {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + theToken
+            }).then(response => {
+                window.location.reload();
+            }, error => {
+                console.log("refresh");
+            });
+    }
+}
+
 class ProfilePage extends React.Component {
     constructor(props) {
         super(props);
@@ -162,6 +209,13 @@ class ProfilePage extends React.Component {
 
         let editFollowButton;
         let profileID = this.props.match.params.userID;
+        let followedUsersList = this.state.user.following.map((usr) =>
+            <MiniUserDetail user={usr} isRemovable={isLoggedIn && userID == this.props.match.params.userID} />
+        );
+        let followersList = this.state.user.followers.map((usr) =>
+            <MiniUserDetail user={usr} isRemovable={false} />
+        );
+
         if (isLoggedIn) {
             if (userID == profileID) {
                 editFollowButton = (<button className="ui  floated button">
@@ -231,10 +285,10 @@ class ProfilePage extends React.Component {
                         </div>
                     </div>
                     <div className="ui bottom attached tab segment" id="followedUsersTab">
-                        <div>{this.state.user.following.length}</div>
+                        <div>{followedUsersList}</div>
                     </div>
                     <div className="ui bottom attached tab segment" id="followersTab">
-                        <div>{this.state.user.followers.length}</div>
+                        <div>{followersList}</div>
                     </div>
                 </div>
             </div>
