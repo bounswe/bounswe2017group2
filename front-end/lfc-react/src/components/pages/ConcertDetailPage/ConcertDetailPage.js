@@ -210,7 +210,13 @@ class Concert extends React.PureComponent {
             </GoogleMap>
             )
 
-
+        let price;
+        if (this.state.concert.price_max > this.state.concert.price_min) {
+            price=(<p><b>Price:</b>&#8378;{this.state.concert.price_min}-&#8378;{this.state.concert.price_max}</p>);
+        }
+        else{
+            price=(<p><b>Price:</b>&#8378;{this.state.concert.price_min}</p>)
+        }
 
 
         return (
@@ -222,7 +228,7 @@ class Concert extends React.PureComponent {
                     <div className="ui list sixteen wide column">
                         <div className="item"><b>Artist:</b>{this.state.concert.artist.name}</div>
                         <div className="item"><b>Date:</b>{this.state.concert.date_time}</div>
-                        <div className="item"><b>Price:</b>{this.state.concert.price_min}TL-{this.state.concert.price_max}TL</div>
+                        <div className="item">{price}</div>
                         <div className="item"><b>Location:</b>{this.state.concert.location.venue}</div>
                     </div>
                 </div>
