@@ -9,7 +9,8 @@ import decode from "jwt-decode";
 
 
 let theToken = localStorage.getItem("lfcJWT");
-let userID = decode(localStorage.lfcJWT).user_id;
+let userID;
+let isLoggedIn = false;
 
 
 class MiniConcertDetail extends React.Component {
@@ -80,7 +81,7 @@ class ProfilePage extends React.Component {
 
     handleFollow(isFollow) {
         if (isFollow) {
-            axios.get('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/follow/', {
+            axios.post('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/follow/', {}, {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + theToken
             })
@@ -89,7 +90,7 @@ class ProfilePage extends React.Component {
                 })
         }
         else {
-            axios.get('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/unfollow/', {
+            axios.post('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/unfollow/', {}, {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + theToken
             })
@@ -152,29 +153,39 @@ class ProfilePage extends React.Component {
 
 
     render() {
-        let editFollowButton;
-        if (userID == this.props.match.params.userID) {
-            editFollowButton = (<button className="ui  floated button">
-                Edit Profile
-            </button>);
+
+
+        if (localStorage.getItem("lfcJWT")) {
+            userID = decode(localStorage.lfcJWT).user_id;
+            isLoggedIn = true;
         }
-        else {
-            if (this.state.user.following.indexOf(this.props.match.params.userID) == -1) {
-                editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(1)}>
-                    Follow
-                </button>);
+
+        let editFollowButton;
+        let profileID = this.props.match.params.userID;
+        if (isLoggedIn) {
+            if (userID == profileID) {
+                editFollowButton = (<button className="ui  floated button">
+                    Edit Profile
+            </button>);
             }
             else {
-                editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(0)}>
-                    Unfollow
+                if (!this.state.user.following.find(function (user) { return user.id === userID })) {
+                    editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(1)}>
+                        Follow
                 </button>);
+                }
+                else {
+                    editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(0)}>
+                        Unfollow
+                </button>);
+                }
             }
         }
         var attendedConcerts = this.state.attended.map((cncrt) =>
-            <MiniConcertDetail concert={cncrt} isCurrentUser={userID == this.props.match.params.userID} />
+            <MiniConcertDetail concert={cncrt} isCurrentUser={isLoggedIn && userID == this.props.match.params.userID} />
         );
         var willAttendConcerts = this.state.willAttend.map((cncrt) =>
-            <MiniConcertDetail concert={cncrt} isCurrentUser={userID == this.props.match.params.userID} />
+            <MiniConcertDetail concert={cncrt} isCurrentUser={isLoggedIn && userID == this.props.match.params.userID} />
         );
         var age = Math.floor((Date.now() - (new Date(this.state.user.birth_date))) / (1000 * 60 * 60 * 24 * 365));
         return (
