@@ -14,6 +14,8 @@ import os
 import dj_database_url
 import datetime
 from datetime import timedelta
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -54,7 +56,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication', # for JWT auth
     ),
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning'
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_RENDERER_CLASSES': 'rest_framework_swagger.renderers.SwaggerUIRenderer',
 
 }
 
@@ -80,18 +83,24 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-HOST = '34.210.127.92'
+HOST = 'http://34.210.127.92'
 PORT = '8000'
 BASE_URL = HOST+':'+PORT +'/'
 HOME_URL = BASE_URL + 'home/'
 LOGIN_URL = BASE_URL + 'login/'
+
+SWAGGER_SETTINGS = {
+'JSON_EDITOR': True,
+}
 
 
 SOCIALACCOUNT_PROVIDERS= {
     'spotify': {
         'client_id': 'f868164aafa94586aa37fa23926f1830',
         'client_secret':'fcad57195d6144fa82959e7516a0e07e',
-        'redirect_uri':'http://localhost:8000/spotify/redirect',
+        'backend_redirect_uri': BASE_URL + 'spotify/redirect',
+        'frontend_redirect_uri': HOME_URL,
+        'android_redirect_uri': HOME_URL,
     }
 }
 #LOGIN_REDIRECT_URL = LOGIN_URL

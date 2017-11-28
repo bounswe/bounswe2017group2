@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+
 from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist, ConcertImage, UserImage
 from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
 from lfc_backend.forms import ConcertImageForm, UserImageForm
@@ -335,7 +337,12 @@ def spotify_authorize(request):
 
     client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
-    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']  # redirect URL should normally be the login page.
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['backend_redirect_uri']
+
+    if request.data['redirect_type'] == 'frontend':
+            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['frontend_redirect_uri']
+    elif request.data['redirect_type'] =='android':
+            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
 
     # If you generate a random string or encode the hash of some client state (e.g., a cookie)
     # in this state variable, you can validate the response to additionally ensure that the
@@ -462,11 +469,11 @@ def get_user_concerts_with_pk(request, pk):
         user = RegisteredUser.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    
+
     concerts = user.concerts.all()
     serializer = ConcertSerializer(concerts, many=True)
     return Response(serializer.data,status=status.HTTP_200_OK)
-     
+
 '''
 CONCERT FUNCTIONS
 '''
