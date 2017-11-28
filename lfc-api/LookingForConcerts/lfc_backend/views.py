@@ -745,15 +745,15 @@ def get_tags(request, search_str):
     json_response = r.json()['search']
     lenght =  len(json_response)
     #print(json_response)
-    
+
     tags = []
     for i in range(lenght):
         if 'description' in json_response[i]:
             if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)):
                 value   = json_response[i]['label']
                 context = json_response[i]['description']
-                url     = json_response[i]['concepturi']
-                t = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","uri":"' + url.replace('"','') + '"}'
+                uri     = json_response[i]['concepturi']
+                t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
                 print(t)
                 tags.append(json.loads(t))
 
