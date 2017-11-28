@@ -724,6 +724,10 @@ TAG FUNCTIONS
 
 @api_view(['GET'])
 def get_tags(request, search_str):
+    '''
+    @param: search_str
+    @return: json list of tags found
+    '''
     if (not request.user.is_authenticated):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
 
@@ -734,20 +738,22 @@ def get_tags(request, search_str):
         'format' : 'json',
         'language' : ['en', 'tr'],
         'search' : query,
-        'type':'item'
+        'type'   :'item'
     }
 
     r = requests.get(API_ENDPOINT, params = params)
     json_response = r.json()['search']
     lenght =  len(json_response)
+    #print(json_response)
 
     tags = []
     for i in range(lenght):
         if 'description' in json_response[i]:
             if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)):
-                value = json_response[i]['label']
+                value   = json_response[i]['label']
                 context = json_response[i]['description']
-                t = '{"value":"'+value.replace('"','')+ '","context":"'+context.replace('"','')+'"}'
+                uri     = json_response[i]['concepturi']
+                t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
                 print(t)
                 tags.append(json.loads(t))
 
@@ -781,6 +787,10 @@ def create_comment(request,pk):
 IMAGE FUNCTIONS
 '''
 class ConcertImageView(FormView):
+    '''
+    Uploads a concert image to the database
+    @return: url of the uploaded image
+    '''
     template_name = 'concert_image_form.html'
     form_class = ConcertImageForm
 
@@ -793,10 +803,18 @@ class ConcertImageView(FormView):
 
 @api_view(['GET'])
 def ConcertShowImage(request, pk):
+    '''
+    @param: pk, id of the cocert image
+    @return: url of that image
+    '''
     img = ConcertImage.objects.get(pk=pk)
     return HttpResponseRedirect(concert_image.image.url)
 
 class UserImageView(FormView):
+    '''
+    Uploads a user image to the database
+    @return: url of the uploaded image
+    '''
     template_name = 'user_image_form.html'
     form_class = UserImageForm
 
@@ -809,5 +827,9 @@ class UserImageView(FormView):
 
 @api_view(['GET'])
 def UserShowImage(request, pk):
+    '''
+    @param: pk, id of the user image
+    @return: url of the image
+    '''
     img = UsserImage.objects.get(pk=pk)
     return HttpResponseRedirect(user_image.image.url)

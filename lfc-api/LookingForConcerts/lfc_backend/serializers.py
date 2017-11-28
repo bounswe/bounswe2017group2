@@ -46,7 +46,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ('value','context')
+        fields = ('value','context','wikidata_uri')
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
