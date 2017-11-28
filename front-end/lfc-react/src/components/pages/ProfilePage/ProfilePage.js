@@ -164,13 +164,13 @@ class ProfilePage extends React.Component {
     }
 
     componentWillMount() {
-        let userID = this.props.match.params.userID;
-        axios.get('http://34.210.127.92:8000/user/' + userID + '/')
+        let profileID = this.props.match.params.userID;
+        axios.get('http://34.210.127.92:8000/user/' + profileID + '/')
             .then(response => {
                 var userData = response.data;
                 var willAttendList = [];
                 var attendedList = [];
-                axios.get('http://34.210.127.92:8000/user/get_concerts/', {
+                axios.get('http://34.210.127.92:8000/user/'+profileID+'/get_concerts/', {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + theToken
                 })
