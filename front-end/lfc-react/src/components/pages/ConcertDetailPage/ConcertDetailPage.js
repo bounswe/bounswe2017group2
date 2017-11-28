@@ -17,6 +17,7 @@ import decode from "jwt-decode";
 const googleMapKey = "AIzaSyCrs1xLdXw8y4rfXc4tiJZZIWcwjmOR7BM";
 let userID;
 const theToken = localStorage.getItem("lfcJWT");
+let isLoggedIn = false;
 //lat: 41.015, lng: 28.979
 
 class CommentBox extends React.Component {
@@ -117,7 +118,7 @@ class Concert extends React.PureComponent {
     }
 
     componentWillMount() {
-        axios.get('http://34.210.127.92:8000/concert/' + this.props.match.params.concertID+'/')
+        axios.get('http://34.210.127.92:8000/concert/' + this.props.match.params.concertID + '/')
             .then(response => {
                 this.setState({
                     concert: response.data,
@@ -158,8 +159,10 @@ class Concert extends React.PureComponent {
 
     render() {
 
-
-        userID = decode(localStorage.lfcJWT).user_id;
+        if (localStorage.getItem("lfcJWT")) {
+            userID = decode(localStorage.lfcJWT).user_id;
+            isLoggedIn = true;
+        }
         console.log(userID);
 
         var visibleMessage = "";
@@ -180,8 +183,20 @@ class Concert extends React.PureComponent {
             invisibleMessage = temp;
         }
         let commentBox = null;
-        if (theToken) {
+        if (isLoggedIn) {
             commentBox = <CommentBox concertID={this.props.match.params.concertID} />;
+        }
+
+        let followConcertButton;
+
+        if(isLoggedIn) {
+            followConcertButton=(
+                <button className="ui animated fade fluid button" onClick={this.handleFollowButton}>
+                    <div className="visible content"> {visibleMessage} </div>
+                    <div className="hidden content">
+                        Mark as {invisibleMessage}
+                    </div>
+                </button>);
         }
 
 
@@ -212,10 +227,10 @@ class Concert extends React.PureComponent {
 
         let price;
         if (this.state.concert.price_max > this.state.concert.price_min) {
-            price=(<p><b>Price:</b>&#8378;{this.state.concert.price_min}-&#8378;{this.state.concert.price_max}</p>);
+            price = (<p><b>Price:</b>&#8378;{this.state.concert.price_min}-&#8378;{this.state.concert.price_max}</p>);
         }
-        else{
-            price=(<p><b>Price:</b>&#8378;{this.state.concert.price_min}</p>)
+        else {
+            price = (<p><b>Price:</b>&#8378;{this.state.concert.price_min}</p>)
         }
 
 
@@ -248,12 +263,7 @@ class Concert extends React.PureComponent {
                     <div className="sixteen wide column">
                         <p>{this.state.concert.description}</p>
 
-                        <button className="ui animated fade fluid button" onClick={this.handleFollowButton}>
-                            <div className="visible content"> {visibleMessage} </div>
-                            <div className="hidden content">
-                                Mark as {invisibleMessage}
-                            </div>
-                        </button>
+                        {followConcertButton}
 
                     </div>
                 </div>
