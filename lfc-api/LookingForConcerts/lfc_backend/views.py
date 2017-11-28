@@ -94,7 +94,7 @@ def unfollow_user(request,pk):
         unfollowing_user = RegisteredUser.objects.get(pk=pk) #Unfollowing user is the user we wish to unfollow
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    me.following.remove(following_user)
+    me.following.remove(unfollowing_user)
     return Response(status = status.HTTP_200_OK)
 
 @api_view(['POST'])
