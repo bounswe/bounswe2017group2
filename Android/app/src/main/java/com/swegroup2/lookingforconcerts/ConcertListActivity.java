@@ -11,8 +11,13 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,20 +28,27 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ConcertListActivity extends AppCompatActivity implements ConcertListAdapter.ConcertListAdapterOnClickHandler {
+public class ConcertListActivity extends AppCompatActivity implements ConcertListAdapter.ConcertListAdapterOnClickHandler, SearchListAdapter.SearchListAdapterOnClickHandler {
     private RecyclerView recyclerView;
+    private RecyclerView searchRecyclerView;
     private ConcertListAdapter adapter;
+    private SearchListAdapter searchAdapter;
     private Button createConcertButton;
     private Button logoutButton;
+    private Button spotifyButton;
 
     private Button profile;
-
-    private SearchView mSearch;
 
     String refreshToken = "";
     String accessToken = "";
 
     UserDto userProfileInfo = new UserDto();
+
+    private EditText concertSearch;
+    private Button concertSearchButton;
+
+    LinearLayout selectedConcertLayout;
+    TextView selectedConcertName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +70,31 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
         profile = (Button) findViewById(R.id.profile);
+        spotifyButton = (Button) findViewById(R.id.spotifyButton);
 
-        //logoutButton = (Button) findViewById(R.id.logout_btn);
+
+        concertSearch = (EditText) findViewById(R.id.search_edit);
+        concertSearchButton = (Button) findViewById(R.id.search_button);
+
+        selectedConcertLayout = (LinearLayout) findViewById(R.id.selected_concert);
+        selectedConcertName = (TextView) findViewById(R.id.concertlist_name_tv_selected);
+
+        concertSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedConcertLayout.setVisibility(View.GONE);
+                searchConcert();
+            }
+        });
+
+        searchRecyclerView = (RecyclerView) findViewById(R.id.search_list_rv);
+
+        LinearLayoutManager searchLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        searchRecyclerView.setLayoutManager(searchLayoutManager);
+
+        searchAdapter = new SearchListAdapter(this, this);
+        searchRecyclerView.setAdapter(searchAdapter);
+
 
         getConcerts();
     }
@@ -98,6 +133,38 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
             }
         });
     }
+
+    private void searchConcert() {
+        refresh();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        String search = concertSearch.getText().toString();
+        Toast.makeText(ConcertListActivity.this, search, Toast.LENGTH_SHORT).show();
+
+        Call<List<ConcertDto>> call = controller.searchConcert(search);
+        call.enqueue(new Callback<List<ConcertDto>>() {
+            @Override
+            public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
+                //Toast.makeText(ConcertListActivity.this, response.body().get(0).name, Toast.LENGTH_SHORT).show();
+
+                searchAdapter.setConcertData(new ArrayList<ConcertDto>());
+                searchAdapter.setConcertData(response.body());
+                searchRecyclerView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(Call<List<ConcertDto>> call, Throwable t) {
+                Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 
     public void refresh() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -164,6 +231,10 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
         startActivity(intent);
         finish();
+    }
+
+    public void spotifyConnect(View view){
+
     }
 
     public void logoutFunc(View view) {
