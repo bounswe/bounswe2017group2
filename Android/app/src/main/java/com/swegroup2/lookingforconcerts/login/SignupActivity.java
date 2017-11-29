@@ -110,7 +110,6 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
-
     private void postRequestMethod() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")

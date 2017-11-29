@@ -184,10 +184,10 @@ public class ConcertDetails extends Fragment {
 
         Map<String, String> map = new HashMap<>();
         map.put("Authorization", "Bearer " + LoginActivity.accessToken);
-        Call<ConcertResponse> call = controller.attend(concertDto.id, map);
-        call.enqueue(new Callback<ConcertResponse>() {
+        Call<Void> call = controller.attend(concertDto.id, map);
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<ConcertResponse> call, Response<ConcertResponse> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 attend.setText("UNATTEND");
 
                 ConcertListActivity.getProfileInfo(getActivity());
@@ -195,7 +195,7 @@ public class ConcertDetails extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ConcertResponse> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 Toast.makeText(getActivity(), "ATTEND ERROR", Toast.LENGTH_SHORT).show();
                 Log.d("FS", t.getMessage());
             }
