@@ -1,4 +1,4 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.concert;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.swegroup2.lookingforconcerts.R;
 
 import java.util.List;
 
