@@ -2,6 +2,12 @@ package com.swegroup2.lookingforconcerts;
 
 
 import com.google.gson.JsonObject;
+import com.swegroup2.lookingforconcerts.concert.Artist;
+import com.swegroup2.lookingforconcerts.concert.ConcertComment;
+import com.swegroup2.lookingforconcerts.concert.ConcertDto;
+import com.swegroup2.lookingforconcerts.concert.ConcertResponse;
+import com.swegroup2.lookingforconcerts.user.UserDto;
+import com.swegroup2.lookingforconcerts.user.UserResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -36,8 +42,11 @@ public interface RestInterfaceController {
     @GET("/user/me/")
     Call<UserDto> getUserProfile(@HeaderMap Map<String, String> headermap);
 
-    @GET("/concert/{id}/subscribe/")
+    @POST("/concert/{id}/subscribe/")
     Call<ConcertResponse> attend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
+
+    @POST("/concert/{id}/unsubscribe/")
+    Call<ConcertResponse> unAttend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
 
     @POST("/signup/")
     Call<UserResponse> signUp(@Body UserDto userDto);
@@ -49,5 +58,5 @@ public interface RestInterfaceController {
     Call<List<Artist>> searchForArtist(@Query("name") String name);
 
     @POST("/upload_user_image/")
-    Call<UserResponse> uploadImage(@Body UserDto userDto );
+    Call<UserResponse> uploadImage(@Body UserDto userDto);
 }
