@@ -203,7 +203,6 @@ class ProfilePage extends React.Component {
 
     render() {
 
-
         if (localStorage.getItem("lfcJWT")) {
             userID = decode(localStorage.lfcJWT).user_id;
             isLoggedIn = true;
