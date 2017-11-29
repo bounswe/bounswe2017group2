@@ -855,3 +855,47 @@ def UserShowImage(request, pk):
     '''
     img = UsserImage.objects.get(pk=pk)
     return HttpResponseRedirect(user_image.image.url)
+
+'''
+RECOMMENDATION FUNCTIONS
+'''
+@api_view(['GET'])
+def get_recommendations(request):
+    if not request.user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    
+    #spotify ids of the top artists info from spotify
+    artistIDs = []
+    #Concerts that are already being followed. These should not be in recommendations. Also prefetches the related artists with those concerts
+    subscribedconcerts = request.user.concerts.all().select_related('artist')
+    #Concerts that can be recommended
+    recommendableconcerts = Concert.objects.all().difference(subscribedconcerts)
+    
+    #Get top artist info from spotify if the user connected his/her account with his/her spotify account.
+    if request.user.spotify_refresh_token is not None:
+        
+        #Get access token
+        result = spotify_get_access_token(request.user)
+        if 'error' in result:
+            return Response(result['error'], status = result['status'])
+        access_token = result
+        
+        #use access token to get current top artists
+        sp = spotipy.Spotify(access_token)
+        results = sp.current_user_top_artists(limit=20, offset=0, time_range='medium_term')
+        if 'error' in results:
+            return Response(results['error'], status = results['status'])
+        for item in results['items']:
+            artistIDs.append(item['id'])
+    
+    #Get artists from the subscribed concerts
+    artists = set()
+    for concert in subscribedconcerts:
+        artists.add(concert.artist)
+    artists = artists.distinct()
+
+    #get recommended concerts
+    recommendedConcerts = recommendableconcerts.filter(Q(artist_in=artists)|Q(artist_spotify_id_in=artistIDs))
+    serializer = ConcertSerializer(recommendedConcerts, many = True)
+
+    return Response(serializer.data, status = status.HTTP_200_OK)
