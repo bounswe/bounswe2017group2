@@ -6,6 +6,7 @@ import com.swegroup2.lookingforconcerts.concert.Artist;
 import com.swegroup2.lookingforconcerts.concert.ConcertComment;
 import com.swegroup2.lookingforconcerts.concert.ConcertDto;
 import com.swegroup2.lookingforconcerts.concert.ConcertResponse;
+import com.swegroup2.lookingforconcerts.concert.Ratings;
 import com.swegroup2.lookingforconcerts.user.UserDto;
 import com.swegroup2.lookingforconcerts.user.UserResponse;
 
@@ -43,10 +44,13 @@ public interface RestInterfaceController {
     Call<UserDto> getUserProfile(@HeaderMap Map<String, String> headermap);
 
     @POST("/concert/{id}/subscribe/")
-    Call<ConcertResponse> attend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
+    Call<Void> attend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
 
     @POST("/concert/{id}/unsubscribe/")
     Call<ConcertResponse> unAttend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
+
+    @POST("/concert/{id}/rate/")
+    Call<ConcertResponse> rate(@Body Ratings ratings, @Path("id") int id, @HeaderMap Map<String, String> headermap);
 
     @POST("/signup/")
     Call<UserResponse> signUp(@Body UserDto userDto);
