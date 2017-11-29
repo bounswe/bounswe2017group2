@@ -12,6 +12,7 @@ import rootReducer from "./rootReducer";
 import { loadState, saveState } from "./localStorage";
 
 const persistedState = loadState() || {};
+
 const store = createStore(
   rootReducer,
   persistedState,
