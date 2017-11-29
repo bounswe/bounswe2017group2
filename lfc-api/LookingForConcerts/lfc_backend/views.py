@@ -867,9 +867,9 @@ def get_recommendations(request):
     #spotify ids of the top artists info from spotify
     artistIDs = []
     #Concerts that are already being followed. These should not be in recommendations. Also prefetches the related artists with those concerts
-    subscribedconcerts = request.user.concerts.all().select_related('artist')
+    subscribedconcerts = request.user.concerts.all()
     #Concerts that can be recommended
-    recommendableconcerts = Concert.objects.all().difference(subscribedconcerts)
+    recommendableconcerts = Concert.objects.all()
     
     #Get top artist info from spotify if the user connected his/her account with his/her spotify account.
     if request.user.spotify_refresh_token is not None:
@@ -889,13 +889,12 @@ def get_recommendations(request):
             artistIDs.append(item['id'])
     
     #Get artists from the subscribed concerts
-    artists = set()
-    for concert in subscribedconcerts:
-        artists.add(concert.artist)
-    artists = artists.distinct()
-
+    artists = Artist.objects.filter(concerts__in=subscribedconcerts)
+    
     #get recommended concerts
-    recommendedConcerts = recommendableconcerts.filter(Q(artist_in=artists)|Q(artist_spotify_id_in=artistIDs))
+    recommendedConcerts = recommendableconcerts.filter(Q(artist__in=artists)|Q(artist__spotify_id__in=artistIDs))
+    print(len(recommendedConcerts))
+    recommendedConcerts = recommendedConcerts.difference(subscribedconcerts)
     serializer = ConcertSerializer(recommendedConcerts, many = True)
 
     return Response(serializer.data, status = status.HTTP_200_OK)
