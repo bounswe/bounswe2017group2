@@ -74,7 +74,6 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
             public void onClick(View v){
                 openGallery();
 
-                uploadImage();
             }
         });
 
@@ -89,6 +88,7 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
                 firstname = mFirstName.getText().toString().trim();
                 lastname = mLastName.getText().toString().trim();
                 //birthdate = mBirthDate.getText().toString().trim();
+                profilepic = imageURI.getPath();
                 postRequestMethod();
 
 
@@ -108,9 +108,10 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
             imageURI = data.getData();
             mProfilePic.setImageURI(imageURI);
             Log.d("tag",imageURI.getPath());
+            Log.v("tag2",mProfilePic.toString());
         }
     }
-
+/*
     public void uploadImage(){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")
@@ -136,6 +137,7 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
             }
         });
     }
+    */
 
     private void postRequestMethod(){
         Retrofit retrofit = new Retrofit.Builder()
@@ -152,7 +154,7 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         userDto.firstName = firstname;
         userDto.lastName = lastname;
         //userDto.birthDate = birthdate;
-        //userDto.image = profilepic;
+        userDto.image = profilepic;
 
         Call<UserResponse> call = controller.signUp(userDto);
         call.enqueue(new Callback<UserResponse>() {

@@ -39,6 +39,9 @@ public interface RestInterfaceController {
     @GET("/concert/{id}/subscribe/")
     Call<ConcertResponse> attend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
 
+    @GET("/concerts/search/")
+    Call<List<ConcertDto>> searchConcert(@Query("search") String search);
+
     @POST("/signup/")
     Call<UserResponse> signUp(@Body UserDto userDto);
 
@@ -48,6 +51,4 @@ public interface RestInterfaceController {
     @GET("/searchartists/")
     Call<List<Artist>> searchForArtist(@Query("name") String name);
 
-    @POST("/upload_user_image/")
-    Call<UserResponse> uploadImage(@Body UserDto userDto );
 }
