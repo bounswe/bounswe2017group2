@@ -15,6 +15,8 @@ from django.contrib.auth.decorators import login_required, permission_required #
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q # used in basic search
+from rest_framework.parsers import JSONParser # for PUT in edit_profile
+
 
 import spotipy # Lightweight Python library for the Spotify Web API
 import traceback
@@ -58,14 +60,49 @@ def list_users(request):
 @api_view(['GET'])
 def get_user_with_pk(request, pk):
     '''
-    returns  the registered user with the given primary key.
+    returns the registered user with the given primary key.
     '''
+    # we should check if the requesting user is following the user whose profile will be returned.
     try:
         user = RegisteredUser.objects.get(pk=pk)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
     serializer = RegisteredUserSerializer(user)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def get_user_info(request):
+    '''
+    returns the profile details of the logged in user.
+    '''
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        serializer = RegisteredUserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['PUT'])
+def edit_profile(request):
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        data = JSONParser().parse(request)
+        user = request.user
+        newdata= RegisteredUserSerializer(user).data
+
+        if 'email' in data: newdata['email'] = data['email']
+        if 'first_name' in data: newdata['first_name'] = data['first_name']
+        if 'last_name' in data: newdata['last_name'] = data['last_name']
+        if 'birth_date' in data: newdata['birth_date'] = data['birth_date']
+        if 'image' in data: newdata['image'] = data['image']
+
+        serializer = RegisteredUserSerializer(user, data=newdata)
+        if serializer.is_valid():
+            serializer.save() # update user info
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def follow_user(request,pk):
@@ -433,14 +470,6 @@ def delete_all_users(request):
         return Response(status = status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
-def get_user_info(request):
-    if (not request.user.is_authenticated):
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-    else:
-        serializer = RegisteredUserSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-@api_view(['GET'])
 def get_user_concerts(request):
     '''
     returns all the concerts of a user
@@ -462,11 +491,11 @@ def get_user_concerts_with_pk(request, pk):
         user = RegisteredUser.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    
+
     concerts = user.concerts.all()
     serializer = ConcertSerializer(concerts, many=True)
     return Response(serializer.data,status=status.HTTP_200_OK)
-     
+
 '''
 CONCERT FUNCTIONS
 '''
@@ -609,6 +638,9 @@ def concert_detail(request, pk):
 
     # modifies the concert with the given primary key
     elif request.method == 'PUT':
+        if (request.user.is_staff == False):
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         serializer = ConcertSerializer(concert, data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -617,6 +649,8 @@ def concert_detail(request, pk):
 
     # deletes the concert with the given primary key
     elif request.method == 'DELETE':
+        if (request.user.is_staff == False):
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         concert.delete()
         return Response(status = status.HTTP_204_NO_CONTENT)
 
@@ -730,6 +764,22 @@ def rate_concert(request,pk):
             concert.ratings.add(rating)
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_average_ratings(request,pk):
+    '''
+    returns the average ratings for the concert specified by its pk
+    '''
+    try:
+        concert = Concert.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return Response({'error':'concert not found.'},status = status.HTTP_404_NOT_FOUND)
+    ratings = concert.ratings.all()
+    serializer = RatingSerializer(ratings, many=True)
+
+
+    print(serializer.data)
+    return Response(status = status.HTTP_200_OK)
 
 
 '''
