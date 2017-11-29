@@ -38,8 +38,6 @@ class CommentBox extends React.Component {
     }
 
     handleSubmit(event) {
-        console.log("Bearer " + theToken);
-        console.log(this.state.value);
         axios.post('http://34.210.127.92:8000/concert/' + this.props.concertID + '/newcomment/', {
             'content': this.state.value,
         }, {
@@ -161,9 +159,9 @@ class Concert extends React.PureComponent {
 
         if (localStorage.getItem("lfcJWT")) {
             userID = decode(localStorage.lfcJWT).user_id;
+            //console.log(localStorage.getItem("lfcJWT"));
             isLoggedIn = true;
         }
-        console.log(userID);
 
         var visibleMessage = "";
         var invisibleMessage = "";
