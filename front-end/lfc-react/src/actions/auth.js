@@ -41,4 +41,5 @@ export const logout = () => dispatch => {
   localStorage.removeItem("lfcJWT");
   setAuthorizationHeader();
   dispatch(userLoggedOut());
+  window.location.reload(); // BAD PRACTICE!
 };
