@@ -146,7 +146,7 @@ class Concert extends React.PureComponent {
                     "stage_show": isRated[1],
                 }, {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + theToken
+                        'Authorization': 'Bearer ' + theToken,
                     }).then(response => {
                         window.location.reload();
                     }, error => {
@@ -178,6 +178,7 @@ class Concert extends React.PureComponent {
     }
 
     handleFollowButton(event) {
+        console.log(theToken);
         if (this.state.concert.attendees.indexOf(userID) == -1) {
             axios.post('http://34.210.127.92:8000/concert/' + this.props.match.params.concertID + '/subscribe/', {
             }, {
