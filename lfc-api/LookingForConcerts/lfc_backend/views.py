@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+
 from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist, ConcertImage, UserImage
 from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
 from lfc_backend.forms import ConcertImageForm, UserImageForm
@@ -61,7 +63,7 @@ def get_user_with_pk(request, pk):
     returns  the registered user with the given primary key.
     '''
     try:
-        user = RegisteredUser.objects.get(pk=pk) 
+        user = RegisteredUser.objects.get(pk=pk)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
     serializer = RegisteredUserSerializer(user)
@@ -94,7 +96,7 @@ def unfollow_user(request,pk):
         unfollowing_user = RegisteredUser.objects.get(pk=pk) #Unfollowing user is the user we wish to unfollow
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    me.following.remove(following_user)
+    me.following.remove(unfollowing_user)
     return Response(status = status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -112,21 +114,77 @@ def signup(request):
     else:
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST) # something went wrong!
 
-def spotify_get_access_token(spotify_refresh_token):
-    print(spotify_refresh_token)
+def spotify_get_access_token(user):
+    '''
+    returns a Spotify access token for the given user
+    '''
+    client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
+    client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
+    TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
+    refresh_token = user.spotify_refresh_token
 
+    params = {
+        'grant_type' : 'refresh_token',
+        'refresh_token' : refresh_token,
+        'client_id':client_id,
+        'client_secret':client_secret,
+    }
+    headers = {
+         "Content-Type": "application/x-www-form-urlencoded",
+     }
+    r = requests.post(TOKEN_ENDPOINT, params= params, headers=headers)
+    if r.status_code == 200: # SUCCESS!
+        return r.json()['access_token']
+    else: # the User has taken Looking for Concerts off his applications list in Spotify. Need to disconnect.
+        user.spotify_id = None
+        user.spotify_display_name = None
+        user.spotify_refresh_token = None
+        # disconnect this user's account from Spotify
+        user.save(update_fields=['spotify_id', 'spotify_display_name','spotify_refresh_token'])
+        return {'error':'The user has deleted Looking For Concerts from his \"applications\" in Spotify. He needs to connect his account to Spotify again.', 'status':r.status_code}
 
+@api_view(['GET'])
+def get_spotify_profile(request):
+    '''
+    returns the Spotify profile of the logged in user. Raises an error if the account is not connected to Spotify.
+    '''
+    if not request.user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    elif request.user.spotify_refresh_token is None:
+        return Response({'error':'The account is not connected to Spotify.'}, status = status.HTTP_400_BAD_REQUEST)
 
+    result = spotify_get_access_token(request.user)
+    if 'error' in result:
+        return Response(result['error'], status = result['status'])
+    else:
+        access_token = result
+
+    print("ACCESS_TOKEN:" + str(access_token))
+    sp = spotipy.Spotify(access_token)
+    results = sp.current_user()
+    return Response(results, status = status.HTTP_200_OK)
 
 # I'm using this to test it without the front-end.
 @api_view(['GET'])
 def spotify_redirect(request):
+    '''
+    This endpoint is used for back-end test purposes only.
+    '''
+    print(request.user.username)
+    print(request.session['username'])
+
+    if(request.user.username != request.session['username']):
+        return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    print("REDIRECT STATE:" + str(request.GET.get('state')))
     # check state to make sure it is the same user.
     if 'spotify_state' in request.session:
         if request.GET.get('state')==request.session['spotify_state']:
             print("Spotify connect: states matched.")
+        else:
+            return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
     else:
-        return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'spotify state not found in session.'}, status = status.HTTP_400_BAD_REQUEST)
 
     if request.GET.get('error') is not None:
         return Response({'error':'The user did not give authorization for connecting to Spotify'}, status = status.HTTP_401_UNAUTHORIZED)
@@ -137,7 +195,7 @@ def spotify_redirect(request):
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
     #redirect_uri = request.GET.get('redirect_uri') # normally, front-end will provide this as a parameter.
     # Now, since I know the redirect uri I hard coded it.
-    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['backend_redirect_uri']
 
     TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 
@@ -161,12 +219,19 @@ def spotify_redirect(request):
         spotify_refresh_token = r.json()['refresh_token']
         spotify_scope = r.json()['scope']
 
-        #print("USERNAME: " + str(request.user['username']))
+        print("USERNAME: " + str(request.user.username))
         print("ACCESS TOKEN: " + str(spotify_access_token))
         print("REFRESH TOKEN: " + str(spotify_refresh_token))
         user = request.user
         user.spotify_refresh_token = spotify_refresh_token
-        user.save(update_fields=['spotify_refresh_token']) # save the Spotify refresh token for this user.
+
+        sp = spotipy.Spotify(spotify_access_token)
+        spotify_profile = sp.current_user()
+        user.spotify_id = spotify_profile['id']
+        user.spotify_display_name = spotify_profile['display_name']
+
+        # connect this user's account to Spotify
+        user.save(update_fields=['spotify_id', 'spotify_display_name','spotify_refresh_token'])
 
         return Response({'message':'Successfully connected the account with Spotify!'}, status = status.HTTP_200_OK)
     else:
@@ -175,10 +240,87 @@ def spotify_redirect(request):
 # This will be used with the front-end
 @api_view(['POST'])
 def spotify_connect(request):
-    return Response(request.data['code'],status = status.HTTP_200_OK)
+    '''
+    Connects the account of the logged in user to his Spotify account.
+    '''
+    print(request.user.username)
+    print(request.session['username'])
+
+    if(request.user.username != request.session['username']):
+        return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    print("REDIRECT STATE:" + str(request.data['state']))
+    # check state to make sure it is the same user.
+    if 'spotify_state' in request.session:
+        if request.data['state']==request.session['spotify_state']:
+            print("Spotify connect: states matched.")
+        else:
+            return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({'error':'spotify state not found in session.'}, status = status.HTTP_400_BAD_REQUEST)
+
+    if request.data['error'] is not None:
+        return Response({'error':'The user did not give authorization for connecting to Spotify'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    code = request.data['code'] # got the authorization code.
+
+    client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
+    client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
+
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['frontend_redirect_uri']
+    if request.data['redirect_type'] =='android':
+            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
+
+    TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
+
+    params = {
+        'grant_type' : 'authorization_code',
+        'code' : code,
+        'redirect_uri' : redirect_uri,
+        'client_id':client_id,
+        'client_secret':client_secret,
+    }
+
+    headers = {
+         "Content-Type": "application/x-www-form-urlencoded",
+     }
+
+    r = requests.post(TOKEN_ENDPOINT, params= params, headers=headers)
+
+    if r.status_code == 200: # SUCCESS!
+        spotify_access_token = r.json()['access_token']
+        # token type is always "Bearer"
+        spotify_refresh_token = r.json()['refresh_token']
+        spotify_scope = r.json()['scope']
+
+        print("USERNAME: " + str(request.user.username))
+        print("ACCESS TOKEN: " + str(spotify_access_token))
+        print("REFRESH TOKEN: " + str(spotify_refresh_token))
+        user = request.user
+        user.spotify_refresh_token = spotify_refresh_token
+
+        sp = spotipy.Spotify(spotify_access_token)
+        spotify_profile = sp.current_user()
+        user.spotify_id = spotify_profile['id']
+        user.spotify_display_name = spotify_profile['display_name']
+
+        # connect this user's account to Spotify
+        user.save(update_fields=['spotify_id', 'spotify_display_name','spotify_refresh_token'])
+
+        return Response({'message':'Successfully connected the account with Spotify!'}, status = status.HTTP_200_OK)
+    else:
+        Response(status = r.status_code)
+
 
 @api_view(['POST'])
 def spotify_authorize(request):
+    '''
+    Returns the Spotify url for the user authorization. If the logged in user denies, his account will not be connected to Spotify.
+    Redirect to the returned url.
+    You will receive code and state as a response from Spotify if the user gives authorization.
+    Else, you will receive error and state as a response.
+    Call the user/spotify/connect ENDPOINT with parameters: code/error and state to complete the Spotify connection.
+    '''
     if not request.user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
     elif request.user.spotify_refresh_token is not None:
@@ -196,13 +338,22 @@ def spotify_authorize(request):
 
     client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
-    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']  # redirect URL should normally be the login page.
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['backend_redirect_uri']
+
+    if request.data['redirect_type'] == 'frontend':
+            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['frontend_redirect_uri']
+    elif request.data['redirect_type'] =='android':
+            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
 
     # If you generate a random string or encode the hash of some client state (e.g., a cookie)
     # in this state variable, you can validate the response to additionally ensure that the
     # request and response originated in the same browser.
     state = uuid.uuid4().hex
+    print("STATE:" +str(state))
     request.session['spotify_state'] = state
+    print("SESSION STATE:" +str(request.session['spotify_state']))
+    request.session['username']= request.user.username
+
     params = {
         'client_id' : client_id,
         'response_type' : 'code',
@@ -213,18 +364,25 @@ def spotify_authorize(request):
     }
     print("sending request for Spotify connect step 1...")
     r = requests.get(AUTHORIZATION_ENDPOINT, params = params, allow_redirects=True)
-    return Response({'url':r.url,'state':state},status = r.status_code)
+    return Response({'url':r.url},status = r.status_code)
+
 
 @api_view(['POST'])
 def spotify_disconnect(request):
+    '''
+    Disconnects the account of the logged in user from Spotify.
+    '''
     if not request.user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
     elif request.user.spotify_refresh_token is None:
-        return Response({'error':'The account is not connected to Spotify.'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'Cannot disconnect. The account is not connected to Spotify.'}, status = status.HTTP_400_BAD_REQUEST)
 
     user = request.user
+    user.spotify_id = None
+    user.spotify_display_name = None
     user.spotify_refresh_token = None
-    user.save(update_fields=['spotify_refresh_token'])
+    # disconnect this user's account from Spotify
+    user.save(update_fields=['spotify_id', 'spotify_display_name','spotify_refresh_token'])
     return Response({'message':'Account successfully disconnected from Spotify.'},status = status.HTTP_200_OK)
 
 @api_view(['DELETE'])
@@ -302,6 +460,20 @@ def get_user_concerts(request):
         return Response(serializer.data,status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+def get_user_concerts_with_pk(request, pk):
+    '''
+    returns the subscribed concerts of the registered user that have the pk value as the primary key value.
+    '''
+    try:
+        user = RegisteredUser.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    concerts = user.concerts.all()
+    serializer = ConcertSerializer(concerts, many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
 
 '''
 CONCERT FUNCTIONS
@@ -388,10 +560,10 @@ def search_concerts(request):
 def advanced_search(request):
     '''
     Searches the concerts with the strings given for concert's name, location, artist and tag.
-    For each of the fields above, endpoint requires a different string. If string is not given or equal to '' search is not filtered for that field. 
+    For each of the fields above, endpoint requires a different string. If string is not given or equal to '' search is not filtered for that field.
     ---For now search can only be done for one tag.
     ---DateTime needs to be implemented
-    ''' 
+    '''
     data = request.GET
     concert_name = data.get('concert_name','')
     location_venue = data.get('location_venue','')
@@ -400,7 +572,7 @@ def advanced_search(request):
     max_value = data.get('max_price','')
     min_value = data.get('min_price','')
 
-    
+
 
     concerts = Concert.objects.all()
     if concert_name !='' :
@@ -415,7 +587,7 @@ def advanced_search(request):
         concerts = concerts.filter(Q(price_max__lte=max_value))
     if min_value.isnumeric() :
         concerts = concerts.filter(Q(price_min__gte=min_value))
-    
+
     try:
         serializer = ConcertSerializer(concerts,many=True)
         return Response(serializer.data, status = status.HTTP_200_OK)
@@ -574,6 +746,10 @@ TAG FUNCTIONS
 
 @api_view(['GET'])
 def get_tags(request, search_str):
+    '''
+    @param: search_str
+    @return: json list of tags found
+    '''
     if (not request.user.is_authenticated):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
 
@@ -584,20 +760,22 @@ def get_tags(request, search_str):
         'format' : 'json',
         'language' : ['en', 'tr'],
         'search' : query,
-        'type':'item'
+        'type'   :'item'
     }
 
     r = requests.get(API_ENDPOINT, params = params)
     json_response = r.json()['search']
     lenght =  len(json_response)
+    #print(json_response)
 
     tags = []
     for i in range(lenght):
         if 'description' in json_response[i]:
             if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)):
-                value = json_response[i]['label']
+                value   = json_response[i]['label']
                 context = json_response[i]['description']
-                t = '{"value":"'+value.replace('"','')+ '","context":"'+context.replace('"','')+'"}'
+                uri     = json_response[i]['concepturi']
+                t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
                 print(t)
                 tags.append(json.loads(t))
 
@@ -631,6 +809,10 @@ def create_comment(request,pk):
 IMAGE FUNCTIONS
 '''
 class ConcertImageView(FormView):
+    '''
+    Uploads a concert image to the database
+    @return: url of the uploaded image
+    '''
     template_name = 'concert_image_form.html'
     form_class = ConcertImageForm
 
@@ -643,10 +825,18 @@ class ConcertImageView(FormView):
 
 @api_view(['GET'])
 def ConcertShowImage(request, pk):
+    '''
+    @param: pk, id of the cocert image
+    @return: url of that image
+    '''
     img = ConcertImage.objects.get(pk=pk)
     return HttpResponseRedirect(concert_image.image.url)
 
 class UserImageView(FormView):
+    '''
+    Uploads a user image to the database
+    @return: url of the uploaded image
+    '''
     template_name = 'user_image_form.html'
     form_class = UserImageForm
 
@@ -659,5 +849,9 @@ class UserImageView(FormView):
 
 @api_view(['GET'])
 def UserShowImage(request, pk):
+    '''
+    @param: pk, id of the user image
+    @return: url of the image
+    '''
     img = UsserImage.objects.get(pk=pk)
     return HttpResponseRedirect(user_image.image.url)

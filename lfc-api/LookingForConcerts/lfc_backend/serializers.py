@@ -8,7 +8,7 @@ from rest_framework import status
 class FollowedFollowingUserSerializer(serializers.ModelSerializer):
     class Meta:
         model=RegisteredUser
-        fields = ('id','username','email','first_name','last_name','birth_date') #Will add image when it is implemented.
+        fields = ('id','username','email','first_name','last_name','birth_date','image')
 
 class RegisteredUserSerializer(serializers.ModelSerializer):
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -17,7 +17,7 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
     following = FollowedFollowingUserSerializer(many=True, read_only=True)
     class Meta:
         model=RegisteredUser
-        fields = ('id','spotify_id','username','email','password','first_name','last_name','birth_date','date_joined','is_active','image','comments','concerts','followers','following')
+        fields = ('id','username','email','password','first_name','last_name','spotify_display_name','birth_date','date_joined','is_active','image','comments','concerts','followers','following')
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
@@ -25,6 +25,7 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.spotify_id = validated_data.get('spotify_id',instance.spotify_id)
+        instance.spotify_display_name = validated_data.get('spotify_display_name',instance.spotify_display_name)
         instance.spotify_refresh_token = validated_data.get('spotify_refresh_token',instance.spotify_refresh_token)
         instance.username = validated_data.get('username',instance.username)
         instance.email = validated_data.get('email',instance.email)
@@ -45,7 +46,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ('value','context')
+        fields = ('value','context','wikidata_uri')
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:

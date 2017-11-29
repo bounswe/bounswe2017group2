@@ -51,7 +51,6 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
     String profilepic;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,9 +66,9 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
 
         Button mProfilePicButton = (Button) findViewById(R.id.profilepicbutton);
 
-        mProfilePicButton.setOnClickListener(new View.OnClickListener(){
+        mProfilePicButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 openGallery();
 
                 uploadImage();
@@ -94,22 +93,22 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         });
     }
 
-    private void openGallery(){
+    private void openGallery() {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && requestCode == PICK_IMAGE){
+        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
             imageURI = data.getData();
             mProfilePic.setImageURI(imageURI);
-            Log.d("tag",imageURI.getPath());
+            Log.d("tag", imageURI.getPath());
         }
     }
 
-    public void uploadImage(){
+    public void uploadImage() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -135,7 +134,7 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         });
     }
 
-    private void postRequestMethod(){
+    private void postRequestMethod() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")
                 .addConverterFactory(GsonConverterFactory.create())

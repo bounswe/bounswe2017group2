@@ -53,20 +53,23 @@ urlpatterns = [
     # USER
     url(r'^signup/$', views.signup, name='signup'), # registers a new user
 
-    url(r'^spotify/authorize$', views.spotify_authorize, name='spotify_authorize'), # sets up the scope and sends the uri to the Spotify connect page
-    url(r'^spotify/connect$', views.spotify_connect, name='spotify_connect'), # connects the Spotify account of the user to his LFC account
-    url(r'^spotify/redirect$', views.spotify_redirect, name='spotify_redirect'),
-    url(r'^spotify/disconnect$', views.spotify_disconnect, name='spotify_disconnect'), # disconnects the account from Spotify
-
-
     url(r'^login/$', TokenObtainPairView.as_view()), # logs the user in
     url(r'^logout/$', logout, name='logout'), # logs the user out
     url(r'^users/$',views.list_users), # lists all the users registered to our app
     url(r'^user/me/$', views.get_user_info), # returns the logged in user object; requires authorization
-    url(r'^user/(?P<pk>[0-9]+)/', views.get_user_with_pk), #returns the user information of the user with the pk as its id
+    # SPOTIFY
+    url(r'^spotify/redirect$', views.spotify_redirect, name='spotify_redirect'),
+
+    url(r'^user/spotify/authorize$', views.spotify_authorize, name='spotify_authorize'), # sets up the scope and sends the uri to the Spotify connect page
+    url(r'^user/spotify/connect$', views.spotify_connect, name='spotify_connect'), # connects the Spotify account of the user to his LFC account
+    url(r'^user/spotify/disconnect$', views.spotify_disconnect, name='spotify_disconnect'), # disconnects the account from Spotify
+    url(r'^user/spotify/profile$', views.get_spotify_profile, name='get_spotify_profile'), # returns the Spotify profile of the logged in user.
+
+    url(r'^user/(?P<pk>[0-9]+)/$', views.get_user_with_pk), #returns the user information of the user with the pk as its id
     url(r'^user/(?P<pk>[0-9]+)/follow/$', views.follow_user), # the logged in user follows the one with given pk; requires authorization
     url(r'^user/(?P<pk>[0-9]+)/unfollow/$', views.unfollow_user), # the logged in user unfollows the one with given pk; requires authorization
     url(r'^user/get_concerts/$',views.get_user_concerts), # returns all the concerts of the logged in user; requires authorization
+    url(r'^user/(?P<pk>[0-9]+)/get_concerts/$', views.get_user_concerts_with_pk), #returns all the concerts of the user with pk primary key value.
     url(r'^user/deactivate/$', views.deactivate_user, name='deactivate_user'), # deactivates the account of the logged in user; requires authorization
     url(r'^user/delete/$', views.delete_user, name='delete_user'), # deletes the account of a given user; only admins are authorized.
     url(r'^user/delete_all/$', views.delete_all_users, name='delete_all_users'), # deletes all user accounts; only admins are authorized.

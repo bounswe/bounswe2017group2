@@ -1,0 +1,56 @@
+.ui.button{
+    background-color: #800000;
+    color: white;
+}
+
+.ui.button:hover{
+    background-color: #400000;
+    color: white;
+}
+
+.ui.button:focus{
+    background-color: #600000;
+    color: white;
+    
+}
+
+.Link {
+    font-size: 13pt;
+    font-weight: bold;
+    color: #800000;
+}
+.Link:hover {
+    font-size: 13pt;
+    font-weight: bold;
+    color: #800000;
+    text-decoration: underline;
+}
+
+.center {
+    text-align: center;
+}
+
+.usersName {
+    font-size: 20pt;
+}
+
+.username {
+    font-size: 15pt;
+}
+
+.userData {
+    font-size: 15pt;
+}
+
+.miniUser {
+    padding-top: 0px!important;
+    padding-bottom: 0px!important;
+}
+
+.followCounters {
+    font-size: 15pt;
+}
+
+#profilePage {
+    margin-top: 1em;
+}

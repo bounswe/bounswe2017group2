@@ -197,6 +197,7 @@ public class ConcertDetails extends Fragment {
             @Override
             public void onFailure(Call<ConcertResponse> call, Throwable t) {
                 Toast.makeText(getActivity(), "ATTEND ERROR", Toast.LENGTH_SHORT).show();
+                Log.d("FS", t.getMessage());
             }
         });
     }

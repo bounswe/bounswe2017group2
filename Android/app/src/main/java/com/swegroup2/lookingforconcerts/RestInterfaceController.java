@@ -1,6 +1,7 @@
 package com.swegroup2.lookingforconcerts;
 
 
+import com.google.gson.JsonObject;
 import com.swegroup2.lookingforconcerts.concert.Artist;
 import com.swegroup2.lookingforconcerts.concert.ConcertComment;
 import com.swegroup2.lookingforconcerts.concert.ConcertDto;
@@ -17,6 +18,8 @@ import retrofit2.http.GET;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 
 /**
  * Created by furkan on 9.10.2017.
@@ -29,6 +32,9 @@ public interface RestInterfaceController {
 
     @POST("/newconcert/")
     Call<ConcertResponse> createConcert(@Body ConcertDto concertDto, @HeaderMap Map<String, String> headermap);
+
+    @GET("/maps/api/place/textsearch/json")
+    Call<JsonObject> searchForVenue(@QueryMap Map<String, String> queryMap);
 
     @GET("/concerts/")
     Call<List<ConcertDto>> getAllConcerts();
@@ -48,10 +54,9 @@ public interface RestInterfaceController {
     @POST("/api/auth/token/refresh/")
     Call<RefreshResponse> refresh(@Body RefreshDto refreshDto);
 
-    @POST("/searchartists/")
-    Call<List<Artist>> searchForArtist(@Body Artist artist);
+    @GET("/searchartists/")
+    Call<List<Artist>> searchForArtist(@Query("name") String name);
 
     @POST("/upload_user_image/")
     Call<UserResponse> uploadImage(@Body UserDto userDto);
-
 }

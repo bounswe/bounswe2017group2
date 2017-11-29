@@ -34,24 +34,24 @@ public class UserProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
         fillConcerts(ConcertListActivity.userDto.concerts);
-        concertHistory= (ListView) findViewById(R.id.concert_history);
+        concertHistory = (ListView) findViewById(R.id.concert_history);
         concertHistoryListAdapter = new ConcertHistoryListAdapter(this, pastConcerts);
         concertHistory.setAdapter(concertHistoryListAdapter);
 
-        nameSurname= (TextView) findViewById(R.id.name_surname);
-        nameSurname.setText(ConcertListActivity.userDto.firstName+" "+ConcertListActivity.userDto.lastName);
+        nameSurname = (TextView) findViewById(R.id.name_surname);
+        nameSurname.setText(ConcertListActivity.userDto.firstName + " " + ConcertListActivity.userDto.lastName);
 
-        birthDate= (TextView) findViewById(R.id.birth_date);
-        birthDate.setText("Birth Date: "+ConcertListActivity.userDto.birthDate);
+        birthDate = (TextView) findViewById(R.id.birth_date);
+        birthDate.setText("Birth Date: " + ConcertListActivity.userDto.birthDate);
 
-        dateJoined= (TextView) findViewById(R.id.date_joined);
-        dateJoined.setText("Date Joined: "+ConcertListActivity.userDto.dateJoined);
+        dateJoined = (TextView) findViewById(R.id.date_joined);
+        dateJoined.setText("Date Joined: " + ConcertListActivity.userDto.dateJoined);
 
-        followers= (TextView) findViewById(R.id.followers);
-        followers.setText("Followers: "+ConcertListActivity.userDto.followers.size());
+        followers = (TextView) findViewById(R.id.followers);
+        followers.setText("Followers: " + ConcertListActivity.userDto.followers.size());
 
-        following= (TextView) findViewById(R.id.following);
-        following.setText("Following: "+ConcertListActivity.userDto.following.size());
+        following = (TextView) findViewById(R.id.following);
+        following.setText("Following: " + ConcertListActivity.userDto.following.size());
 
 
     }

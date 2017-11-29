@@ -32,6 +32,7 @@ class RegisteredUser(AbstractUser):
     # For recommendations
     # if the user connects his account with Spotify
     spotify_id = models.CharField(_('spotify_id'), max_length=50,null=True, blank=True)
+    spotify_display_name = models.CharField(_('spotify_display_name'),max_length=50,null=True, blank=True)
     spotify_refresh_token = models.CharField(_('spotify_refresh_token'),max_length=50,null=True, blank=True)
 
     email = models.EmailField(
@@ -57,7 +58,8 @@ class Tag(models.Model):
     '''
     tag_id = models.AutoField(primary_key=True)
     value = models.CharField(max_length=20)
-    context = models.CharField(max_length=20)
+    context = models.CharField(max_length=200, blank=True)
+    wikidata_uri = models.CharField(max_length=50, blank=True)
 
 class Artist(models.Model):
     #images - implemented in Image --ONE TO MANY

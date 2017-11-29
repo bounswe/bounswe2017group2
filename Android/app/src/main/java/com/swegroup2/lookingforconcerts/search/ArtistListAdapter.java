@@ -21,7 +21,7 @@ import java.util.List;
  */
 
 public class ArtistListAdapter extends RecyclerView.Adapter<ArtistListAdapter
-        .ArtistListAdapterViewHolder>{
+        .ArtistListAdapterViewHolder> {
     private final ArtistListAdapterOnClickHandler mClickHandler;
     private List<Artist> mArtistData;
     Context context;
