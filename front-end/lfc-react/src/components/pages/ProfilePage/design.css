@@ -42,6 +42,11 @@
     font-size: 15pt;
 }
 
+.miniUser {
+    padding-top: 0px!important;
+    padding-bottom: 0px!important;
+}
+
 .followCounters {
     font-size: 15pt;
 }
