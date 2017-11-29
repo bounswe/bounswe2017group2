@@ -29,6 +29,8 @@ import requests # for sending requests
 import json # for getting the response body as json
 import re # for regular expressions
 import uuid # to generate random string for state in spotify_connect
+import numpy as np # for mean ratings
+import pprint # pretty print for json objects
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -782,13 +784,15 @@ def get_average_ratings(request,pk):
         concert = Concert.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return Response({'error':'concert not found.'},status = status.HTTP_404_NOT_FOUND)
-    ratings = concert.ratings.all()
-    serializer = RatingSerializer(ratings, many=True)
+    ratings = RatingSerializer(concert.ratings.all(), many=True).data
 
+    avg_ratings ={}
+    avg_ratings['concert_atmosphere'] = np.mean([rating['concert_atmosphere'] for rating in ratings])
+    avg_ratings['artist_costumes'] = np.mean([rating['artist_costumes'] for rating in ratings])
+    avg_ratings['music_quality'] = np.mean([rating['music_quality'] for rating in ratings])
+    avg_ratings['stage_show'] = np.mean([rating['stage_show'] for rating in ratings])
 
-    print(serializer.data)
-    return Response(status = status.HTTP_200_OK)
-
+    return Response(avg_ratings,status = status.HTTP_200_OK)
 
 '''
 TAG FUNCTIONS
