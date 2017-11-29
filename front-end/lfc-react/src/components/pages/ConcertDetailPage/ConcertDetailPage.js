@@ -6,10 +6,10 @@ import { GoogleMap, Marker, withScriptjs, withGoogleMap, InfoWindow } from 'reac
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Button } from 'semantic-ui-react';
+import { Button, Rating } from 'semantic-ui-react';
 import './design.css';
-import $ from 'jquery';
 import decode from "jwt-decode";
+
 
 //default from 'semantic-ui-react/dist/commonjs/collections/Table/TableRow';
 
@@ -188,15 +188,38 @@ class Concert extends React.PureComponent {
         }
 
         let followConcertButton;
+        let rateButtons;
 
-        if(isLoggedIn) {
-            followConcertButton=(
+        if (isLoggedIn) {
+            followConcertButton = (
                 <button className="ui animated fade fluid button" onClick={this.handleFollowButton}>
                     <div className="visible content"> {visibleMessage} </div>
                     <div className="hidden content">
                         Mark as {invisibleMessage}
                     </div>
                 </button>);
+            if (visibleMessage == "Attended") {
+                rateButtons = (
+                    <div className="ui grid">
+                        <div className="four wide column center">
+                            <div><h5>Concert Venue</h5></div>
+                            <Rating icon='star' maxRating={5} />
+                        </div>
+                        <div className="four wide column center">
+                            <div><h5>Stage Show</h5></div>
+                            <Rating icon='star' maxRating={5} />
+                        </div>
+                        <div className="four wide column center">
+                            <div><h5>Something</h5></div>
+                            <Rating icon='star' maxRating={5} />
+                        </div>
+                        <div className="four wide column center">
+                            <div><h5>Something</h5></div>
+                            <Rating icon='star' maxRating={5} />
+                        </div>
+                    </div>
+                );
+            }
         }
 
 
@@ -262,6 +285,8 @@ class Concert extends React.PureComponent {
                 <div className="row">
                     <div className="sixteen wide column">
                         <p>{this.state.concert.description}</p>
+
+                        <div>{rateButtons}</div>
 
                         {followConcertButton}
 
