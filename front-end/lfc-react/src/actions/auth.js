@@ -28,6 +28,7 @@ export const login = credentials => dispatch =>
           access_token: accessToken,
           refresh_token: refreshToken
         };
+        localStorage.lfcJWT = user.access_token;
         dispatch(userLoggedIn(user));
       })
       .catch(err => {
@@ -37,6 +38,7 @@ export const login = credentials => dispatch =>
 
 export const logout = () => dispatch => {
   localStorage.removeItem("state");
+  localStorage.removeItem("lfcJWT");
   setAuthorizationHeader();
   dispatch(userLoggedOut());
 };

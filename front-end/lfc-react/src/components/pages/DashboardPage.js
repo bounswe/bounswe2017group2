@@ -7,7 +7,6 @@ import { fetch } from "../../actions/concert";
 const ConcertItem = ({ concert }) => (
   <Item>
     <Item.Image src={concert.artist ? concert.artist.images[2].url : ""} />
-    {console.log(concert.artist)}
     <Item.Content>
       <Item.Header as="a">
         {concert.artist ? concert.artist.name : ""}
@@ -47,7 +46,6 @@ class DashboardPage extends React.Component {
   }
   render() {
     const { concerts } = this.props;
-    console.log(concerts);
     return (
       <div className="ui container">
         <ConcertsList concerts={concerts} />
