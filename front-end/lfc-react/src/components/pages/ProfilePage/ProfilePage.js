@@ -71,20 +71,22 @@ class MiniUserDetail extends React.Component {
             );
         }
         return (
-            <div className="ui grid segment">
-                <img className="ui image three wide column" height="100px" src={this.props.user.image} />
-                <div className="ten wide column">
-                    <h3><Link className="Link" to={"/user/" + this.props.user.id} onClick={this.refreshPage}>{this.props.user.username}</Link></h3>
-                    <h4>{this.props.user.first_name} {this.props.user.last_name}</h4>
-                </div>
-                <div className="three wide column">
-                    {removeButton}
+            <div className="ui eight wide column miniUser">
+                <div className="ui grid segment">
+                    <img className="ui image three wide column" height="100px" src={"http://34.210.127.92:8000" + this.props.user.image} />
+                    <div className="ten wide column">
+                        <h3><Link className="Link" to={"/user/" + this.props.user.id} onClick={this.refreshPage}>{this.props.user.username}</Link></h3>
+                        <h4>{this.props.user.first_name} {this.props.user.last_name}</h4>
+                    </div>
+                    <div className="three wide column">
+                        {removeButton}
+                    </div>
                 </div>
             </div>
         )
     }
 
-    refreshPage(){
+    refreshPage() {
         window.location.reload();
     }
 
@@ -170,7 +172,7 @@ class ProfilePage extends React.Component {
                 var userData = response.data;
                 var willAttendList = [];
                 var attendedList = [];
-                axios.get('http://34.210.127.92:8000/user/'+profileID+'/get_concerts/', {
+                axios.get('http://34.210.127.92:8000/user/' + profileID + '/get_concerts/', {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + theToken
                 })
@@ -285,10 +287,10 @@ class ProfilePage extends React.Component {
                         </div>
                     </div>
                     <div className="ui bottom attached tab segment" id="followedUsersTab">
-                        <div>{followedUsersList}</div>
+                        <div className="ui grid center">{followedUsersList}</div>
                     </div>
                     <div className="ui bottom attached tab segment" id="followersTab">
-                        <div>{followersList}</div>
+                        <div className="ui grid center">{followersList}</div>
                     </div>
                 </div>
             </div>
