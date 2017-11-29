@@ -1,26 +1,24 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.login;
 
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
+import com.swegroup2.lookingforconcerts.R;
+import com.swegroup2.lookingforconcerts.RestInterfaceController;
+import com.swegroup2.lookingforconcerts.user.UserResponse;
+import com.swegroup2.lookingforconcerts.user.UserDto;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,7 +62,7 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         mPasswordView = (EditText) findViewById(R.id.password);
         mFirstName = (EditText) findViewById(R.id.firstname);
         mLastName = (EditText) findViewById(R.id.lastname);
-        //mBirthDate = (EditText) findViewById(R.id.birthdate);
+        mBirthDate = (EditText) findViewById(R.id.birthdate);
         mProfilePic = (ImageView) findViewById(R.id.profilepic);
 
         Button mProfilePicButton = (Button) findViewById(R.id.profilepicbutton);
@@ -88,7 +86,7 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
                 password = mPasswordView.getText().toString().trim();
                 firstname = mFirstName.getText().toString().trim();
                 lastname = mLastName.getText().toString().trim();
-                //birthdate = mBirthDate.getText().toString().trim();
+                birthdate = mBirthDate.getText().toString().trim();
                 postRequestMethod();
 
 
@@ -151,7 +149,7 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         userDto.password = password;
         userDto.firstName = firstname;
         userDto.lastName = lastname;
-        //userDto.birthDate = birthdate;
+        userDto.birthDate = birthdate;
         //userDto.image = profilepic;
 
         Call<UserResponse> call = controller.signUp(userDto);

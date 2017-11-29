@@ -1,10 +1,11 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.concert;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.swegroup2.lookingforconcerts.R;
+import com.swegroup2.lookingforconcerts.RefreshDto;
+import com.swegroup2.lookingforconcerts.RefreshResponse;
+import com.swegroup2.lookingforconcerts.RestInterfaceController;
+import com.swegroup2.lookingforconcerts.login.LoginActivity;
+import com.swegroup2.lookingforconcerts.search.ArtistListAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,9 +62,6 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
     String[] tags;
     String venue;
     String coordinates;
-
-    String accessToken;
-    String refreshToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,9 +122,6 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
 
         adapter = new ArtistListAdapter(this, this);
         recyclerView.setAdapter(adapter);
-
-        accessToken = getIntent().getStringExtra("access");
-        refreshToken = getIntent().getStringExtra("refresh");
     }
 
     private boolean isValid() {
@@ -163,7 +164,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         concertDto.comments = new ArrayList<>();
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Bearer " + accessToken);
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
 
         Call<ConcertResponse> call = controller.createConcert(concertDto, map);
         call.enqueue(new Callback<ConcertResponse>() {
@@ -171,12 +172,12 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
             public void onResponse(Call<ConcertResponse> call, Response<ConcertResponse> response) {
                 if (response.message().equals("Unauthorized")) {
                     final RefreshDto refreshDto = new RefreshDto();
-                    refreshDto.refresh = refreshToken;
+                    refreshDto.refresh = LoginActivity.refreshToken;
                     Call<RefreshResponse> callRefresh = controller.refresh(refreshDto);
                     callRefresh.enqueue(new Callback<RefreshResponse>() {
                         @Override
                         public void onResponse(Call<RefreshResponse> call, Response<RefreshResponse> response) {
-                            accessToken = response.body().access;
+                            LoginActivity.accessToken = response.body().access;
                             postRequestMethod();
                         }
 
@@ -184,8 +185,6 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
                         public void onFailure(Call<RefreshResponse> call, Throwable t) {
                             Toast.makeText(CreateConcertActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(CreateConcertActivity.this, ConcertListActivity.class);
-                            intent.putExtra("access", accessToken);
-                            intent.putExtra("refresh", refreshToken);
                             startActivity(intent);
                             CreateConcertActivity.this.finish();
                         }
@@ -193,8 +192,6 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
                 }
 
                 Intent intent = new Intent(CreateConcertActivity.this, ConcertListActivity.class);
-                intent.putExtra("access", accessToken);
-                intent.putExtra("refresh", refreshToken);
                 startActivity(intent);
                 CreateConcertActivity.this.finish();
             }
@@ -203,8 +200,6 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
             public void onFailure(Call<ConcertResponse> call, Throwable t) {
                 Toast.makeText(CreateConcertActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(CreateConcertActivity.this, ConcertListActivity.class);
-                intent.putExtra("access", accessToken);
-                intent.putExtra("refresh", refreshToken);
                 startActivity(intent);
                 CreateConcertActivity.this.finish();
             }

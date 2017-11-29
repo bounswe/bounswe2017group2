@@ -1,15 +1,17 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.user;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.swegroup2.lookingforconcerts.concert.ConcertComment;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Pınar on 15.11.2017.
  */
 
-public class UserDto {
+public class UserDto implements Serializable {
 
     @SerializedName("id")
     @Expose()

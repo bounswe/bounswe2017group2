@@ -1,4 +1,4 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.concert;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -78,38 +78,6 @@ class ConcertLocation implements Serializable {
     @SerializedName("coordinates")
     @Expose
     public String coordinates;
-}
-
-class ConcertComment implements Serializable {
-    @SerializedName("content")
-    @Expose
-    public String content;
-
-}
-
-class Artist implements Serializable {
-    @SerializedName("name")
-    @Expose
-    public String name;
-    @SerializedName("spotify_id")
-    @Expose
-    public String spotifyId;
-    @SerializedName("images")
-    @Expose
-    public List<Image> images;
-
-}
-
-class Image implements Serializable {
-    @SerializedName("url")
-    @Expose
-    public String url;
-    @SerializedName("height")
-    @Expose
-    public Integer height;
-    @SerializedName("width")
-    @Expose
-    public Integer width;
 }
 
 

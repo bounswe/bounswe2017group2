@@ -1,34 +1,24 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.login;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.swegroup2.lookingforconcerts.R;
+import com.swegroup2.lookingforconcerts.RefreshDto;
+import com.swegroup2.lookingforconcerts.RefreshResponse;
+import com.swegroup2.lookingforconcerts.RestInterfaceController;
+import com.swegroup2.lookingforconcerts.concert.ConcertListActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,10 +33,12 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import static android.Manifest.permission.READ_CONTACTS;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A login screen that offers login via username/password.
@@ -54,6 +46,8 @@ import static android.Manifest.permission.READ_CONTACTS;
 public class LoginActivity extends AppCompatActivity {
     String username, password;
     String token;
+    public static String refreshToken = "";
+    public static String accessToken = "";
 
 
     // UI references.
@@ -130,6 +124,34 @@ public class LoginActivity extends AppCompatActivity {
         return sb.toString();
     }
 
+    public static void refresh(final Context context) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        RefreshDto refreshDto = new RefreshDto();
+        refreshDto.refresh = refreshToken;
+
+        Call<RefreshResponse> call = controller.refresh(refreshDto);
+
+        call.enqueue(new Callback<RefreshResponse>() {
+            @Override
+            public void onResponse(Call<RefreshResponse> call, Response<RefreshResponse> response) {
+                if (!LoginActivity.accessToken.equals(response.body().access)) {
+                    LoginActivity.accessToken = response.body().access;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RefreshResponse> call, Throwable t) {
+                Toast.makeText(context, "ERROR", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -166,8 +188,8 @@ public class LoginActivity extends AppCompatActivity {
                 Intent i = new Intent(LoginActivity.this, ConcertListActivity.class);
                 try {
                     JSONObject json = new JSONObject(token);
-                    i.putExtra("access", json.getString("access"));
-                    i.putExtra("refresh", json.getString("refresh"));
+                    accessToken = json.getString("access");
+                    refreshToken = json.getString("refresh");
                     SharedPreferences settings = PreferenceManager
                             .getDefaultSharedPreferences(getApplicationContext());
                     SharedPreferences.Editor editor = settings.edit();

@@ -1,5 +1,6 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.concert;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,6 +14,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.swegroup2.lookingforconcerts.login.LoginActivity;
+import com.swegroup2.lookingforconcerts.R;
+import com.swegroup2.lookingforconcerts.RefreshDto;
+import com.swegroup2.lookingforconcerts.RefreshResponse;
+import com.swegroup2.lookingforconcerts.RestInterfaceController;
+import com.swegroup2.lookingforconcerts.user.UserDto;
+import com.swegroup2.lookingforconcerts.user.UserProfileActivity;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,25 +38,18 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     private ConcertListAdapter adapter;
     private Button createConcertButton;
     private Button logoutButton;
-
-    private Button profile;
+    public static List<ConcertDto> concerts;
+    public static UserDto userDto;
+    static Button profile;
 
     private SearchView mSearch;
 
-    String refreshToken = "";
-    String accessToken = "";
-
-    UserDto userProfileInfo = new UserDto();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_concert_list);
 
-        refreshToken = getIntent().getStringExtra("refresh");
-        accessToken = getIntent().getStringExtra("access");
-        Log.v("myTag", "refresh: " + refreshToken);
-        Log.v("myTag", "access: " + accessToken);
 
         recyclerView = (RecyclerView) findViewById(R.id.concert_list_rv);
 
@@ -58,10 +61,12 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
         profile = (Button) findViewById(R.id.profile);
-
-        //logoutButton = (Button) findViewById(R.id.logout_btn);
+        profile.setClickable(false);
 
         getConcerts();
+        getProfileInfo(this);
+
+
     }
 
     @Override
@@ -75,8 +80,8 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
                 .commit();
     }
 
-    private void getConcerts() {
-        refresh();
+    public void getConcerts() {
+        LoginActivity.refresh(this);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -89,7 +94,9 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         call.enqueue(new Callback<List<ConcertDto>>() {
             @Override
             public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
-                adapter.setConcertData(response.body());
+                concerts = response.body();
+                adapter.setConcertData(concerts);
+
             }
 
             @Override
@@ -99,37 +106,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         });
     }
 
-    public void refresh() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://34.210.127.92:8000/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
-
-        RefreshDto refreshDto = new RefreshDto();
-        refreshDto.refresh = refreshToken;
-
-        Call<RefreshResponse> call = controller.refresh(refreshDto);
-
-        call.enqueue(new Callback<RefreshResponse>() {
-            @Override
-            public void onResponse(Call<RefreshResponse> call, Response<RefreshResponse> response) {
-                if (!accessToken.equals(response.body().access)) {
-                    accessToken = response.body().access;
-                    Log.d("FS", "accessToken " + accessToken);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RefreshResponse> call, Throwable t) {
-                Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public void profile(View view) {
-        refresh();
+    public static void getProfileInfo(final Context context) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -138,30 +115,31 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Bearer " + accessToken);
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
 
         Call<UserDto> call = controller.getUserProfile(map);
 
         call.enqueue(new Callback<UserDto>() {
             @Override
             public void onResponse(Call<UserDto> call, Response<UserDto> response) {
-
-                Toast.makeText(ConcertListActivity.this,response.body().username, Toast.LENGTH_LONG).show();
+                userDto = response.body();
+                profile.setClickable(true);
             }
 
             @Override
             public void onFailure(Call<UserDto> call, Throwable t) {
-                Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "PROFILE ERROR", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    public static void profile(View view) {
+        Intent intent = new Intent(view.getContext(), UserProfileActivity.class);
+        view.getContext().startActivity(intent);
+    }
+
     public void createConcert(View view) {
         Intent intent = new Intent(this, CreateConcertActivity.class);
-
-        intent.putExtra("refresh", refreshToken);
-        intent.putExtra("access", accessToken);
-
         startActivity(intent);
         finish();
     }

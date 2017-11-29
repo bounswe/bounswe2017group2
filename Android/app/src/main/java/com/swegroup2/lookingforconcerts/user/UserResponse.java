@@ -1,4 +1,4 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.user;
 
 import java.io.Serializable;
 
