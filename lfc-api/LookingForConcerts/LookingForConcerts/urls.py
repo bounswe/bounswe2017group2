@@ -79,6 +79,7 @@ urlpatterns = [
     url(r'^concert/(?P<pk>[0-9]+)/subscribe/$', views.subscribe_concert), # subscribes logged in user to the concert; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/unsubscribe/$', views.unsubscribe_concert), # unsubscribes logged in user from concert; requires authorization
     url(r'^concerts/$', views.list_concerts), # lists all concerts in DB
+    url(r'^concerts/get_recommended_concerts/$', views.get_recommendations), #lists the concerts that are recommended to the user using his/her subscribed concerts and spotify top artists if spotify connection is made.
     url(r'^newconcert/$', views.create_concert), # creates a concert with provided info; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert; only admins are authorized for modification or deletion
     # CONCERT SEARCH
