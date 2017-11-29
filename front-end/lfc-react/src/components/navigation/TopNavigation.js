@@ -12,6 +12,9 @@ const TopNavigation = ({ isAuthenticated, user, logout }) => (
       LookingForConcerts
     </Menu.Item>
     <Menu.Item>
+      <Button color="green">Connect to Spotify</Button>
+    </Menu.Item>
+    <Menu.Item>
       <Input icon="search" placeholder="Search..." />
     </Menu.Item>
 
