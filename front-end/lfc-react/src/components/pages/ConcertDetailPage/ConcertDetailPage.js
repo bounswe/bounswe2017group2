@@ -6,10 +6,10 @@ import { GoogleMap, Marker, withScriptjs, withGoogleMap, InfoWindow } from 'reac
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Button } from 'semantic-ui-react';
+import { Button, Rating } from 'semantic-ui-react';
 import './design.css';
-import $ from 'jquery';
 import decode from "jwt-decode";
+
 
 //default from 'semantic-ui-react/dist/commonjs/collections/Table/TableRow';
 
@@ -18,6 +18,8 @@ const googleMapKey = "AIzaSyCrs1xLdXw8y4rfXc4tiJZZIWcwjmOR7BM";
 let userID;
 const theToken = localStorage.getItem("lfcJWT");
 let isLoggedIn = false;
+let isRated = [0, 0, 0, 0];
+let currentRatings;
 //lat: 41.015, lng: 28.979
 
 class CommentBox extends React.Component {
@@ -38,8 +40,6 @@ class CommentBox extends React.Component {
     }
 
     handleSubmit(event) {
-        console.log("Bearer " + theToken);
-        console.log(this.state.value);
         axios.post('http://34.210.127.92:8000/concert/' + this.props.concertID + '/newcomment/', {
             'content': this.state.value,
         }, {
@@ -110,10 +110,15 @@ class Concert extends React.PureComponent {
                     },
                 }],
                 attendees: [],
+                ratings: [],
             },
         };
 
         this.handleFollowButton = this.handleFollowButton.bind(this);
+        this.handleRate1 = this.handleRate1.bind(this);
+        this.handleRate2 = this.handleRate2.bind(this);
+        this.handleRate3 = this.handleRate3.bind(this);
+        this.handleRate4 = this.handleRate4.bind(this);
 
     }
 
@@ -132,7 +137,48 @@ class Concert extends React.PureComponent {
 
     }
 
+    updateRating() {
+        if (isRated[0] && isRated[1] && isRated[2] && isRated[3]) {
+            axios.post('http://34.210.127.92:8000/concert/' + this.props.match.params.concertID + '/rate/', {
+                    "concert_atmosphere": isRated[3],
+                    "artist_costumes": isRated[2],
+                    "music_quality": isRated[0],
+                    "stage_show": isRated[1],
+                }, {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + theToken,
+                    }).then(response => {
+                        window.location.reload();
+                    }, error => {
+                        console.log("refresh");
+                    });
+        }
+    }
+
+    handleRate1(event, { rating, maxRating }) {
+        currentRatings.music_quality=rating;
+        isRated[0] = rating;
+        this.updateRating();
+    }
+
+    handleRate2(event, { rating, maxRating }) {
+        currentRatings.stage_show=rating;
+        isRated[1] = rating;
+        this.updateRating();
+    }
+    handleRate3(event, { rating, maxRating }) {
+        currentRatings.artist_costumes=rating;
+        isRated[2] = rating;
+        this.updateRating();
+    }
+    handleRate4(event, { rating, maxRating }) {
+        currentRatings.concert_atmosphere=rating;
+        isRated[3] = rating;
+        this.updateRating();
+    }
+
     handleFollowButton(event) {
+        console.log(theToken);
         if (this.state.concert.attendees.indexOf(userID) == -1) {
             axios.post('http://34.210.127.92:8000/concert/' + this.props.match.params.concertID + '/subscribe/', {
             }, {
@@ -161,9 +207,9 @@ class Concert extends React.PureComponent {
 
         if (localStorage.getItem("lfcJWT")) {
             userID = decode(localStorage.lfcJWT).user_id;
+            //console.log(localStorage.getItem("lfcJWT"));
             isLoggedIn = true;
         }
-        console.log(userID);
 
         var visibleMessage = "";
         var invisibleMessage = "";
@@ -188,15 +234,39 @@ class Concert extends React.PureComponent {
         }
 
         let followConcertButton;
+        let rateButtons;
 
-        if(isLoggedIn) {
-            followConcertButton=(
+        if (isLoggedIn) {
+            currentRatings=this.state.concert.ratings.find(function(rating) {return rating.owner===userID})
+            followConcertButton = (
                 <button className="ui animated fade fluid button" onClick={this.handleFollowButton}>
                     <div className="visible content"> {visibleMessage} </div>
                     <div className="hidden content">
                         Mark as {invisibleMessage}
                     </div>
                 </button>);
+            if (visibleMessage == "Attended") {
+                rateButtons = (
+                    <div className="ui grid">
+                        <div className="four wide column center">
+                            <div><h5>Music Quality</h5></div>
+                            <Rating icon='star' maxRating={5} defaultRating={currentRatings.music_quality} onRate={this.handleRate1} />
+                        </div>
+                        <div className="four wide column center">
+                            <div><h5>Stage Show</h5></div>
+                            <Rating icon='star' maxRating={5} defaultRating={currentRatings.stage_show} onRate={this.handleRate2} />
+                        </div>
+                        <div className="four wide column center">
+                            <div><h5>Artist Costumes</h5></div>
+                            <Rating icon='star' maxRating={5} defaultRating={currentRatings.artist_costumes} onRate={this.handleRate3} />
+                        </div>
+                        <div className="four wide column center">
+                            <div><h5>Concert Atmosphere</h5></div>
+                            <Rating icon='star' maxRating={5} defaultRating={currentRatings.concert_atmosphere} onRate={this.handleRate4} />
+                        </div>
+                    </div>
+                );
+            }
         }
 
 
@@ -241,10 +311,10 @@ class Concert extends React.PureComponent {
                 </div>
                 <div className="row">
                     <div className="ui list sixteen wide column">
-                        <div className="item"><b>Artist:</b>{this.state.concert.artist.name}</div>
-                        <div className="item"><b>Date:</b>{this.state.concert.date_time}</div>
-                        <div className="item">{price}</div>
-                        <div className="item"><b>Location:</b>{this.state.concert.location.venue}</div>
+                        <div className="item concertData"><b>Artist:</b>{this.state.concert.artist.name}</div>
+                        <div className="item concertData"><b>Date:</b>{this.state.concert.date_time}</div>
+                        <div className="item concertData">{price}</div>
+                        <div className="item concertData"><b>Location:</b>{this.state.concert.location.venue}</div>
                     </div>
                 </div>
 
@@ -262,6 +332,8 @@ class Concert extends React.PureComponent {
                 <div className="row">
                     <div className="sixteen wide column">
                         <p>{this.state.concert.description}</p>
+
+                        <div>{rateButtons}</div>
 
                         {followConcertButton}
 

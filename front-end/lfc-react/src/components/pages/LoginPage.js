@@ -6,12 +6,12 @@ import { login } from "../../actions/auth";
 
 class LoginPage extends React.Component {
   submit = data =>
-    this.props.login(data).then(() => this.props.history.push("/dashboard"));
+    this.props.login(data).then(() => this.props.history.push("/"));
 
   render() {
     return (
       <div>
-        <h1>Login to LookingForConcerts</h1>
+        <h2>Login</h2>
 
         <LoginForm submit={this.submit} />
       </div>

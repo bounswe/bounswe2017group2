@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Form, Button, Message } from "semantic-ui-react";
-import isEmail from "validator/lib/isEmail";
-import InlineError from "../messages/InlineError";
+import { isEmail, isLength } from "validator";
+import InlineError from "..//messages/InlineError";
 
 class SignupForm extends React.Component {
   state = {
@@ -11,9 +11,7 @@ class SignupForm extends React.Component {
       email: "",
       password: "",
       first_name: "",
-      last_name: "",
-      birth_date: null,
-      avatar: null
+      last_name: ""
     },
     loading: false,
     errors: {}
@@ -31,14 +29,23 @@ class SignupForm extends React.Component {
     this.setState({ errors });
     if (Object.keys(errors).length === 0) {
       this.setState({ loading: true });
-      this.props.submit(this.state.data).catch(err =>
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            global: err.response.data.username
-          },
-          loading: false
-        })
+      this.props.submit(this.state.data).catch(
+        err =>
+          err.response !== undefined
+            ? this.setState({
+                errors: {
+                  ...this.state.errors,
+                  global: err.response.data.username
+                },
+                loading: false
+              })
+            : this.setState({
+                errors: {
+                  ...this.state.errors,
+                  global: "Connection Error"
+                },
+                loading: false
+              })
       );
     }
   };
@@ -48,7 +55,8 @@ class SignupForm extends React.Component {
 
     if (!isEmail(data.email)) errors.email = "Invalid email";
     if (!data.username) errors.username = "Invalid username";
-    if (!data.password) errors.password = "Can't be blank";
+    if (!data.password || !isLength(data.password, { min: 5, max: 16 }))
+      errors.password = "Password should be between 5-16 characters";
 
     return errors;
   };
@@ -65,33 +73,28 @@ class SignupForm extends React.Component {
           </Message>
         )}
 
-        <Form.Group widths={1}>
-          <Form.Input label="First name">
+        <Form.Field error={!!errors.first_name} width={5}>
+          <label htmlFor="first_name">
+            First Name
             <input
               name="first_name"
               value={data.first_name}
               onChange={this.onChange}
             />
-          </Form.Input>
-          <Form.Input label="Last name">
+          </label>
+          {errors.first_name && <InlineError text={errors.first_name} />}
+        </Form.Field>
+
+        <Form.Field error={!!errors.last_name} width={5}>
+          <label htmlFor="last_name">
+            Last Name
             <input
               name="last_name"
               value={data.last_name}
               onChange={this.onChange}
             />
-          </Form.Input>
-        </Form.Group>
-
-        <Form.Field error={!!errors.username} width={5}>
-          <label htmlFor="username">
-            User name
-            <input
-              name="username"
-              value={data.username}
-              onChange={this.onChange}
-            />
           </label>
-          {errors.username && <InlineError text={errors.username} />}
+          {errors.last_name && <InlineError text={errors.last_name} />}
         </Form.Field>
 
         <Form.Field error={!!errors.email} width={5}>
@@ -105,6 +108,18 @@ class SignupForm extends React.Component {
             />
           </label>
           {errors.email && <InlineError text={errors.email} />}
+        </Form.Field>
+
+        <Form.Field error={!!errors.username} width={5}>
+          <label htmlFor="username">
+            User name
+            <input
+              name="username"
+              value={data.username}
+              onChange={this.onChange}
+            />
+          </label>
+          {errors.username && <InlineError text={errors.username} />}
         </Form.Field>
 
         <Form.Field error={!!errors.password} width={5}>

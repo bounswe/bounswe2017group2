@@ -49,8 +49,12 @@ public interface RestInterfaceController {
     @POST("/concert/{id}/unsubscribe/")
     Call<ConcertResponse> unAttend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
 
+
     @POST("/concert/{id}/rate/")
     Call<ConcertResponse> rate(@Body Ratings ratings, @Path("id") int id, @HeaderMap Map<String, String> headermap);
+
+    @GET("/concerts/search/")
+    Call<List<ConcertDto>> searchConcert(@Query("search") String search);
 
     @POST("/signup/")
     Call<UserResponse> signUp(@Body UserDto userDto);

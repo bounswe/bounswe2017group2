@@ -3,8 +3,6 @@ package com.swegroup2.lookingforconcerts.concert;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -153,7 +151,6 @@ public class ConcertDetails extends Fragment {
 
         comments.setText(allComments);
 
-
         ratingBar.setStepSize((float) 1.0);
 
 
@@ -218,7 +215,6 @@ public class ConcertDetails extends Fragment {
                 rate();
             }
         });
-
 
         // Inflate the layout for this fragment
         return view;
@@ -294,7 +290,6 @@ public class ConcertDetails extends Fragment {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 attend.setText("UNATTEND");
-
                 ConcertListActivity.getProfileInfo(getActivity());
                 Toast.makeText(getActivity(), "ATTEND", Toast.LENGTH_SHORT).show();
             }
