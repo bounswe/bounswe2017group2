@@ -9,7 +9,8 @@ import decode from "jwt-decode";
 
 
 let theToken = localStorage.getItem("lfcJWT");
-let userID = decode(localStorage.lfcJWT).user_id;
+let userID;
+let isLoggedIn = false;
 
 
 class MiniConcertDetail extends React.Component {
@@ -53,6 +54,55 @@ class MiniConcertDetail extends React.Component {
     }
 }
 
+
+class MiniUserDetail extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleRemove = this.handleRemove.bind(this);
+        this.refreshPage = this.refreshPage.bind(this);
+    }
+    render() {
+        let removeButton;
+        if (this.props.isRemovable) {
+            removeButton = (
+                <button className=" circular mini ui icon right floated button" onClick={() => this.handleRemove()}>
+                    <i className="remove icon"></i>
+                </button>
+            );
+        }
+        return (
+            <div className="ui eight wide column miniUser">
+                <div className="ui grid segment">
+                    <img className="ui image three wide column" height="100px" src={"http://34.210.127.92:8000" + this.props.user.image} />
+                    <div className="ten wide column">
+                        <h3><Link className="Link" to={"/user/" + this.props.user.id} onClick={this.refreshPage}>{this.props.user.username}</Link></h3>
+                        <h4>{this.props.user.first_name} {this.props.user.last_name}</h4>
+                    </div>
+                    <div className="three wide column">
+                        {removeButton}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    refreshPage() {
+        window.location.reload();
+    }
+
+    handleRemove(event) {
+        axios.post('http://34.210.127.92:8000/user/' + this.props.user.id + '/unfollow/', {
+        }, {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + theToken
+            }).then(response => {
+                window.location.reload();
+            }, error => {
+                console.log("refresh");
+            });
+    }
+}
+
 class ProfilePage extends React.Component {
     constructor(props) {
         super(props);
@@ -80,7 +130,7 @@ class ProfilePage extends React.Component {
 
     handleFollow(isFollow) {
         if (isFollow) {
-            axios.get('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/follow/', {
+            axios.post('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/follow/', {}, {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + theToken
             })
@@ -89,7 +139,7 @@ class ProfilePage extends React.Component {
                 })
         }
         else {
-            axios.get('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/unfollow/', {
+            axios.post('http://34.210.127.92:8000/user/' + this.props.match.params.userID + '/unfollow/', {}, {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + theToken
             })
@@ -116,13 +166,13 @@ class ProfilePage extends React.Component {
     }
 
     componentWillMount() {
-        let userID = this.props.match.params.userID;
-        axios.get('http://34.210.127.92:8000/user/' + userID + '/')
+        let profileID = this.props.match.params.userID;
+        axios.get('http://34.210.127.92:8000/user/' + profileID + '/')
             .then(response => {
                 var userData = response.data;
                 var willAttendList = [];
                 var attendedList = [];
-                axios.get('http://34.210.127.92:8000/user/get_concerts/', {
+                axios.get('http://34.210.127.92:8000/user/' + profileID + '/get_concerts/', {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + theToken
                 })
@@ -152,29 +202,45 @@ class ProfilePage extends React.Component {
 
 
     render() {
-        let editFollowButton;
-        if (userID == this.props.match.params.userID) {
-            editFollowButton = (<button className="ui  floated button">
-                Edit Profile
-            </button>);
+
+        if (localStorage.getItem("lfcJWT")) {
+            userID = decode(localStorage.lfcJWT).user_id;
+            isLoggedIn = true;
         }
-        else {
-            if (this.state.user.following.indexOf(this.props.match.params.userID) == -1) {
-                editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(1)}>
-                    Follow
-                </button>);
+
+        let editFollowButton;
+        let profileID = this.props.match.params.userID;
+        let followedUsersList = this.state.user.following.map((usr) =>
+            <MiniUserDetail user={usr} isRemovable={isLoggedIn && userID == this.props.match.params.userID} />
+        );
+        let followersList = this.state.user.followers.map((usr) =>
+            <MiniUserDetail user={usr} isRemovable={false} />
+        );
+
+        if (isLoggedIn) {
+            if (userID == profileID) {
+                editFollowButton = (<button className="ui  floated button">
+                    Edit Profile
+            </button>);
             }
             else {
-                editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(0)}>
-                    Unfollow
+                if (!this.state.user.followers.find(function (user) { return user.id === userID })) {
+                    editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(1)}>
+                        Follow
                 </button>);
+                }
+                else {
+                    editFollowButton = (<button className="ui  floated button" onClick={() => this.handleFollow(0)}>
+                        Unfollow
+                </button>);
+                }
             }
         }
         var attendedConcerts = this.state.attended.map((cncrt) =>
-            <MiniConcertDetail concert={cncrt} isCurrentUser={userID == this.props.match.params.userID} />
+            <MiniConcertDetail concert={cncrt} isCurrentUser={isLoggedIn && userID == this.props.match.params.userID} />
         );
         var willAttendConcerts = this.state.willAttend.map((cncrt) =>
-            <MiniConcertDetail concert={cncrt} isCurrentUser={userID == this.props.match.params.userID} />
+            <MiniConcertDetail concert={cncrt} isCurrentUser={isLoggedIn && userID == this.props.match.params.userID} />
         );
         var age = Math.floor((Date.now() - (new Date(this.state.user.birth_date))) / (1000 * 60 * 60 * 24 * 365));
         return (
@@ -220,10 +286,10 @@ class ProfilePage extends React.Component {
                         </div>
                     </div>
                     <div className="ui bottom attached tab segment" id="followedUsersTab">
-                        <div>{this.state.user.following.length}</div>
+                        <div className="ui grid center">{followedUsersList}</div>
                     </div>
                     <div className="ui bottom attached tab segment" id="followersTab">
-                        <div>{this.state.user.followers.length}</div>
+                        <div className="ui grid center">{followersList}</div>
                     </div>
                 </div>
             </div>

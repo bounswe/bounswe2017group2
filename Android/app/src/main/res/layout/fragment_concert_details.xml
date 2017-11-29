@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context="com.swegroup2.lookingforconcerts.ConcertDetails">
+    tools:context="com.swegroup2.lookingforconcerts.concert.ConcertDetails">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -28,11 +28,11 @@
                     android:layout_height="wrap_content"
                     android:text="back" />
 
-                <Switch
+                <Button
                     android:id="@+id/attend"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Attend" />
+                    android:text="ATTEND" />
             </LinearLayout>
 
             <TextView

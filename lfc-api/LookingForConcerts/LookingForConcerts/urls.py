@@ -57,6 +57,8 @@ urlpatterns = [
     url(r'^logout/$', logout, name='logout'), # logs the user out
     url(r'^users/$',views.list_users), # lists all the users registered to our app
     url(r'^user/me/$', views.get_user_info), # returns the logged in user object; requires authorization
+    url(r'^user/edit_profile/$', views.edit_profile), # updates the information of the user
+
     # SPOTIFY
     url(r'^spotify/redirect$', views.spotify_redirect, name='spotify_redirect'),
 
@@ -65,10 +67,11 @@ urlpatterns = [
     url(r'^user/spotify/disconnect$', views.spotify_disconnect, name='spotify_disconnect'), # disconnects the account from Spotify
     url(r'^user/spotify/profile$', views.get_spotify_profile, name='get_spotify_profile'), # returns the Spotify profile of the logged in user.
 
-    url(r'^user/(?P<pk>[0-9]+)/', views.get_user_with_pk), #returns the user information of the user with the pk as its id
+    url(r'^user/(?P<pk>[0-9]+)/$', views.get_user_with_pk), #returns the user information of the user with the pk as its id
     url(r'^user/(?P<pk>[0-9]+)/follow/$', views.follow_user), # the logged in user follows the one with given pk; requires authorization
     url(r'^user/(?P<pk>[0-9]+)/unfollow/$', views.unfollow_user), # the logged in user unfollows the one with given pk; requires authorization
     url(r'^user/get_concerts/$',views.get_user_concerts), # returns all the concerts of the logged in user; requires authorization
+    url(r'^user/(?P<pk>[0-9]+)/get_concerts/$', views.get_user_concerts_with_pk), #returns all the concerts of the user with pk primary key value.
     url(r'^user/deactivate/$', views.deactivate_user, name='deactivate_user'), # deactivates the account of the logged in user; requires authorization
     url(r'^user/delete/$', views.delete_user, name='delete_user'), # deletes the account of a given user; only admins are authorized.
     url(r'^user/delete_all/$', views.delete_all_users, name='delete_all_users'), # deletes all user accounts; only admins are authorized.
@@ -76,8 +79,9 @@ urlpatterns = [
     url(r'^concert/(?P<pk>[0-9]+)/subscribe/$', views.subscribe_concert), # subscribes logged in user to the concert; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/unsubscribe/$', views.unsubscribe_concert), # unsubscribes logged in user from concert; requires authorization
     url(r'^concerts/$', views.list_concerts), # lists all concerts in DB
+    url(r'^concerts/get_recommended_concerts/$', views.get_recommendations), #lists the concerts that are recommended to the user using his/her subscribed concerts and spotify top artists if spotify connection is made.
     url(r'^newconcert/$', views.create_concert), # creates a concert with provided info; requires authorization
-    url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert
+    url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert; only admins are authorized for modification or deletion
     # CONCERT SEARCH
     url(r'^concerts/search/$', views.search_concerts), # returns a list of concerts matching with data on their name, location, artist and tags.
     url(r'^concerts/advanced_search/$', views.advanced_search),
@@ -87,6 +91,8 @@ urlpatterns = [
     url(r'^concert/(?P<pk>[0-9]+)/newcomment/$', views.create_comment), # adds a new comment by the logged in user to the concert specified by its primary key; requires authorization
     # RATING
     url(r'^concert/(?P<pk>[0-9]+)/rate/$', views.rate_concert), # adds a new rating by the logged in user to the concert specified by its primary key; requires authorization
+    url(r'^concert/(?P<pk>[0-9]+)/average_ratings/$', views.get_average_ratings), # returns the average ratings for the concert specified by its primary key
+
     # LOCATION
     url(r'^locations/$',views.list_locations), # lists all locations in DB
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB

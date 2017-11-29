@@ -10,11 +10,55 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="com.swegroup2.lookingforconcerts.ConcertListActivity">
+        tools:context="com.swegroup2.lookingforconcerts.concert.ConcertListActivity">
 
-        <SearchView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:hint="Search"
+                android:id="@+id/search_edit" />
+
+            <Button
+                android:id="@+id/search_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="go"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/selected_concert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_centerVertical="true"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/concertlist_name_tv_selected"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/search_list_rv"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="8dp"
+            android:visibility="gone">
+
+        </android.support.v7.widget.RecyclerView>
+
 
         <Button
             android:id="@+id/create_concert_btn"
@@ -33,6 +77,12 @@
             android:id="@+id/profile" />
 
         <Button
+            android:id="@+id/spotifyButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CONNECT TO SPOTIFY" />
+
+        <Button
             android:id="@+id/logout_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,6 +92,7 @@
             android:text="Logout" />
 
         <android.support.v7.widget.RecyclerView
+            android:focusable="true"
             android:id="@+id/concert_list_rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -53,4 +104,5 @@
 
 
     </LinearLayout>
+
 </FrameLayout>

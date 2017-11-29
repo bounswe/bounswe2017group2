@@ -1,4 +1,4 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.concert;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.swegroup2.lookingforconcerts.R;
+import com.swegroup2.lookingforconcerts.RestInterfaceController;
+import com.swegroup2.lookingforconcerts.login.LoginActivity;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -42,7 +44,7 @@ public class ConcertDetails extends Fragment {
     TextView location;
     TextView comments;
     EditText commentText;
-    Switch attend;
+    public static Button attend;
 
     Button comment;
     Button back;
@@ -67,8 +69,7 @@ public class ConcertDetails extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             concertDto = new ConcertDto();
-
-            concertDto = (ConcertDto)deserialize((getArguments().getByteArray("concert")));
+            concertDto = (ConcertDto) deserialize((getArguments().getByteArray("concert")));
 
         }
 
@@ -89,7 +90,7 @@ public class ConcertDetails extends Fragment {
         comments = (TextView) view.findViewById(R.id.comments);
         back = (Button) view.findViewById(R.id.back_to_list);
         comment = (Button) view.findViewById(R.id.comment);
-        attend= (Switch) view.findViewById(R.id.attend);
+        attend = (Button) view.findViewById(R.id.attend);
         commentText = (EditText) view.findViewById(R.id.comment_edittext);
 
         back.setOnClickListener(new View.OnClickListener() {
@@ -106,16 +107,26 @@ public class ConcertDetails extends Fragment {
             }
         });
 
-        attend.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        if (ConcertListActivity.userDto.concerts.contains(concertDto.id)) {
+            attend.setText("UNATTEND");
+        }
+
+        attend.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                attend();
+            public void onClick(View v) {
+                if (attend.getText().toString().equals("ATTEND")) {
+                    attend();
+                } else {
+                    unAttend();
+                }
             }
         });
 
 
         name.setText("Name: " + concertDto.name);
-        artistName.setText("Artist Name: " + concertDto.artist.name);
+        if (concertDto.artist != null) {
+            artistName.setText("Artist Name: " + concertDto.artist.name);
+        }
         date.setText("Date: " + concertDto.date);
         description.setText("Description: " + concertDto.description);
         minPrice.setText("Min Price: " + concertDto.minPrice);
@@ -128,6 +139,7 @@ public class ConcertDetails extends Fragment {
         }
 
         comments.setText(allComments);
+
 
         // Inflate the layout for this fragment
         return view;
@@ -143,15 +155,9 @@ public class ConcertDetails extends Fragment {
         ConcertComment concertComment = new ConcertComment();
         concertComment.content = comment;
 
-        String refreshToken = "";
-        String accessToken = "";
-        refreshToken = getActivity().getIntent().getStringExtra("refresh");
-        accessToken = getActivity().getIntent().getStringExtra("access");
-        Log.v("myTag","refresh: " + refreshToken);
-        Log.v("myTag","access: " + accessToken);
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Bearer " + accessToken);
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
 
         Call<ConcertResponse> call = controller.makeComment(concertDto.id, concertComment, map);
         call.enqueue(new Callback<ConcertResponse>() {
@@ -176,27 +182,50 @@ public class ConcertDetails extends Fragment {
 
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
-        String token = "";
-        token = getActivity().getIntent().getStringExtra("access");
-        Log.v("myTag", "tokenL: " + token);
-
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Bearer " + token);
-
-        Call<ConcertResponse> call = controller.attend(concertDto.id, map);
-        call.enqueue(new Callback<ConcertResponse>() {
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
+        Call<Void> call = controller.attend(concertDto.id, map);
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<ConcertResponse> call, Response<ConcertResponse> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                attend.setText("UNATTEND");
+
+                ConcertListActivity.getProfileInfo(getActivity());
                 Toast.makeText(getActivity(), "ATTEND", Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onFailure(Call<ConcertResponse> call, Throwable t) {
-                Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(getActivity(), "ATTEND ERROR", Toast.LENGTH_SHORT).show();
+                Log.d("FS", t.getMessage());
             }
         });
     }
 
+    public void unAttend() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
+        Call<ConcertResponse> call = controller.unAttend(concertDto.id, map);
+        call.enqueue(new Callback<ConcertResponse>() {
+            @Override
+            public void onResponse(Call<ConcertResponse> call, Response<ConcertResponse> response) {
+                attend.setText("ATTEND");
+                ConcertListActivity.getProfileInfo(getActivity());
+                Toast.makeText(getActivity(), "UNATTEND", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<ConcertResponse> call, Throwable t) {
+                Toast.makeText(getActivity(), "UNATTEND ERROR", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 
     public static byte[] serialize(Object obj) {

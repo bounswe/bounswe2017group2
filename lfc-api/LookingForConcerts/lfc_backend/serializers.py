@@ -8,7 +8,7 @@ from rest_framework import status
 class FollowedFollowingUserSerializer(serializers.ModelSerializer):
     class Meta:
         model=RegisteredUser
-        fields = ('id','username','email','first_name','last_name','birth_date') #Will add image when it is implemented.
+        fields = ('id','username','email','first_name','last_name','birth_date','image')
 
 class RegisteredUserSerializer(serializers.ModelSerializer):
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -29,13 +29,15 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
         instance.spotify_refresh_token = validated_data.get('spotify_refresh_token',instance.spotify_refresh_token)
         instance.username = validated_data.get('username',instance.username)
         instance.email = validated_data.get('email',instance.email)
-        instance.password = validated_data.get('password',instance.password)
+        #instance.password = make_password(validated_data.get('password',instance.password))
         instance.first_name = validated_data.get('first_name',instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.birth_date = validated_data.get('birth_date', instance.birth_date)
         instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.image = validated_data.get('image', instance.image)
 
+        instance.save()
+        return instance
 
 class CommentSerializer(serializers.ModelSerializer):
     owner = RegisteredUserSerializer(read_only=True)
@@ -46,7 +48,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ('value','context')
+        fields = ('value','context','wikidata_uri')
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:

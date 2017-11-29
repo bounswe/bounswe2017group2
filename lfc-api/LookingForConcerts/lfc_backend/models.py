@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 
 from django.utils.translation import ugettext_lazy as _
 from .managers import UserManager
+from django.core.validators import MaxValueValidator, MinValueValidator # for integer constraints
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
@@ -58,7 +59,8 @@ class Tag(models.Model):
     '''
     tag_id = models.AutoField(primary_key=True)
     value = models.CharField(max_length=20)
-    context = models.CharField(max_length=20)
+    context = models.CharField(max_length=200, blank=True)
+    wikidata_uri = models.CharField(max_length=50, blank=True)
 
 class Artist(models.Model):
     #images - implemented in Image --ONE TO MANY
@@ -78,7 +80,7 @@ class ConcertImage(models.Model):
 class Concert(models.Model):
     concert_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length= 150)
-    artist = models.ForeignKey(Artist, related_name = 'concerts', on_delete = models.DO_NOTHING, null = True)
+    artist = models.ForeignKey(Artist, related_name = 'concerts', on_delete = models.DO_NOTHING, null = False)
     location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.CASCADE,  null=True)
     attendees = models.ManyToManyField(RegisteredUser, related_name = 'concerts')
     # tags - implemented in tag --MANY TO MANY
@@ -130,10 +132,11 @@ class Rating(models.Model):
     rating_id = models.AutoField(primary_key=True)
     owner = models.ForeignKey(RegisteredUser, related_name = 'concert_ratings', on_delete = models.CASCADE, null=True)
     concert = models.ForeignKey(Concert, related_name = 'ratings', on_delete = models.CASCADE, null=True)
-    concert_atmosphere = models.IntegerField(null=True)
-    artist_costumes = models.IntegerField(null=True)
-    music_quality = models.IntegerField(null=True)
-    stage_show = models.IntegerField(null=True)
+
+    concert_atmosphere = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)], null=True)
+    artist_costumes = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)], null=True)
+    music_quality = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)], null=True)
+    stage_show = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)], null=True)
 
     class Meta: # a user can rate a concert only once.
         unique_together = ("owner", "concert")

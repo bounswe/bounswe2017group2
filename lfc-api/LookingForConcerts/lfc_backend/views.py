@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+
 from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist, ConcertImage, UserImage
 from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
 from lfc_backend.forms import ConcertImageForm, UserImageForm
@@ -15,6 +17,8 @@ from django.contrib.auth.decorators import login_required, permission_required #
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q # used in basic search
+from rest_framework.parsers import JSONParser # for PUT in edit_profile
+
 
 import spotipy # Lightweight Python library for the Spotify Web API
 import traceback
@@ -25,6 +29,8 @@ import requests # for sending requests
 import json # for getting the response body as json
 import re # for regular expressions
 import uuid # to generate random string for state in spotify_connect
+import numpy as np # for mean ratings
+import pprint # pretty print for json objects
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -58,14 +64,49 @@ def list_users(request):
 @api_view(['GET'])
 def get_user_with_pk(request, pk):
     '''
-    returns  the registered user with the given primary key.
+    returns the registered user with the given primary key.
     '''
+    # we should check if the requesting user is following the user whose profile will be returned.
     try:
         user = RegisteredUser.objects.get(pk=pk)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
     serializer = RegisteredUserSerializer(user)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def get_user_info(request):
+    '''
+    returns the profile details of the logged in user.
+    '''
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        serializer = RegisteredUserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['PUT'])
+def edit_profile(request):
+    if (not request.user.is_authenticated):
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        data = JSONParser().parse(request)
+        user = request.user
+        newdata= RegisteredUserSerializer(user).data
+
+        if 'email' in data: newdata['email'] = data['email']
+        if 'first_name' in data: newdata['first_name'] = data['first_name']
+        if 'last_name' in data: newdata['last_name'] = data['last_name']
+        if 'birth_date' in data: newdata['birth_date'] = data['birth_date']
+        if 'image' in data: newdata['image'] = data['image']
+
+        serializer = RegisteredUserSerializer(user, data=newdata)
+        if serializer.is_valid():
+            serializer.save() # update user info
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def follow_user(request,pk):
@@ -94,7 +135,7 @@ def unfollow_user(request,pk):
         unfollowing_user = RegisteredUser.objects.get(pk=pk) #Unfollowing user is the user we wish to unfollow
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
-    me.following.remove(following_user)
+    me.following.remove(unfollowing_user)
     return Response(status = status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -193,7 +234,7 @@ def spotify_redirect(request):
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
     #redirect_uri = request.GET.get('redirect_uri') # normally, front-end will provide this as a parameter.
     # Now, since I know the redirect uri I hard coded it.
-    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['backend_redirect_uri']
 
     TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 
@@ -264,9 +305,10 @@ def spotify_connect(request):
 
     client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
-    #redirect_uri = request.GET.get('redirect_uri') # normally, front-end will provide this as a parameter.
-    # Now, since I know the redirect uri I hard coded it.
-    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']
+
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['frontend_redirect_uri']
+    if request.data['redirect_type'] =='android':
+            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
 
     TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 
@@ -335,7 +377,12 @@ def spotify_authorize(request):
 
     client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
-    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['redirect_uri']  # redirect URL should normally be the login page.
+    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['backend_redirect_uri']
+
+    if request.data['redirect_type'] == 'frontend':
+            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['frontend_redirect_uri']
+    elif request.data['redirect_type'] =='android':
+            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
 
     # If you generate a random string or encode the hash of some client state (e.g., a cookie)
     # in this state variable, you can validate the response to additionally ensure that the
@@ -433,14 +480,6 @@ def delete_all_users(request):
         return Response(status = status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
-def get_user_info(request):
-    if (not request.user.is_authenticated):
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-    else:
-        serializer = RegisteredUserSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-@api_view(['GET'])
 def get_user_concerts(request):
     '''
     returns all the concerts of a user
@@ -452,6 +491,20 @@ def get_user_concerts(request):
         return Response(serializer.data,status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+def get_user_concerts_with_pk(request, pk):
+    '''
+    returns the subscribed concerts of the registered user that have the pk value as the primary key value.
+    '''
+    try:
+        user = RegisteredUser.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    concerts = user.concerts.all()
+    serializer = ConcertSerializer(concerts, many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
 
 '''
 CONCERT FUNCTIONS
@@ -595,6 +648,9 @@ def concert_detail(request, pk):
 
     # modifies the concert with the given primary key
     elif request.method == 'PUT':
+        if (request.user.is_staff == False):
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         serializer = ConcertSerializer(concert, data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -603,6 +659,8 @@ def concert_detail(request, pk):
 
     # deletes the concert with the given primary key
     elif request.method == 'DELETE':
+        if (request.user.is_staff == False):
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         concert.delete()
         return Response(status = status.HTTP_204_NO_CONTENT)
 
@@ -717,6 +775,24 @@ def rate_concert(request,pk):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_average_ratings(request,pk):
+    '''
+    returns the average ratings for the concert specified by its pk
+    '''
+    try:
+        concert = Concert.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return Response({'error':'concert not found.'},status = status.HTTP_404_NOT_FOUND)
+    ratings = RatingSerializer(concert.ratings.all(), many=True).data
+
+    avg_ratings ={}
+    avg_ratings['concert_atmosphere'] = np.mean([rating['concert_atmosphere'] for rating in ratings])
+    avg_ratings['artist_costumes'] = np.mean([rating['artist_costumes'] for rating in ratings])
+    avg_ratings['music_quality'] = np.mean([rating['music_quality'] for rating in ratings])
+    avg_ratings['stage_show'] = np.mean([rating['stage_show'] for rating in ratings])
+
+    return Response(avg_ratings,status = status.HTTP_200_OK)
 
 '''
 TAG FUNCTIONS
@@ -724,6 +800,10 @@ TAG FUNCTIONS
 
 @api_view(['GET'])
 def get_tags(request, search_str):
+    '''
+    @param: search_str
+    @return: json list of tags found
+    '''
     if (not request.user.is_authenticated):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
 
@@ -734,20 +814,22 @@ def get_tags(request, search_str):
         'format' : 'json',
         'language' : ['en', 'tr'],
         'search' : query,
-        'type':'item'
+        'type'   :'item'
     }
 
     r = requests.get(API_ENDPOINT, params = params)
     json_response = r.json()['search']
     lenght =  len(json_response)
+    #print(json_response)
 
     tags = []
     for i in range(lenght):
         if 'description' in json_response[i]:
             if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)):
-                value = json_response[i]['label']
+                value   = json_response[i]['label']
                 context = json_response[i]['description']
-                t = '{"value":"'+value.replace('"','')+ '","context":"'+context.replace('"','')+'"}'
+                uri     = json_response[i]['concepturi']
+                t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
                 print(t)
                 tags.append(json.loads(t))
 
@@ -781,6 +863,10 @@ def create_comment(request,pk):
 IMAGE FUNCTIONS
 '''
 class ConcertImageView(FormView):
+    '''
+    Uploads a concert image to the database
+    @return: url of the uploaded image
+    '''
     template_name = 'concert_image_form.html'
     form_class = ConcertImageForm
 
@@ -793,10 +879,18 @@ class ConcertImageView(FormView):
 
 @api_view(['GET'])
 def ConcertShowImage(request, pk):
+    '''
+    @param: pk, id of the cocert image
+    @return: url of that image
+    '''
     img = ConcertImage.objects.get(pk=pk)
     return HttpResponseRedirect(concert_image.image.url)
 
 class UserImageView(FormView):
+    '''
+    Uploads a user image to the database
+    @return: url of the uploaded image
+    '''
     template_name = 'user_image_form.html'
     form_class = UserImageForm
 
@@ -809,5 +903,52 @@ class UserImageView(FormView):
 
 @api_view(['GET'])
 def UserShowImage(request, pk):
+    '''
+    @param: pk, id of the user image
+    @return: url of the image
+    '''
     img = UsserImage.objects.get(pk=pk)
     return HttpResponseRedirect(user_image.image.url)
+
+'''
+RECOMMENDATION FUNCTIONS
+'''
+@api_view(['GET'])
+def get_recommendations(request):
+    if not request.user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    
+    #spotify ids of the top artists info from spotify
+    artistIDs = []
+    #Concerts that are already being followed. These should not be in recommendations. Also prefetches the related artists with those concerts
+    subscribedconcerts = request.user.concerts.all()
+    #Concerts that can be recommended
+    recommendableconcerts = Concert.objects.all()
+    
+    #Get top artist info from spotify if the user connected his/her account with his/her spotify account.
+    if request.user.spotify_refresh_token is not None:
+        
+        #Get access token
+        result = spotify_get_access_token(request.user)
+        if 'error' in result:
+            return Response(result['error'], status = result['status'])
+        access_token = result
+        
+        #use access token to get current top artists
+        sp = spotipy.Spotify(access_token)
+        results = sp.current_user_top_artists(limit=20, offset=0, time_range='medium_term')
+        if 'error' in results:
+            return Response(results['error'], status = results['status'])
+        for item in results['items']:
+            artistIDs.append(item['id'])
+    
+    #Get artists from the subscribed concerts
+    artists = Artist.objects.filter(concerts__in=subscribedconcerts)
+    
+    #get recommended concerts
+    recommendedConcerts = recommendableconcerts.filter(Q(artist__in=artists)|Q(artist__spotify_id__in=artistIDs))
+    print(len(recommendedConcerts))
+    recommendedConcerts = recommendedConcerts.difference(subscribedconcerts)
+    serializer = ConcertSerializer(recommendedConcerts, many = True)
+
+    return Response(serializer.data, status = status.HTTP_200_OK)
