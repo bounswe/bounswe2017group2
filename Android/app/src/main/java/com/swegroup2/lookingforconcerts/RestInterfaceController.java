@@ -46,9 +46,14 @@ public interface RestInterfaceController {
     Call<ConcertResponse> attend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
 
     @POST("/concert/{id}/unsubscribe/")
-    Call<ConcertResponse> unAttend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
+            Call<ConcertResponse> unAttend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
+
+    @GET("/concerts/search/")
+    Call<List<ConcertDto>> searchConcert(@Query("search") String search);
+
 
     @POST("/signup/")
+
     Call<UserResponse> signUp(@Body UserDto userDto);
 
     @POST("/api/auth/token/refresh/")
@@ -58,5 +63,6 @@ public interface RestInterfaceController {
     Call<List<Artist>> searchForArtist(@Query("name") String name);
 
     @POST("/upload_user_image/")
-    Call<UserResponse> uploadImage(@Body UserDto userDto);
+            Call<UserResponse> uploadImage(@Body UserDto userDto);
+
 }

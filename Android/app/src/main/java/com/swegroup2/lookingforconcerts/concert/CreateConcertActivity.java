@@ -20,6 +20,7 @@ import com.swegroup2.lookingforconcerts.R;
 import com.swegroup2.lookingforconcerts.RefreshDto;
 import com.swegroup2.lookingforconcerts.RefreshResponse;
 import com.swegroup2.lookingforconcerts.RestInterfaceController;
+import com.swegroup2.lookingforconcerts.Secret;
 import com.swegroup2.lookingforconcerts.VenueListAdapter;
 import com.swegroup2.lookingforconcerts.login.LoginActivity;
 import com.swegroup2.lookingforconcerts.search.ArtistListAdapter;

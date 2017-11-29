@@ -71,7 +71,6 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
             public void onClick(View v) {
                 openGallery();
 
-                uploadImage();
             }
         });
 
@@ -86,6 +85,8 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
                 firstname = mFirstName.getText().toString().trim();
                 lastname = mLastName.getText().toString().trim();
                 birthdate = mBirthDate.getText().toString().trim();
+
+                profilepic = imageURI.getPath();
                 postRequestMethod();
 
 
@@ -108,31 +109,7 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
-    public void uploadImage() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://34.210.127.92:8000/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
-
-        UserDto userDto = new UserDto();
-        userDto.image = profilepic;
-
-        Call<UserResponse> call = controller.uploadImage(userDto);
-        call.enqueue(new Callback<UserResponse>() {
-            @Override
-            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
-                Toast.makeText(SignupActivity.this, "UPLOADED", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(Call<UserResponse> call, Throwable t) {
-
-                Toast.makeText(SignupActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     private void postRequestMethod() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -149,7 +126,8 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
         userDto.firstName = firstname;
         userDto.lastName = lastname;
         userDto.birthDate = birthdate;
-        //userDto.image = profilepic;
+
+        userDto.image = profilepic;
 
         Call<UserResponse> call = controller.signUp(userDto);
         call.enqueue(new Callback<UserResponse>() {
