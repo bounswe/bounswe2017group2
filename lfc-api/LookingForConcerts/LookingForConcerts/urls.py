@@ -90,7 +90,7 @@ urlpatterns = [
     url(r'^concert/(?P<pk>[0-9]+)/newcomment/$', views.create_comment), # adds a new comment by the logged in user to the concert specified by its primary key; requires authorization
     # RATING
     url(r'^concert/(?P<pk>[0-9]+)/rate/$', views.rate_concert), # adds a new rating by the logged in user to the concert specified by its primary key; requires authorization
-    url(r'^concert/(?P<pk>[0-9]+)/avg_ratings/$', views.get_average_ratings), # returns the average ratings for the concert specified by its primary key
+    url(r'^concert/(?P<pk>[0-9]+)/average_ratings/$', views.get_average_ratings), # returns the average ratings for the concert specified by its primary key
 
     # LOCATION
     url(r'^locations/$',views.list_locations), # lists all locations in DB
