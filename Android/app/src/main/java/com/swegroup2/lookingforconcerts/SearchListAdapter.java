@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.swegroup2.lookingforconcerts.concert.ConcertDto;
+
 import java.util.List;
 
 /**
@@ -64,7 +66,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Se
 
     public class SearchListAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final TextView mConcertName;
-       public final TextView mArtistName;
+        public final TextView mArtistName;
         public final TextView mConcertDate;
 
 

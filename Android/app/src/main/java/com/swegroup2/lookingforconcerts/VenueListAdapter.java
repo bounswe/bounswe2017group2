@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.swegroup2.lookingforconcerts.concert.ConcertLocation;
+
 import java.util.List;
 
 /**
@@ -14,7 +16,7 @@ import java.util.List;
  */
 
 public class VenueListAdapter extends RecyclerView.Adapter<VenueListAdapter
-        .VenueListAdapterViewHolder>{
+        .VenueListAdapterViewHolder> {
 
     private final VenueListAdapterOnClickHandler mClickHandler;
     private List<ConcertLocation> mVenueData;

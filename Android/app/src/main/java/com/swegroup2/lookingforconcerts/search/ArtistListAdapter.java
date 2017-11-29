@@ -1,4 +1,4 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.search;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.swegroup2.lookingforconcerts.R;
+import com.swegroup2.lookingforconcerts.concert.Artist;
+import com.swegroup2.lookingforconcerts.concert.Image;
 
 import java.util.List;
 
@@ -18,7 +21,7 @@ import java.util.List;
  */
 
 public class ArtistListAdapter extends RecyclerView.Adapter<ArtistListAdapter
-        .ArtistListAdapterViewHolder>{
+        .ArtistListAdapterViewHolder> {
     private final ArtistListAdapterOnClickHandler mClickHandler;
     private List<Artist> mArtistData;
     Context context;

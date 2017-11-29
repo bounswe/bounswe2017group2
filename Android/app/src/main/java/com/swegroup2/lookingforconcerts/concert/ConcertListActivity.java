@@ -1,5 +1,6 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.concert;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,6 +18,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.swegroup2.lookingforconcerts.SearchListAdapter;
+import com.swegroup2.lookingforconcerts.login.LoginActivity;
+import com.swegroup2.lookingforconcerts.R;
+import com.swegroup2.lookingforconcerts.RefreshDto;
+import com.swegroup2.lookingforconcerts.RefreshResponse;
+import com.swegroup2.lookingforconcerts.RestInterfaceController;
+import com.swegroup2.lookingforconcerts.user.UserDto;
+import com.swegroup2.lookingforconcerts.user.UserProfileActivity;
+
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +39,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.swegroup2.lookingforconcerts.login.LoginActivity.accessToken;
+import static com.swegroup2.lookingforconcerts.login.LoginActivity.refreshToken;
+
 public class ConcertListActivity extends AppCompatActivity implements ConcertListAdapter.ConcertListAdapterOnClickHandler, SearchListAdapter.SearchListAdapterOnClickHandler {
     private RecyclerView recyclerView;
     private RecyclerView searchRecyclerView;
@@ -35,14 +49,15 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     private SearchListAdapter searchAdapter;
     private Button createConcertButton;
     private Button logoutButton;
+    public static List<ConcertDto> concerts;
+    public static UserDto userDto;
+    static Button profile;
+
+
+    private SearchView mSearch;
+
     private Button spotifyButton;
 
-    private Button profile;
-
-    String refreshToken = "";
-    String accessToken = "";
-
-    UserDto userProfileInfo = new UserDto();
 
     private EditText concertSearch;
     private Button concertSearchButton;
@@ -55,10 +70,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_concert_list);
 
-        refreshToken = getIntent().getStringExtra("refresh");
-        accessToken = getIntent().getStringExtra("access");
-        Log.v("myTag", "refresh: " + refreshToken);
-        Log.v("myTag", "access: " + accessToken);
 
         recyclerView = (RecyclerView) findViewById(R.id.concert_list_rv);
 
@@ -70,10 +81,12 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
         profile = (Button) findViewById(R.id.profile);
+
         spotifyButton = (Button) findViewById(R.id.spotifyButton);
 
 
         concertSearch = (EditText) findViewById(R.id.search_edit);
+        concertSearch.clearFocus();
         concertSearchButton = (Button) findViewById(R.id.search_button);
 
         selectedConcertLayout = (LinearLayout) findViewById(R.id.selected_concert);
@@ -97,6 +110,9 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
 
         getConcerts();
+        getProfileInfo(this);
+
+
     }
 
     @Override
@@ -110,8 +126,8 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
                 .commit();
     }
 
-    private void getConcerts() {
-        refresh();
+    public void getConcerts() {
+        LoginActivity.refresh(this);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -122,16 +138,19 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         Call<List<ConcertDto>> call = controller.getAllConcerts();
 
         call.enqueue(new Callback<List<ConcertDto>>() {
-            @Override
-            public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
-                adapter.setConcertData(response.body());
-            }
+                         @Override
+                         public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
+                             concerts = response.body();
+                             adapter.setConcertData(concerts);
+                         }
 
-            @Override
-            public void onFailure(Call<List<ConcertDto>> call, Throwable t) {
-                Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
-            }
-        });
+                         @Override
+                         public void onFailure(Call<List<ConcertDto>> call, Throwable t) {
+                             Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+                         }
+                     }
+
+        );
     }
 
     private void searchConcert() {
@@ -165,7 +184,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     }
 
 
-
     public void refresh() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")
@@ -186,6 +204,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
                     accessToken = response.body().access;
                     Log.d("FS", "accessToken " + accessToken);
                 }
+
             }
 
             @Override
@@ -195,8 +214,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         });
     }
 
-    public void profile(View view) {
-        refresh();
+    public static void getProfileInfo(final Context context) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://34.210.127.92:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -212,28 +230,29 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         call.enqueue(new Callback<UserDto>() {
             @Override
             public void onResponse(Call<UserDto> call, Response<UserDto> response) {
-
-                Toast.makeText(ConcertListActivity.this,response.body().username, Toast.LENGTH_LONG).show();
+                userDto = response.body();
+                profile.setClickable(true);
             }
 
             @Override
             public void onFailure(Call<UserDto> call, Throwable t) {
-                Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "PROFILE ERROR", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    public static void profile(View view) {
+        Intent intent = new Intent(view.getContext(), UserProfileActivity.class);
+        view.getContext().startActivity(intent);
+    }
+
     public void createConcert(View view) {
         Intent intent = new Intent(this, CreateConcertActivity.class);
-
-        intent.putExtra("refresh", refreshToken);
-        intent.putExtra("access", accessToken);
-
         startActivity(intent);
         finish();
     }
 
-    public void spotifyConnect(View view){
+    public void spotifyConnect(View view) {
 
     }
 
