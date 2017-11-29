@@ -3,13 +3,14 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Image as ImageComponent, Item, Label } from "semantic-ui-react";
 import { fetch } from "../../actions/concert";
+import { Link } from 'react-router-dom';
 
 const ConcertItem = ({ concert }) => (
   <Item>
     <Item.Image src={concert.artist ? concert.artist.images[2].url : ""} />
     {console.log(concert.artist)}
     <Item.Content>
-      <Item.Header as="a">
+      <Item.Header as={Link} to={"/concert/" + concert.concert_id}>
         {concert.artist ? concert.artist.name : ""}
       </Item.Header>
       <Item.Meta>
@@ -34,10 +35,10 @@ const ConcertsList = ({ concerts }) => (
         </div>
       </div>
     ) : (
-      concerts.map(concert => (
-        <ConcertItem concert={concert} key={concert.concert_id} />
-      ))
-    )}
+        concerts.map(concert => (
+          <ConcertItem concert={concert} key={concert.concert_id} />
+        ))
+      )}
   </Item.Group>
 );
 
