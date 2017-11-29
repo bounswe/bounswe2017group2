@@ -59,7 +59,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     private Button spotifyButton;
 
 
-
     private EditText concertSearch;
     private Button concertSearchButton;
 
@@ -87,6 +86,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
 
         concertSearch = (EditText) findViewById(R.id.search_edit);
+        concertSearch.clearFocus();
         concertSearchButton = (Button) findViewById(R.id.search_button);
 
         selectedConcertLayout = (LinearLayout) findViewById(R.id.selected_concert);
@@ -138,20 +138,20 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         Call<List<ConcertDto>> call = controller.getAllConcerts();
 
         call.enqueue(new Callback<List<ConcertDto>>() {
-            @Override
-            public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
-                concerts = response.body();
-                adapter.setConcertData(concerts);
-            }
+                         @Override
+                         public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
+                             concerts = response.body();
+                             adapter.setConcertData(concerts);
+                         }
 
-                @Override
-                public void onFailure (Call < List < ConcertDto >> call, Throwable t){
-                    Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
-                }
-            }
+                         @Override
+                         public void onFailure(Call<List<ConcertDto>> call, Throwable t) {
+                             Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+                         }
+                     }
 
-            );
-        }
+        );
+    }
 
     private void searchConcert() {
         refresh();
