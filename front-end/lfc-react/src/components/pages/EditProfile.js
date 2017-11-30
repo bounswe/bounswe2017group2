@@ -5,8 +5,7 @@ import axios from "axios";
 import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
 
 let theToken = localStorage.lfcJWT;
-const payload = decode(theToken);
-const user_id = payload.user_id;
+
 
 class EditProfile extends React.Component {
     constructor() {
@@ -64,10 +63,11 @@ class EditProfile extends React.Component {
         }, {
             'Content-Type': 'application/json',
         }).then(response => {
-            var loc =
-            window.location.assign('/user/' + user_id + '/');
+            const payload = decode(theToken);
+            const user_id = payload.user_id;
+           window.location.assign('/user/' + user_id + '/');
         }, error => {
-            console.log(theToken);
+            console.log("error");
         });
         event.preventDefault();
     }
@@ -102,4 +102,15 @@ class EditProfile extends React.Component {
 
 }
 
+EditProfile.propTypes = {
+    isAuthenticated: PropTypes.bool.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+        isAuthenticated: !!state.user.accessToken
+    };
+}
+
 export default EditProfile;
+
