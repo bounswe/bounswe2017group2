@@ -1,0 +1,322 @@
+{
+        "name": "Adamlar Konseri",
+        "artist": {
+            "images": [
+                {
+                    "height": 640,
+                    "url": "https://i.scdn.co/image/12ad6a1ac85aa20bf88ba6def9946dc906ed82cf",
+                    "width": 640
+                },
+                {
+                    "height": 300,
+                    "url": "https://i.scdn.co/image/c327986ae7ab92ac279480296349232ffe00d6f3",
+                    "width": 300
+                },
+                {
+                    "height": 64,
+                    "url": "https://i.scdn.co/image/9e9324ffae4404151cae2cde2fe96ea7085953eb",
+                    "width": 64
+                }
+            ],
+            "spotify_id": "1g4J8P1JWwanNyyXckRX5W",
+            "name": "Adamlar"
+        },
+        "date_time": "2017-11-29",
+        "description": "'Eski Dostum Tankla Gelmiş' albümüyle dikkat çeken Adamlar, özellikle dinamik performanslarıyla tanınıyor. İkinci albümleri 'Rüyalarda Buruşmuşuz'u 2016'da yayımlayan ekip, pek çok janrı Türkçe sözlerle bir araya getirerek kompakt bir müzik deneyimi sunuyor. Vokal ve gitarda Tolga Akdoğan, elektrik gitarda Emre Malikler, bas gitarda Can Aydemir ve davulda Berkan Tilavel'den oluşan Adamlar, 1 Aralık'ta Hayalperest By Hayal Kahvesi Görükle sahnesinde!",
+        "price_min": 34,
+        "price_max": 34,
+        "tags": [
+		            {
+		        "value": "#rockmusic ",
+		        "context": "genre of popular music that originated as rock and roll in 1950s USA",
+		        "wikidata_uri": "http://www.wikidata.org/entity/Q11399"
+		    },{
+		        "value": "#alternativerock ",
+		        "context": "genre of rock music",
+		        "wikidata_uri": "http://www.wikidata.org/entity/Q11366"
+		    }
+        ],
+        "location": {
+            "venue": "IF Performance Hall",
+            "coordinates": "41.044048 29.006431"
+        }
+}
+
+{
+        "name": "Palmiyeler Konseri",
+        "artist": {
+            "images": [
+                {
+                    "height": 640,
+                    "url": "https://i.scdn.co/image/7f8be0ef98576d1a0e54ffb995b9568ae899dec0",
+                    "width": 640
+                },
+                {
+                    "height": 320,
+                    "url": "https://i.scdn.co/image/c3a80d1650d6b614ceca1166420ab11934d79a2d",
+                    "width": 320
+                },
+                {
+                    "height": 160,
+                    "url": "https://i.scdn.co/image/b17dba3160c3e2d85c2a382b68e6ed72e1a4770e",
+                    "width": 160
+                }
+            ],
+            "spotify_id": "441Mk7JKv8WtAsaR9REPGX",
+            "name": "Palmiyeler"
+        },
+        "date_time": "2017-11-22",
+        "description": "Palmiyeler sizi çağırıyor. 'Senden Haber Yok' ve 'Karbeyaz' singlelarını da dahil ederek yayınladıkları 'Venus' albümü ile adını geniş çevrelere duyuran Palmiyeler ilk kez Ankara'daMertcan Mertbilek, Tarık Töre, Rana Uludağ ve Barış Konyalı'dan oluşan grup sahne performansları ve görselliği ile de dikkat çekiyor.",
+        "price_min": 34,
+        "price_max": 34,
+        "tags": [
+            {
+                "value": "#Rock",
+                "context": "Music"
+            }
+        ],
+        "location": {
+            "venue": "Kadıköy Sahne",
+            "coordinates": "40.990397 29.027724"
+        }
+}
+
+
+{
+        "name": "Kalben Konseri",
+        "artist": {
+            "images": [
+                {
+                    "height": 640,
+                    "url": "https://i.scdn.co/image/02f49b06fd696e1c9e425ec5e5b89920a691aa43",
+                    "width": 640
+                },
+                {
+                    "height": 320,
+                    "url": "https://i.scdn.co/image/e0fadc324605a23d6844c4b0446151aede711089",
+                    "width": 320
+                },
+                {
+                    "height": 160,
+                    "url": "https://i.scdn.co/image/ce95c0a427eba101f2e42df587a6702d24b6d1c8",
+                    "width": 160
+                }
+            ],
+            "spotify_id": "4sldxVDeyb0J8OMoYApqfV",
+            "name": "Kalben"
+        },
+        "date_time": "2017-12-22",
+        "description": "Rahat bir koltuk, sessiz menü ve şehrin en iyi müzisyenleri... Müzik düşünmeye 8 yaşındayken annesinin aldığı klavyeyle başlayan ve 13 yaşında ilk gitarı olan cızır cızır 'Santana'ya kavuşan Kalben, içinden gelen şarkıları kendince, kendi sözleriyle söylüyor. İnsanların doya doya yaşayabildiği, özgür sokaklarından mutlu sesler yükselen şehirlerin kahramanlarından bahseden şarkılarını bağır çağır ve hep birlikte söylemekten keyif alıyor.",
+        "price_min": 50,
+        "price_max": 50,
+        "tags": [
+            {
+                "value": "#Rock",
+                "context": "Music"
+            }
+        ],
+        "location": {
+            "venue": "Dorock XL",
+            "coordinates": "40.989742 29.022878"
+        }
+}
+
+{
+        "name": "Deniz Tekin Konseri",
+        "artist": {
+            "images": [
+                {
+                    "height": 640,
+                    "url": "https://i.scdn.co/image/d007d1c7346596dd3a86810fc5a221a89d31f694",
+                    "width": 640
+                },
+                {
+                    "height": 320,
+                    "url": "https://i.scdn.co/image/6ca01c4ede905b85d0faf6a32833ccef5d98e75c",
+                    "width": 320
+                },
+                {
+                    "height": 160,
+                    "url": "https://i.scdn.co/image/4ce565b1816a2d55a796126844392e431f7ab78d",
+                    "width": 160
+                }
+            ],
+            "spotify_id": "4TdvNk4wmn5DgBFiLDeCj0",
+            "name": "Deniz Tekin"
+        },
+        "date_time": "2017-12-06",
+        "description": "Youtube ve Soundcloud'da yayınladığı şarkılarla milyonlarca kişiye ulaşan genç  sanatçı Deniz Tekin, güçlü sesi ve sahne performansı ile gelecek vadeden sanatçılardan. Nisan'da ilk  stüdyo albümü Kozakuluçka ile dikkat çeken müzisyen, önümüzdeki seneler  içinde de müziğin çeşitli alanlarında üretimine devam ediyor olacak. 2015'ten  aktifleşen müzik hayatına Sezer Özdem (bas gitar), Bartu Özbatur (davul) ve  Gürhan Öğütücü (elektrogitar)'yle beraber; yorumculuğunun yanı sıra söz ve  müziğini kendi yazdığı şarkılarla devam etmek niyetindedir. Yer aldığı festivaller: Sofar London 2015, Nilüfer Müzik Festivali 2016, Zeytinli Rock Festivali 2016 –  2017.Henüz 20 yaşında olan genç yetenek, 6 Aralık günü Lokalize serisi kapsamında Zorlu PSM #studio’da şarkılarını söyleyecek! Kaçırmayın!",
+        "price_min": 25,
+        "price_max": 50,
+        "tags": [
+            {
+                "value": "#Rock",
+                "context": "Music"
+            }
+        ],
+        "location": {
+            "venue": "Zorlu PSM",
+            "coordinates": "41.066078 29.017403"
+        }
+}
+
+{
+        "name": "Yüzyüzeyken Konuşuruz Konseri",
+        "artist": {
+            "images": [
+                {
+                    "height": 640,
+                    "url": "https://i.scdn.co/image/ccedb64b05ce112fdf077dd1b3bd86f4ea115dab",
+                    "width": 640
+                },
+                {
+                    "height": 320,
+                    "url": "https://i.scdn.co/image/8aaad4271d06c0ae3727f75b0e98ed5236c939fd",
+                    "width": 320
+                },
+                {
+                    "height": 160,
+                    "url": "https://i.scdn.co/image/42283abd40480cf7b2d9e0f1a12e1628134963d3",
+                    "width": 160
+                }
+            ],
+            "spotify_id": "7gobcoscOfsY0nOeqqFzvU",
+            "name": "Yüzyüzeyken Konuşuruz"
+        },
+        "date_time": "2017-11-06",
+        "description": "Yüzyüzeyken Konuşuruz, metropolün içinde sıkışmış; kayıp bir jenarasyon olma tehlikesinin eşiğinde büyümüş iki genç insanın anlattığı hikayelerden oluşan şehirli bir lirik müzik grubu... Yaptıkları müziği en genel bakışla indie-folk olarak isimlendiriyorlar. Yüzyüzeyken Konuşuruz gitar ve vokalde Kaan Boşnak, elektrik gitarda Engin Sevik, bas gitarda Can Tunaboylu ve davulda Can Kalyoncu'dan oluşan kadrosuyla konserler vermektedir.",
+        "price_min": 34,
+        "price_max": 40,
+        "tags": [
+            {
+                "value": "#Rock",
+                "context": "Music"
+            }
+        ],
+        "location": {
+            "venue": "Hayal Kahvesi",
+            "coordinates": "40.759208 29.979307"
+        }
+}
+
+{
+        "name": "Manuş Baba Konseri",
+        "artist": {
+        "images": [{
+                    "height": 640,
+                    "url": "https://i.scdn.co/image/8100d5444c87af4c4bc34ca53c0e7dec6afd0cdf",
+                    "width": 640
+                },
+                {
+                    "height": 300,
+                    "url": "https://i.scdn.co/image/af21a1dc6fa431ff24ee2fd9de28366238c5d3cd",
+                    "width": 300
+                },
+                {
+                    "height": 64,
+                    "url": "https://i.scdn.co/image/c2255d4ff0412ce1a7a9ffce21a73fd9c07d043b",
+                    "width": 64
+                }
+            ],
+            "spotify_id": "6p4UYgBKfV1XMDvD9KrtTv",
+            "name": "Manuş Baba"
+        },
+        "date_time": "2017-11-06",
+        "description": "Manuş adını çocukluk dönemi anneannesinin kendisine küçük, güzel çocuk anlamında Manuş olarak seslenmesiyle almıştır. 'Baba ise bebekken konuşmaya başladığında ağzından çıkan, ilk sesleniş, ilk kelimedir.  İnsan olabilmenin o derin kaygısını taşımanın ve bunun için emek harcamanın önemini  kendi babası ile keşfettiğini dile getiren sanatçı; çocukluk ve ilk gençlik dönemi arasında kendisinde bıraktığı hatırası önemli izler ile kendi babasının, Manuş Baba karakterinin oluşmasında ve ismini bu şekilde duyurmasında önemli etkileri olmuştur.",
+        "price_min": 67,
+        "price_max": 78,
+        "tags": [
+            {
+                "value": "#Rock",
+                "context": "Music"
+            }
+        ],
+        "location": {
+            "venue": "Mall of İstanbul Sahne",
+            "coordinates": "41.062916 28.805229"
+        }
+}
+
+{
+        "name": "Pinhani Konseri",
+        "artist": {
+        "images": [{
+                    "height": 640,
+                    "url": "https://i.scdn.co/image/e024086f66849785727d80d4ff6d610919e4c22b",
+                    "width": 640
+                },
+                {
+                    "height": 300,
+                    "url": "https://i.scdn.co/image/d2d468c6f2303d9fa00d2a65a7cba2e550a1b39b",
+                    "width": 300
+                },
+                {
+                    "height": 64,
+                    "url": "https://i.scdn.co/image/cdda6022e987d363b55a9bb46ba52181ead4fb80",
+                    "width": 64
+                }
+            ],
+            "spotify_id": "4Bdqzh78prwuqwInMb555P",
+            "name": "Pinhani"
+        },
+        "date_time": "2017-12-23",
+        "description": "2016 yılının başında Kediköy adlı beşinci albümünü yayımlayan Pinhani, 2004 yılında kuruldu. Grup üyeleri medyadan uzak bir yaşam sürdüğü için şarkılarını çok kişi, yüzlerini az kişi tanır. Grubun dört üyesinin üçü Kadıköy'de yaşar, her gün aranızda dolaşırlar.",
+        "price_min": 45,
+        "price_max": 45,
+        "tags": [
+            {
+                "value": "#Rock",
+                "context": "Music"
+            }
+        ],
+        "location": {
+            "venue": "Kadıköy Sahne",
+            "coordinates": "40.990397 29.027724"
+        }
+}
+
+
+{
+        "name": "Adamlar Konseri",
+        "artist": {
+        "images": [
+            {
+                "height": 640,
+                "url": "https://i.scdn.co/image/12ad6a1ac85aa20bf88ba6def9946dc906ed82cf",
+                "width": 640
+            },
+            {
+                "height": 300,
+                "url": "https://i.scdn.co/image/c327986ae7ab92ac279480296349232ffe00d6f3",
+                "width": 300
+            },
+            {
+                "height": 64,
+                "url": "https://i.scdn.co/image/9e9324ffae4404151cae2cde2fe96ea7085953eb",
+                "width": 64
+            }
+        ],
+        "spotify_id": "1g4J8P1JWwanNyyXckRX5W",
+        "name": "Adamlar"
+    },
+        "date_time": "2017-12-20",
+        "description": "'Eski Dostum Tankla Gelmiş' albümüyle dikkat çeken Adamlar, özellikle dinamik performanslarıyla tanınıyor. İkinci albümleri 'Rüyalarda Buruşmuşuz'u 2016'da yayımlayan ekip, pek çok janrı Türkçe sözlerle bir araya getirerek kompakt bir müzik deneyimi sunuyor. Vokal ve gitarda Tolga Akdoğan, elektrik gitarda Emre Malikler, bas gitarda Can Aydemir ve davulda Berkan Tilavel'den oluşan Adamlar, 1 Aralık'ta Hayalperest By Hayal Kahvesi Görükle sahnesinde!",
+        "price_min": 34,
+        "price_max": 34,
+        "tags": [
+            {
+                "value": "#AlternatifRock",
+                "context": "Music"
+            },
+
+            {
+                "value": "#Rock",
+                "context": "Music"
+            }
+        ],
+        "location": {
+            "venue": "Babylon",
+            "coordinates": "41.058277 28.979829"
+        }
+        "seller_url":"http://babylon.com.tr/tr/etkinlikler/mekan/babylon/20-aralik-2017/adamlar",
+}

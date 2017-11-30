@@ -1,0 +1,51 @@
+ {
+        "username": "halil",
+        "email": "halil@gmail.com",
+        "password": "halil",
+        "first_name": "Halil",
+        "last_name": "Buffer",
+        "birth_date": "1984-07-23",
+        "image": "/media/user/pp.jpg"
+}
+
+
+{
+        "username": "hazilet",
+        "email": "hazilet@gmail.com",
+        "password": "hazilet",
+        "first_name": "Hazilet",
+        "last_name": "Diyapozon",
+        "birth_date": "1999-01-03",
+        "image": "/media/user/hazan_pp.jpg"
+}
+
+{
+        "username": "bgaga",
+        "email": "bgaga@gmail.com",
+        "password": "bgaga",
+        "first_name": "Britney",
+        "last_name": "Gaga",
+        "birth_date": "1990-12-08",
+        "image": "/media/user/bgaga.jpg"
+}
+
+{
+        "username": "monab",
+        "email": "monab@gmail.com",
+        "password": "monab",
+        "first_name": "Mona",
+        "last_name": "Burhan",
+        "birth_date": "1981-05-28",
+        "image": "/media/user/monab.jpg"
+}
+
+{
+        "username": "sakira",
+        "email": "sakira@gmail.com",
+        "password": "sakira",
+        "first_name": "Şakira",
+        "last_name": "Hipsdontlie",
+        "birth_date": "1984-11-07",
+        "image": "/media/user/sakira.jpg"
+}
+
