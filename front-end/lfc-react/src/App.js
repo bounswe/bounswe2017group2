@@ -16,10 +16,15 @@ import TopNavigation from "./components/navigation/TopNavigation";
 const App = ({ location, isAuthenticated }) => (
   <div className="ui container">
     <TopNavigation />
+
     <Route location={location} path="/" exact component={DashboardPage} />
     <Route location={location} path="/concert/:concertID/" exact component={ConcertDetailPage} />
     <Route location={location} path="/user/:userID/" exact component={ProfilePage} />
 	<Route location={location} path="/EditProfile/" exact component={EditProfile} />
+
+    <Route location={location} path="/home" exact component={DashboardPage} />
+
+
     <GuestRoute location={location} path="/login" exact component={LoginPage} />
     <GuestRoute
       location={location}
