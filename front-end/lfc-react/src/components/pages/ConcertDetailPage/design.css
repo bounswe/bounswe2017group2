@@ -16,6 +16,11 @@
     color: white;
 }
 
+.stars{
+    padding-top: 0px!important;
+}
+
+
 .ui.button:focus{
     background-color: #600000;
     color: white;
