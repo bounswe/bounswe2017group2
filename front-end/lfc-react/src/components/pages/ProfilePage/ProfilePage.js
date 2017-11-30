@@ -287,7 +287,9 @@ class ProfilePage extends React.Component {
     if (isLoggedIn) {
       if (userID == profileID) {
         editFollowButton = (
+          <Link className="Link" to={"/EditProfile/"}>
           <button className="ui  floated button">Edit Profile</button>
+          </Link>
         );
       } else {
         if (
