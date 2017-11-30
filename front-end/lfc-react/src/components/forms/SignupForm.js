@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Form, Button, Message } from "semantic-ui-react";
 import { isEmail, isLength } from "validator";
-import InlineError from "..//messages/InLineError";
+import InlineError from "..//messages/InlineError";
 
 class SignupForm extends React.Component {
   state = {
