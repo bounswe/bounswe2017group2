@@ -135,7 +135,8 @@ class Concert extends React.PureComponent {
                     }
                 ],
                 attendees: [],
-                ratings: []
+                ratings: [],
+                seller_url: '',
             }
         };
 
@@ -481,7 +482,14 @@ class Concert extends React.PureComponent {
         return (
             <div className="ui grid segment">
                 <div className="row">
-                    <h1 className="sixteen wide column">{this.state.concert.name}</h1>
+                    <div className="fourteen wide column">
+                        <h1>{this.state.concert.name}</h1>
+                    </div>
+                    <div className="two wide column">
+                        <a href={"http://"+this.state.concert.seller_url}>
+                            <button className="ui right floated  button">Buy</button>
+                        </a>
+                    </div>
                 </div>
                 <div className="row">
                     <div className="ui list sixteen wide column">
