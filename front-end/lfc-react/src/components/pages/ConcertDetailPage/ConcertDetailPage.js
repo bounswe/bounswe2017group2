@@ -137,6 +137,7 @@ class Concert extends React.PureComponent {
                 attendees: [],
                 ratings: [],
                 seller_url: '',
+                tags: [],
             }
         };
 
@@ -486,9 +487,16 @@ class Concert extends React.PureComponent {
                         <h1>{this.state.concert.name}</h1>
                     </div>
                     <div className="two wide column">
-                        <a href={"http://"+this.state.concert.seller_url}>
+                        <a href={"http://" + this.state.concert.seller_url}>
                             <button className="ui right floated  button">Buy</button>
                         </a>
+                    </div>
+                </div>
+                <div className="row tagsRow">
+                    <div className="sixteen wide column">
+                        {this.state.concert.tags.map(tag => (
+                            <div className="tag">{tag.value}</div>
+                        ))}
                     </div>
                 </div>
                 <div className="row">
