@@ -1,28 +1,37 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Menu, Input, Button } from "semantic-ui-react";
+import { Menu, Input, Button, Form } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import gravatarUrl from "gravatar-url";
+import decode from "jwt-decode";
+// import gravatarUrl from "gravatar-url";
 import * as actions from "../../actions/auth";
 
-const TopNavigation = ({ isAuthenticated, user, logout }) => (
+const TopNavigation = ({ isAuthenticated, logout }) => (
   <Menu secondary pointing>
-    <Menu.Item header as={Link} to="/">
+    <Menu.Item header as={Link} to="/home">
       LookingForConcerts
     </Menu.Item>
     <Menu.Item>
-      <Input icon="search" placeholder="Search..." />
+      <Button color="green">Connect to Spotify</Button>
+    </Menu.Item>
+    <Menu.Item>
+      <Form onSubmit={this.onSubmit}>
+        <Input icon="search" placeholder="Search..." />
+      </Form>
     </Menu.Item>
 
     <Menu.Menu position="right">
       {isAuthenticated ? (
         <Menu secondary>
-          <Menu.Item as={Link} to="/profile">
+          <Menu.Item
+            as={Link}
+            to={"/user/" + decode(localStorage.lfcJWT).user_id + "/"}
+          >
             Profile
           </Menu.Item>
           <Menu.Item as={Link} to="/">
-            Newsfeed
+            Create a Concert
           </Menu.Item>
           <Menu.Item onClick={() => logout()}>Logout</Menu.Item>
         </Menu>

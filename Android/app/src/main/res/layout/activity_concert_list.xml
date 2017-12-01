@@ -59,37 +59,55 @@
 
         </android.support.v7.widget.RecyclerView>
 
-
-        <Button
-            android:id="@+id/create_concert_btn"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:onClick="createConcert"
-            android:text="Create Concert" />
+            android:orientation="horizontal">
 
-        <Button
-            android:text="PROFILE"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="profile"
-            android:id="@+id/profile" />
+            <Button
+                android:text="PROFILE"
+                android:layout_width="0dp"
+                android:background="@color/buttonColor"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_height="60dp"
+                android:onClick="profile"
+                android:id="@+id/profile" />
 
-        <Button
-            android:id="@+id/spotifyButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CONNECT TO SPOTIFY" />
+            <Button
+                android:text="Create Concert"
+                android:background="@color/buttonColor"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_height="60dp"
+                android:onClick="createConcert"
+                android:id="@+id/create_concert_btn" />
 
-        <Button
-            android:id="@+id/logout_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:onClick="logoutFunc"
-            android:text="Logout" />
+            <Button
+                android:id="@+id/spotifyButton"
+                android:background="@color/buttonColor"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_height="60dp"
+                android:text="SPOTIFY" />
+
+            <Button
+                android:id="@+id/logout_btn"
+                android:background="@color/buttonColor"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_height="60dp"
+                android:onClick="logoutFunc"
+                android:text="Logout" />
+
+
+        </LinearLayout>
+
+
+
 
         <android.support.v7.widget.RecyclerView
             android:focusable="true"

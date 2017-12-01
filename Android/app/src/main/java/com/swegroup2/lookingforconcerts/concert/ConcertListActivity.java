@@ -27,7 +27,6 @@ import com.swegroup2.lookingforconcerts.RestInterfaceController;
 import com.swegroup2.lookingforconcerts.user.UserDto;
 import com.swegroup2.lookingforconcerts.user.UserProfileActivity;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +51,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     public static List<ConcertDto> concerts;
     public static UserDto userDto;
     static Button profile;
-
 
     private SearchView mSearch;
 
@@ -81,6 +79,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
         profile = (Button) findViewById(R.id.profile);
+
 
         spotifyButton = (Button) findViewById(R.id.spotifyButton);
 
@@ -169,8 +168,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         call.enqueue(new Callback<List<ConcertDto>>() {
             @Override
             public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
-                //Toast.makeText(ConcertListActivity.this, response.body().get(0).name, Toast.LENGTH_SHORT).show();
-
                 searchAdapter.setConcertData(new ArrayList<ConcertDto>());
                 searchAdapter.setConcertData(response.body());
                 searchRecyclerView.setVisibility(View.VISIBLE);
@@ -204,7 +201,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
                     accessToken = response.body().access;
                     Log.d("FS", "accessToken " + accessToken);
                 }
-
             }
 
             @Override
@@ -223,7 +219,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Bearer " + accessToken);
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
 
         Call<UserDto> call = controller.getUserProfile(map);
 

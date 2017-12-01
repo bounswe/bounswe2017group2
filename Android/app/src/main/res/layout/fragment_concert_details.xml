@@ -11,7 +11,7 @@
 
         <LinearLayout
             android:id="@+id/linearLayout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
@@ -75,6 +75,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
+            <TextView
+                android:id="@+id/detailed_ratings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Rate for Concert Atmosphere"/>
+
+            <RatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ratingBar" />
+
+            <Button
+                android:id="@+id/rate_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rate" />
+
+
             <EditText
                 android:id="@+id/comment_edittext"
                 android:layout_width="match_parent"
@@ -89,6 +108,7 @@
 
 
         </LinearLayout>
+
 
 
     </RelativeLayout>

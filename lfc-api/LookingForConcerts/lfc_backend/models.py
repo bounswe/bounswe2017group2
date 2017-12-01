@@ -80,7 +80,7 @@ class ConcertImage(models.Model):
 class Concert(models.Model):
     concert_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length= 150)
-    artist = models.ForeignKey(Artist, related_name = 'concerts', on_delete = models.DO_NOTHING, null = False)
+    artist = models.ForeignKey(Artist, related_name = 'concerts', on_delete = models.DO_NOTHING, null = True)
     location = models.ForeignKey(Location, related_name = 'concerts', on_delete = models.CASCADE,  null=True)
     attendees = models.ManyToManyField(RegisteredUser, related_name = 'concerts')
     # tags - implemented in tag --MANY TO MANY

@@ -16,6 +16,20 @@
     color: white;
 }
 
+.stars{
+    padding-top: 0px!important;
+}
+
+.tag {
+    color: grey;
+    font-size: 15pt;
+}
+
+.tagsRow {
+    padding-top: 0px!important;
+    padding-bottom: 0px!important;
+}
+
 .ui.button:focus{
     background-color: #600000;
     color: white;
