@@ -27,6 +27,8 @@ import com.swegroup2.lookingforconcerts.RestInterfaceController;
 import com.swegroup2.lookingforconcerts.user.UserDto;
 import com.swegroup2.lookingforconcerts.user.UserProfileActivity;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,11 +45,14 @@ import static com.swegroup2.lookingforconcerts.login.LoginActivity.refreshToken;
 
 public class ConcertListActivity extends AppCompatActivity implements ConcertListAdapter.ConcertListAdapterOnClickHandler, SearchListAdapter.SearchListAdapterOnClickHandler {
     private RecyclerView recyclerView;
+    private RecyclerView horizontalRecyclerView;
     private RecyclerView searchRecyclerView;
     private ConcertListAdapter adapter;
+    private ConcertListAdapter horizontalAdapter;
     private SearchListAdapter searchAdapter;
     private Button createConcertButton;
     private Button logoutButton;
+    private TextView recommendationText;
     public static List<ConcertDto> concerts;
     public static UserDto userDto;
     static Button profile;
@@ -70,12 +75,21 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
 
         recyclerView = (RecyclerView) findViewById(R.id.concert_list_rv);
+       horizontalRecyclerView = (RecyclerView) findViewById(R.id.recommendation_rv);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new ConcertListAdapter(this);
         recyclerView.setAdapter(adapter);
+
+        LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        horizontalRecyclerView.setLayoutManager(horizontalLayoutManager);
+
+        horizontalAdapter = new ConcertListAdapter(this);
+        horizontalRecyclerView.setAdapter(horizontalAdapter);
+
+        recommendationText = (TextView) findViewById(R.id.recommendation_text);
 
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
         profile = (Button) findViewById(R.id.profile);
@@ -110,6 +124,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
         getConcerts();
         getProfileInfo(this);
+        getRecommendedConcerts();
 
 
     }
@@ -152,6 +167,36 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         );
     }
 
+    public void getRecommendedConcerts() {
+        LoginActivity.refresh(this);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
+
+        Call<List<ConcertDto>> call = controller.getRecommendedConcerts(map);
+
+        call.enqueue(new Callback<List<ConcertDto>>() {
+                         @Override
+                         public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
+                             concerts = response.body();
+                             horizontalAdapter.setConcertData(concerts);
+                         }
+
+                         @Override
+                         public void onFailure(Call<List<ConcertDto>> call, Throwable t) {
+                             Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+                         }
+                     }
+
+        );
+    }
+
     private void searchConcert() {
         refresh();
         Retrofit retrofit = new Retrofit.Builder()
@@ -162,7 +207,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         String search = concertSearch.getText().toString();
-        Toast.makeText(ConcertListActivity.this, search, Toast.LENGTH_SHORT).show();
 
         Call<List<ConcertDto>> call = controller.searchConcert(search);
         call.enqueue(new Callback<List<ConcertDto>>() {

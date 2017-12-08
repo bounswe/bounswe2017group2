@@ -6,6 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -107,7 +110,24 @@
         </LinearLayout>
 
 
+        <TextView
+            android:id="@+id/recommendation_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="More Concerts You Might Like"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
 
+        <android.support.v7.widget.RecyclerView
+            android:focusable="true"
+            android:id="@+id/recommendation_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp">
+
+        </android.support.v7.widget.RecyclerView>
 
         <android.support.v7.widget.RecyclerView
             android:focusable="true"
@@ -121,6 +141,7 @@
 
 
 
-    </LinearLayout>
 
+    </LinearLayout>
+    </ScrollView>
 </FrameLayout>
