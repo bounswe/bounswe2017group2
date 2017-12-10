@@ -13,21 +13,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.swegroup2.lookingforconcerts.SearchListAdapter;
-import com.swegroup2.lookingforconcerts.login.LoginActivity;
 import com.swegroup2.lookingforconcerts.R;
 import com.swegroup2.lookingforconcerts.RefreshDto;
 import com.swegroup2.lookingforconcerts.RefreshResponse;
 import com.swegroup2.lookingforconcerts.RestInterfaceController;
+import com.swegroup2.lookingforconcerts.SearchListAdapter;
+import com.swegroup2.lookingforconcerts.login.LoginActivity;
 import com.swegroup2.lookingforconcerts.user.UserDto;
 import com.swegroup2.lookingforconcerts.user.UserProfileActivity;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;

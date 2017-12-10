@@ -12,6 +12,11 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.swegroup2.lookingforconcerts.R;
 import com.swegroup2.lookingforconcerts.RestInterfaceController;
 import com.swegroup2.lookingforconcerts.login.LoginActivity;
@@ -32,7 +37,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ConcertDetails extends Fragment {
+public class ConcertDetails extends Fragment implements com.google.android.gms.maps.OnMapReadyCallback{
 
     private static ConcertDto concertDto;
     TextView name;
@@ -42,13 +47,14 @@ public class ConcertDetails extends Fragment {
     TextView minPrice;
     TextView maxPrice;
     TextView location;
+    MapView mapView;
     TextView sellerUrl;
     TextView comments;
     TextView rateDetails;
     int rateCount = 0;
     EditText commentText;
     RatingBar ratingBar;
-    public static Button attend;
+    Button attend;
 
     Button comment;
     Button back;
@@ -96,6 +102,7 @@ public class ConcertDetails extends Fragment {
         minPrice = (TextView) view.findViewById(R.id.minPrice);
         maxPrice = (TextView) view.findViewById(R.id.maxPrice);
         location = (TextView) view.findViewById(R.id.location);
+        mapView = (MapView) view.findViewById(R.id.mapView);
         sellerUrl = (TextView) view.findViewById(R.id.seller_url);
         comments = (TextView) view.findViewById(R.id.comments);
         rateDetails = (TextView) view.findViewById(R.id.detailed_ratings);
@@ -120,7 +127,9 @@ public class ConcertDetails extends Fragment {
             }
         });
 
-        if (ConcertListActivity.userDto.concerts.contains(concertDto.id)) {
+        if (ConcertListActivity.userDto != null && ConcertListActivity.userDto.concerts.contains
+                (concertDto
+                .id)) {
             attend.setText("UNATTEND");
         }
 
@@ -144,7 +153,9 @@ public class ConcertDetails extends Fragment {
         description.setText("Description: " + concertDto.description);
         minPrice.setText("Min Price: " + concertDto.minPrice);
         maxPrice.setText("Max Price: " + concertDto.maxPrice);
-        location.setText("Location: " + concertDto.location.venue + " " + concertDto.location.coordinates);
+        location.setText("Location: " + concertDto.location.venue);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
         if (concertDto.sellerUrl != null) {
             sellerUrl.setText("Ticket Link: " + concertDto.sellerUrl);
         } else {
@@ -225,6 +236,30 @@ public class ConcertDetails extends Fragment {
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
     }
 
     public void rate() {
@@ -378,5 +413,16 @@ public class ConcertDetails extends Fragment {
         }
 
         return o;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        //TODO: fix after backend latlng update
+        String[] latlng = concertDto.location.coordinates.split(" ");
+        LatLng placeLocation = new LatLng(Double.valueOf(latlng[0]), Double.valueOf(latlng[1]));
+        googleMap.addMarker(new MarkerOptions().position(placeLocation));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(placeLocation));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(14), 1000, null);
+        mapView.onResume();
     }
 }

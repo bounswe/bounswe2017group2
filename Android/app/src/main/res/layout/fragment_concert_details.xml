@@ -70,6 +70,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+
+            </com.google.android.gms.maps.MapView>
+
             <TextView
                 android:id="@+id/seller_url"
                 android:layout_width="wrap_content"

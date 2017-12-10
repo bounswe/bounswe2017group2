@@ -1,7 +1,7 @@
 package com.swegroup2.lookingforconcerts;
 
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import com.swegroup2.lookingforconcerts.concert.Artist;
 import com.swegroup2.lookingforconcerts.concert.ConcertComment;
 import com.swegroup2.lookingforconcerts.concert.ConcertDto;
@@ -35,7 +35,7 @@ public interface RestInterfaceController {
     Call<ConcertResponse> createConcert(@Body ConcertDto concertDto, @HeaderMap Map<String, String> headermap);
 
     @GET("/maps/api/place/textsearch/json")
-    Call<JsonObject> searchForVenue(@QueryMap Map<String, String> queryMap);
+    Call<JsonElement> searchForVenue(@QueryMap Map<String, String> queryMap);
 
     @GET("/concerts/")
     Call<List<ConcertDto>> getAllConcerts();
@@ -51,7 +51,6 @@ public interface RestInterfaceController {
 
     @POST("/concert/{id}/unsubscribe/")
     Call<ConcertResponse> unAttend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
-
 
     @POST("/concert/{id}/rate/")
     Call<ConcertResponse> rate(@Body Ratings ratings, @Path("id") int id, @HeaderMap Map<String, String> headermap);
