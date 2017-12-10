@@ -40,6 +40,9 @@ public interface RestInterfaceController {
     @GET("/concerts/")
     Call<List<ConcertDto>> getAllConcerts();
 
+    @GET("/concerts/get_recommended_concerts/")
+    Call<List<ConcertDto>> getRecommendedConcerts(@HeaderMap Map<String, String> headermap);
+
     @GET("/user/me/")
     Call<UserDto> getUserProfile(@HeaderMap Map<String, String> headermap);
 
