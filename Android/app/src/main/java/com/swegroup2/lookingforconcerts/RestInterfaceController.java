@@ -1,6 +1,5 @@
 package com.swegroup2.lookingforconcerts;
 
-
 import com.google.gson.JsonElement;
 import com.swegroup2.lookingforconcerts.concert.Artist;
 import com.swegroup2.lookingforconcerts.concert.ConcertComment;
@@ -69,4 +68,9 @@ public interface RestInterfaceController {
 
     @POST("/upload_user_image/")
     Call<UserResponse> uploadImage(@Body UserDto userDto);
+
+    @GET("/tags/{tag}/")
+    Call<List<com.swegroup2.lookingforconcerts.concert.Tag>> searchTags(@Path("tag") String tag,
+                                                                        @HeaderMap Map<String,
+            String> headerMap);
 }

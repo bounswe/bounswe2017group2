@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,9 +22,10 @@ import com.swegroup2.lookingforconcerts.RefreshDto;
 import com.swegroup2.lookingforconcerts.RefreshResponse;
 import com.swegroup2.lookingforconcerts.RestInterfaceController;
 import com.swegroup2.lookingforconcerts.Secret;
-import com.swegroup2.lookingforconcerts.VenueListAdapter;
+import com.swegroup2.lookingforconcerts.adapters.TagListAdapter;
+import com.swegroup2.lookingforconcerts.adapters.VenueListAdapter;
 import com.swegroup2.lookingforconcerts.login.LoginActivity;
-import com.swegroup2.lookingforconcerts.search.ArtistListAdapter;
+import com.swegroup2.lookingforconcerts.adapters.ArtistListAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CreateConcertActivity extends AppCompatActivity implements ArtistListAdapter
-        .ArtistListAdapterOnClickHandler, VenueListAdapter.VenueListAdapterOnClickHandler {
+        .ArtistListAdapterOnClickHandler, VenueListAdapter.VenueListAdapterOnClickHandler, TagListAdapter.TagListAdapterOnClickHandler {
 
     EditText concertNameEditText;
     EditText artistNameEditText;
@@ -47,12 +47,13 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
     EditText descriptionEditText;
     EditText minPriceEditText;
     EditText maxPriceEditText;
-    EditText tagsEditText;
+    EditText tagEditText;
     EditText venueEditText;
     EditText ticketLinkEditText;
     Button submitButton;
     Button artistButton;
     Button venueButton;
+    Button tagButton;
 
     RecyclerView artistRecyclerView;
     ArtistListAdapter artistAdapter;
@@ -66,13 +67,18 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
     TextView selectedVenueName;
     TextView selectedVenueLocation;
 
+    RecyclerView tagRecyclerView;
+    TagListAdapter tagAdapter;
+    LinearLayout selectedTagLayout;
+    TextView selectedTag;
+
     String concertName;
     Artist artist;
     String date;
     String description;
     Integer minPrice;
     Integer maxPrice;
-    String[] tags;
+    List<Tag> tags;
     ConcertLocation location;
     String ticketLink;
 
@@ -86,12 +92,13 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         descriptionEditText = (EditText) findViewById(R.id.description_edit);
         minPriceEditText = (EditText) findViewById(R.id.min_price_edit);
         maxPriceEditText = (EditText) findViewById(R.id.max_price_edit);
-        tagsEditText = (EditText) findViewById(R.id.tags_edit);
+        tagEditText = (EditText) findViewById(R.id.tag_edit);
         venueEditText = (EditText) findViewById(R.id.venue_edit);
         ticketLinkEditText = (EditText) findViewById(R.id.link_edit);
         submitButton = (Button) findViewById(R.id.submit_button);
         artistButton = (Button) findViewById(R.id.artist_button);
         venueButton = (Button) findViewById(R.id.venue_button);
+        tagButton = (Button) findViewById(R.id.tag_button);
 
         selectedArtistLayout = (LinearLayout) findViewById(R.id.selected_artist);
         selectedArtistName = (TextView) findViewById(R.id.artist_list_name_tv_selected);
@@ -100,6 +107,11 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         selectedVenueLayout = (LinearLayout) findViewById(R.id.selected_venue);
         selectedVenueName = (TextView) findViewById(R.id.venue_list_venue_selected);
         selectedVenueLocation = (TextView) findViewById(R.id.venue_list_address_selected);
+
+        selectedTagLayout = (LinearLayout) findViewById(R.id.selected_tags);
+        selectedTag = (TextView) findViewById(R.id.tag_list_tag_selected);
+
+        tags = new ArrayList<>();
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,7 +124,6 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
                         minPriceEditText.getText().toString());
                 maxPrice = Integer.parseInt(maxPriceEditText.getText().toString().isEmpty() ? "0" :
                         maxPriceEditText.getText().toString());
-                tags = tagsEditText.getText().toString().trim().split(",");
                 ticketLink = ticketLinkEditText.getText().toString().trim();
 
                 if (!isValid()) {
@@ -140,8 +151,16 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
             }
         });
 
+        tagButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchTag();
+            }
+        });
+
         artistRecyclerView = (RecyclerView) findViewById(R.id.artist_list_rv);
         venueRecyclerView = (RecyclerView) findViewById(R.id.venue_list_rv);
+        tagRecyclerView = (RecyclerView) findViewById(R.id.tag_list_rv);
 
         LinearLayoutManager artistLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         artistRecyclerView.setLayoutManager(artistLayoutManager);
@@ -150,11 +169,18 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
                 LinearLayoutManager.VERTICAL, false);
         venueRecyclerView.setLayoutManager(venueLayoutManager);
 
+        LinearLayoutManager tagLayoutManager = new LinearLayoutManager(this, LinearLayoutManager
+                .VERTICAL, false);
+        tagRecyclerView.setLayoutManager(tagLayoutManager);
+
         artistAdapter = new ArtistListAdapter(this, this);
         artistRecyclerView.setAdapter(artistAdapter);
 
         venueAdapter = new VenueListAdapter(this, this);
         venueRecyclerView.setAdapter(venueAdapter);
+
+        tagAdapter = new TagListAdapter(this, this);
+        tagRecyclerView.setAdapter(tagAdapter);
 
     }
 
@@ -181,15 +207,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         concertDto.description = description;
         concertDto.minPrice = minPrice;
         concertDto.maxPrice = maxPrice;
-        List<Tag> tagList = new ArrayList<>();
-        for (String tag : tags) {
-            if (!tag.isEmpty()) {
-                Tag temp = new Tag();
-                temp.value = tag;
-                tagList.add(temp);
-            }
-        }
-        concertDto.tags = tagList;
+        concertDto.tags = tags;
         concertDto.location = location;
         concertDto.comments = new ArrayList<>();
         if (!ticketLink.equals("")) {
@@ -247,7 +265,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
 
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
-        String name = artistNameEditText.getText().toString();
+        String name = artistNameEditText.getText().toString().replace(' ', '+').trim();
 
         Call<List<Artist>> call = controller.searchForArtist(name);
         call.enqueue(new Callback<List<Artist>>() {
@@ -322,6 +340,52 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         });
     }
 
+    private void searchTag() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        final RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        String tag = tagEditText.getText().toString().replace(' ', '+').trim();
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
+
+        Call<List<Tag>> call = controller.searchTags(tag, map);
+        call.enqueue(new Callback<List<Tag>>() {
+            @Override
+            public void onResponse(Call<List<Tag>> call, Response<List<Tag>> response) {
+                if (response.message().equals("Unauthorized")) {
+                    final RefreshDto refreshDto = new RefreshDto();
+                    refreshDto.refresh = LoginActivity.refreshToken;
+                    Call<RefreshResponse> callRefresh = controller.refresh(refreshDto);
+                    callRefresh.enqueue(new Callback<RefreshResponse>() {
+                        @Override
+                        public void onResponse(Call<RefreshResponse> call, Response<RefreshResponse> response) {
+                            LoginActivity.accessToken = response.body().access;
+                            searchTag();
+                        }
+
+                        @Override
+                        public void onFailure(Call<RefreshResponse> call, Throwable t) {
+                            Toast.makeText(CreateConcertActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                tagAdapter.setTagData(new ArrayList<Tag>());
+                tagAdapter.setTagData(response.body());
+                tagRecyclerView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(Call<List<Tag>> call, Throwable t) {
+                Toast.makeText(CreateConcertActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onClick(Artist artist) {
         artistRecyclerView.setVisibility(View.GONE);
@@ -344,6 +408,17 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         selectedVenueLayout.setVisibility(View.VISIBLE);
 
         this.location = location;
+    }
+
+    @Override
+    public void onClick(Tag tag) {
+        tagRecyclerView.setVisibility(View.GONE);
+
+        selectedTag.setText(selectedTag.getText() + "* " + tag.value + " (" + tag.context + ")" +
+                "\n");
+        selectedTagLayout.setVisibility(View.VISIBLE);
+
+        tags.add(tag);
     }
 }
 

@@ -71,14 +71,4 @@ public class ConcertDto implements Serializable {
     public String image;
 }
 
-class Tag implements Serializable {
-    @SerializedName("value")
-    @Expose
-    public String value;
-
-    @SerializedName("context")
-    @Expose
-    public String context;
-}
-
 

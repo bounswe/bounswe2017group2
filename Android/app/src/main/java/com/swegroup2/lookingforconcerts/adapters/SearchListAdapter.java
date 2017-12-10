@@ -1,4 +1,4 @@
-package com.swegroup2.lookingforconcerts.concert;
+package com.swegroup2.lookingforconcerts.adapters;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -9,20 +9,23 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.swegroup2.lookingforconcerts.R;
+import com.swegroup2.lookingforconcerts.concert.ConcertDto;
 
 import java.util.List;
 
 /**
- * Created by elifguler on 23.10.2017.
+ * Created by Pınar on 28.11.2017.
  */
 
-public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.ConcertListAdapterViewHolder> {
+public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.SearchListAdapterViewHolder> {
 
-    private final ConcertListAdapterOnClickHandler mClickHandler;
+    private final SearchListAdapterOnClickHandler mClickHandler;
     private List<ConcertDto> mConcertData;
+    Context context;
 
-    public ConcertListAdapter(ConcertListAdapterOnClickHandler clickHandler) {
+    public SearchListAdapter(SearchListAdapterOnClickHandler clickHandler, Context context) {
         mClickHandler = clickHandler;
+        this.context = context;
     }
 
     public void setConcertData(List<ConcertDto> concertData) {
@@ -31,19 +34,19 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
     }
 
     @Override
-    public ConcertListAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SearchListAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
 
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View view = inflater.inflate(R.layout.concert_list_item, parent, false);
+        View view = inflater.inflate(R.layout.search_list_item, parent, false);
 
-        return new ConcertListAdapterViewHolder(view);
+        return new SearchListAdapterViewHolder(view);
     }
 
     @Override
     @TargetApi(24)
-    public void onBindViewHolder(ConcertListAdapterViewHolder holder, int position) {
+    public void onBindViewHolder(SearchListAdapterViewHolder holder, int position) {
         ConcertDto concert = mConcertData.get(position);
 
         if (concert.artist != null) {
@@ -62,18 +65,18 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
         return mConcertData.size();
     }
 
-    public class ConcertListAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class SearchListAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final TextView mConcertName;
         public final TextView mArtistName;
         public final TextView mConcertDate;
 
 
-        public ConcertListAdapterViewHolder(View view) {
+        public SearchListAdapterViewHolder(View view) {
             super(view);
 
-            mConcertName = (TextView) view.findViewById(R.id.concert_name_tv);
-            mArtistName = (TextView) view.findViewById(R.id.artist_name_tv);
-            mConcertDate = (TextView) view.findViewById(R.id.date_tv);
+            mConcertName = (TextView) view.findViewById(R.id.search_concert_name_tv);
+            mArtistName = (TextView) view.findViewById(R.id.search_artist_name_tv);
+            mConcertDate = (TextView) view.findViewById(R.id.search_date_tv);
 
             view.setOnClickListener(this);
         }
@@ -84,7 +87,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
         }
     }
 
-    public interface ConcertListAdapterOnClickHandler {
+    public interface SearchListAdapterOnClickHandler {
         void onClick(ConcertDto concertDto);
     }
 }
