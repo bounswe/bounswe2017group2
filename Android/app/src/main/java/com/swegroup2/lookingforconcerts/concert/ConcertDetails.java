@@ -42,6 +42,7 @@ public class ConcertDetails extends Fragment {
     TextView minPrice;
     TextView maxPrice;
     TextView location;
+    TextView sellerUrl;
     TextView comments;
     TextView rateDetails;
     int rateCount = 0;
@@ -95,6 +96,7 @@ public class ConcertDetails extends Fragment {
         minPrice = (TextView) view.findViewById(R.id.minPrice);
         maxPrice = (TextView) view.findViewById(R.id.maxPrice);
         location = (TextView) view.findViewById(R.id.location);
+        sellerUrl = (TextView) view.findViewById(R.id.seller_url);
         comments = (TextView) view.findViewById(R.id.comments);
         rateDetails = (TextView) view.findViewById(R.id.detailed_ratings);
         ratingBar = (RatingBar) view.findViewById(R.id.ratingBar);
@@ -143,6 +145,11 @@ public class ConcertDetails extends Fragment {
         minPrice.setText("Min Price: " + concertDto.minPrice);
         maxPrice.setText("Max Price: " + concertDto.maxPrice);
         location.setText("Location: " + concertDto.location.venue + " " + concertDto.location.coordinates);
+        if (concertDto.sellerUrl != null) {
+            sellerUrl.setText("Ticket Link: " + concertDto.sellerUrl);
+        } else {
+            sellerUrl.setText("Ticket link not available.");
+        }
         String allComments = "Comments: \n";
 
         for (int i = 0; i < concertDto.comments.size(); i++) {
