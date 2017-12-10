@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
 import com.swegroup2.lookingforconcerts.R;
@@ -72,8 +73,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
     Integer minPrice;
     Integer maxPrice;
     String[] tags;
-    String venue;
-    String coordinates;
+    ConcertLocation location;
     String ticketLink;
 
     @Override
@@ -113,7 +113,6 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
                 maxPrice = Integer.parseInt(maxPriceEditText.getText().toString().isEmpty() ? "0" :
                         maxPriceEditText.getText().toString());
                 tags = tagsEditText.getText().toString().trim().split(",");
-                venue = venueEditText.getText().toString().trim();
                 ticketLink = ticketLinkEditText.getText().toString().trim();
 
                 if (!isValid()) {
@@ -160,8 +159,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
     }
 
     private boolean isValid() {
-        return !(concertName.isEmpty() || artist == null || date.isEmpty() || venue.isEmpty
-                () || coordinates.isEmpty());
+        return !(concertName.isEmpty() || artist == null || date.isEmpty() || location == null);
     }
 
     private void postRequestMethod() {
@@ -192,12 +190,11 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
             }
         }
         concertDto.tags = tagList;
-        ConcertLocation concertLocation = new ConcertLocation();
-        concertLocation.venue = venue;
-        concertLocation.coordinates = coordinates;
-        concertDto.location = concertLocation;
+        concertDto.location = location;
         concertDto.comments = new ArrayList<>();
-        concertDto.sellerUrl = ticketLink;
+        if (!ticketLink.equals("")) {
+            concertDto.sellerUrl = ticketLink;
+        }
 
         Map<String, String> map = new HashMap<>();
         map.put("Authorization", "Bearer " + LoginActivity.accessToken);
@@ -277,24 +274,24 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         Map<String, String> map = new HashMap<>();
-        map.put("query", venueEditText.getText().toString().trim());
+        map.put("query", venueEditText.getText().toString().replace(' ', '+').trim());
         map.put("key", Secret.GOOGLE_PLACES_API_KEY);
 
-        Call<JsonObject> call = controller.searchForVenue(map);
-        call.enqueue(new Callback<JsonObject>() {
+        Call<JsonElement> call = controller.searchForVenue(map);
+        call.enqueue(new Callback<JsonElement>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 List<ConcertLocation> list = getLocationFromJSON(response.body());
                 venueAdapter.setVenueData(new ArrayList<ConcertLocation>());
                 venueAdapter.setVenueData(list);
                 venueRecyclerView.setVisibility(View.VISIBLE);
             }
 
-            private List<ConcertLocation> getLocationFromJSON(JsonObject body) {
+            private List<ConcertLocation> getLocationFromJSON(JsonElement body) {
                 List<ConcertLocation> list = new ArrayList<>();
 
                 try {
-                    JsonArray results = body.getAsJsonArray("results");
+                    JsonArray results = body.getAsJsonObject().getAsJsonArray("results");
 
                     for (int i = 0; i < results.size(); i++) {
                         JsonObject result = results.get(i).getAsJsonObject();
@@ -319,7 +316,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
+            public void onFailure(Call<JsonElement> call, Throwable t) {
                 Toast.makeText(CreateConcertActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -346,8 +343,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         selectedVenueLocation.setText(location.address);
         selectedVenueLayout.setVisibility(View.VISIBLE);
 
-        this.venue = location.venue;
-        this.coordinates = location.coordinates;
+        this.location = location;
     }
 }
 
