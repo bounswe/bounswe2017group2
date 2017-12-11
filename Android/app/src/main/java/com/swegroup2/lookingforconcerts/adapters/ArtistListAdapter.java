@@ -1,4 +1,4 @@
-package com.swegroup2.lookingforconcerts.search;
+package com.swegroup2.lookingforconcerts.adapters;
 
 import android.annotation.TargetApi;
 import android.content.Context;

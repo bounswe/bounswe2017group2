@@ -1,4 +1,4 @@
-package com.swegroup2.lookingforconcerts;
+package com.swegroup2.lookingforconcerts.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.swegroup2.lookingforconcerts.R;
 import com.swegroup2.lookingforconcerts.concert.ConcertLocation;
 
 import java.util.List;

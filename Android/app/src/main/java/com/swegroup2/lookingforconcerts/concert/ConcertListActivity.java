@@ -21,7 +21,7 @@ import com.swegroup2.lookingforconcerts.R;
 import com.swegroup2.lookingforconcerts.RefreshDto;
 import com.swegroup2.lookingforconcerts.RefreshResponse;
 import com.swegroup2.lookingforconcerts.RestInterfaceController;
-import com.swegroup2.lookingforconcerts.SearchListAdapter;
+import com.swegroup2.lookingforconcerts.adapters.SearchListAdapter;
 import com.swegroup2.lookingforconcerts.login.LoginActivity;
 import com.swegroup2.lookingforconcerts.user.UserDto;
 import com.swegroup2.lookingforconcerts.user.UserProfileActivity;
