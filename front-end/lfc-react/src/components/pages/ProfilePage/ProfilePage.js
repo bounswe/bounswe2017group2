@@ -175,6 +175,7 @@ class ProfilePage extends React.Component {
     this.handleTab = this.handleTab.bind(this);
     this.handleFollow = this.handleFollow.bind(this);
     this.handleSpotifyConnect = this.handleSpotifyConnect.bind(this);
+    this.handleSpotifyDisconnect = this.handleSpotifyDisconnect.bind(this);
   }
 
   handleSpotifyConnect() {
@@ -186,6 +187,22 @@ class ProfilePage extends React.Component {
       .then(
       response => {
         window.location.href = response.data.url;
+      },
+      error => {
+        console.log("refresh");
+      }
+      );
+  }
+
+  handleSpotifyDisconnect() {
+    axios
+      .post(
+      "http://34.210.127.92:8000/user/spotify/disconnect",
+      {}
+      )
+      .then(
+      response => {
+        window.location.reload();
       },
       error => {
         console.log("refresh");
@@ -277,7 +294,7 @@ class ProfilePage extends React.Component {
         )
         .then(
         response => {
-          window.location.href = response.data.url;
+          window.location.reload();
         },
         error => {
           console.log("refresh");
@@ -346,11 +363,20 @@ class ProfilePage extends React.Component {
             <button className="ui button">Edit Profile</button>
           </Link>
         );
-        spotifyButton = (
-          <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyConnect()}>
-            <i className="spotify icon"></i>Connect
+        if (!spotifyProfile) {
+          spotifyButton = (
+            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyConnect()}>
+              <i className="spotify icon"></i>Connect
           </button>
-        )
+          )
+        }
+        else {
+          spotifyButton = (
+            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyDisconnect()}>
+              <i className="spotify icon"></i>Disconnect
+          </button>
+          )
+        }
       } else {
         if (
           !this.state.user.followers.find(function (user) {
@@ -396,10 +422,7 @@ class ProfilePage extends React.Component {
 
     let spotifyData;
 
-    console.log(spotifyProfile);
-
     if (spotifyProfile) {
-      console.log("oz");
       spotifyData = (
         <div className="item userData">
           <b>spotify name</b> &nbsp; {spotifyProfile.display_name}
