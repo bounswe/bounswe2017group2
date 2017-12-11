@@ -350,6 +350,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
 
         final RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
+        // TODO: check for what to do when there are spaces in the tag entered
         String tag = tagEditText.getText().toString().replaceAll(" ", "%20").trim();
         Map<String, String> map = new HashMap<>();
         map.put("Authorization", "Bearer " + LoginActivity.accessToken);
