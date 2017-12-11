@@ -12,6 +12,8 @@ import decode from "jwt-decode";
 let theToken = localStorage.getItem("lfcJWT");
 let userID;
 let isLoggedIn = false;
+let profileID;
+let spotifyProfile;
 
 class MiniConcertDetail extends React.Component {
   constructor(props) {
@@ -58,22 +60,22 @@ class MiniConcertDetail extends React.Component {
   handleRemove(event) {
     axios
       .post(
-        "http://34.210.127.92:8000/concert/" +
-          this.props.concert.concert_id +
-          "/unsubscribe/",
-        {},
-        {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + theToken
-        }
+      "http://34.210.127.92:8000/concert/" +
+      this.props.concert.concert_id +
+      "/unsubscribe/",
+      {},
+      {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + theToken
+      }
       )
       .then(
-        response => {
-          window.location.reload();
-        },
-        error => {
-          console.log("refresh");
-        }
+      response => {
+        window.location.reload();
+      },
+      error => {
+        console.log("refresh");
+      }
       );
   }
 }
@@ -131,20 +133,20 @@ class MiniUserDetail extends React.Component {
   handleRemove(event) {
     axios
       .post(
-        "http://34.210.127.92:8000/user/" + this.props.user.id + "/unfollow/",
-        {},
-        {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + theToken
-        }
+      "http://34.210.127.92:8000/user/" + this.props.user.id + "/unfollow/",
+      {},
+      {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + theToken
+      }
       )
       .then(
-        response => {
-          window.location.reload();
-        },
-        error => {
-          console.log("refresh");
-        }
+      response => {
+        window.location.reload();
+      },
+      error => {
+        console.log("refresh");
+      }
       );
   }
 }
@@ -172,20 +174,54 @@ class ProfilePage extends React.Component {
     };
     this.handleTab = this.handleTab.bind(this);
     this.handleFollow = this.handleFollow.bind(this);
+    this.handleSpotifyConnect = this.handleSpotifyConnect.bind(this);
+    this.handleSpotifyDisconnect = this.handleSpotifyDisconnect.bind(this);
+  }
+
+  handleSpotifyConnect() {
+    axios
+      .post(
+      "http://34.210.127.92:8000/user/spotify/authorize",
+      { "redirect_type": "frontend" }
+      )
+      .then(
+      response => {
+        window.location.href = response.data.url;
+      },
+      error => {
+        console.log("refresh");
+      }
+      );
+  }
+
+  handleSpotifyDisconnect() {
+    axios
+      .post(
+      "http://34.210.127.92:8000/user/spotify/disconnect",
+      {}
+      )
+      .then(
+      response => {
+        window.location.reload();
+      },
+      error => {
+        console.log("refresh");
+      }
+      );
   }
 
   handleFollow(isFollow) {
     if (isFollow) {
       axios
         .post(
-          "http://34.210.127.92:8000/user/" +
-            this.props.match.params.userID +
-            "/follow/",
-          {},
-          {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + theToken
-          }
+        "http://34.210.127.92:8000/user/" +
+        profileID +
+        "/follow/",
+        {},
+        {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + theToken
+        }
         )
         .then(response => {
           window.location.reload();
@@ -193,14 +229,14 @@ class ProfilePage extends React.Component {
     } else {
       axios
         .post(
-          "http://34.210.127.92:8000/user/" +
-            this.props.match.params.userID +
-            "/unfollow/",
-          {},
-          {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + theToken
-          }
+        "http://34.210.127.92:8000/user/" +
+        profileID +
+        "/unfollow/",
+        {},
+        {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + theToken
+        }
         )
         .then(response => {
           window.location.reload();
@@ -225,7 +261,47 @@ class ProfilePage extends React.Component {
   }
 
   componentWillMount() {
-    let profileID = this.props.match.params.userID;
+    axios.get("http://34.210.127.92:8000/user/spotify/profile").then(
+      response => {
+        spotifyProfile = response.data;
+      },
+      error => {
+        console.log("refresh user");
+      }
+    );
+
+    if (localStorage.getItem("lfcJWT")) {
+      userID = decode(localStorage.lfcJWT).user_id;
+      isLoggedIn = true;
+    }
+
+    if (this.props.match.params.userID) {
+      profileID = this.props.match.params.userID;
+    }
+    else {
+      profileID = userID;
+    }
+
+    let params = require('query-string').parse(this.props.location.search);
+    if (params.code) {
+      axios
+        .post(
+        "http://34.210.127.92:8000/user/spotify/connect",
+        {
+          "code": params.code,
+          "state": params.state,
+        }
+        )
+        .then(
+        response => {
+          window.location.reload();
+        },
+        error => {
+          console.log("refresh");
+        }
+        );
+    }
+
     axios.get("http://34.210.127.92:8000/user/" + profileID + "/").then(
       response => {
         var userData = response.data;
@@ -233,28 +309,28 @@ class ProfilePage extends React.Component {
         var attendedList = [];
         axios
           .get(
-            "http://34.210.127.92:8000/user/" + profileID + "/get_concerts/",
-            {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + theToken
-            }
+          "http://34.210.127.92:8000/user/" + profileID + "/get_concerts/",
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + theToken
+          }
           )
           .then(
-            response => {
-              for (let concert of response.data) {
-                let dateOfConcert = new Date(concert.date_time);
-                if (dateOfConcert > Date.now()) willAttendList.push(concert);
-                else attendedList.push(concert);
-              }
-
-              this.setState({
-                willAttend: willAttendList,
-                attended: attendedList
-              });
-            },
-            error => {
-              console.log("refresh concert");
+          response => {
+            for (let concert of response.data) {
+              let dateOfConcert = new Date(concert.date_time);
+              if (dateOfConcert > Date.now()) willAttendList.push(concert);
+              else attendedList.push(concert);
             }
+
+            this.setState({
+              willAttend: willAttendList,
+              attended: attendedList
+            });
+          },
+          error => {
+            console.log("refresh concert");
+          }
           );
         this.setState({
           user: userData
@@ -267,17 +343,13 @@ class ProfilePage extends React.Component {
   }
 
   render() {
-    if (localStorage.getItem("lfcJWT")) {
-      userID = decode(localStorage.lfcJWT).user_id;
-      isLoggedIn = true;
-    }
 
     let editFollowButton;
-    let profileID = this.props.match.params.userID;
+    let spotifyButton
     let followedUsersList = this.state.user.following.map(usr => (
       <MiniUserDetail
         user={usr}
-        isRemovable={isLoggedIn && userID == this.props.match.params.userID}
+        isRemovable={isLoggedIn && userID == profileID}
       />
     ));
     let followersList = this.state.user.followers.map(usr => (
@@ -288,18 +360,32 @@ class ProfilePage extends React.Component {
       if (userID == profileID) {
         editFollowButton = (
           <Link className="Link" to={"/EditProfile/"}>
-          <button className="ui  floated button">Edit Profile</button>
+            <button className="ui button">Edit Profile</button>
           </Link>
         );
+        if (!spotifyProfile) {
+          spotifyButton = (
+            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyConnect()}>
+              <i className="spotify icon"></i>Connect
+          </button>
+          )
+        }
+        else {
+          spotifyButton = (
+            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyDisconnect()}>
+              <i className="spotify icon"></i>Disconnect
+          </button>
+          )
+        }
       } else {
         if (
-          !this.state.user.followers.find(function(user) {
+          !this.state.user.followers.find(function (user) {
             return user.id === userID;
           })
         ) {
           editFollowButton = (
             <button
-              className="ui  floated button"
+              className="ui floated button"
               onClick={() => this.handleFollow(1)}
             >
               Follow
@@ -320,19 +406,29 @@ class ProfilePage extends React.Component {
     var attendedConcerts = this.state.attended.map(cncrt => (
       <MiniConcertDetail
         concert={cncrt}
-        isCurrentUser={isLoggedIn && userID == this.props.match.params.userID}
+        isCurrentUser={isLoggedIn && userID == profileID}
       />
     ));
     var willAttendConcerts = this.state.willAttend.map(cncrt => (
       <MiniConcertDetail
         concert={cncrt}
-        isCurrentUser={isLoggedIn && userID == this.props.match.params.userID}
+        isCurrentUser={isLoggedIn && userID == profileID}
       />
     ));
     var age = Math.floor(
       (Date.now() - new Date(this.state.user.birth_date)) /
-        (1000 * 60 * 60 * 24 * 365)
+      (1000 * 60 * 60 * 24 * 365)
     );
+
+    let spotifyData;
+
+    if (spotifyProfile && userID==profileID) {
+      spotifyData = (
+        <div className="item userData">
+          <b>spotify name</b> &nbsp; {spotifyProfile.display_name}
+        </div>)
+    }
+
     return (
       <div className="ui grid" id="profilePage">
         <div className="row">
@@ -341,7 +437,7 @@ class ProfilePage extends React.Component {
             height="130px"
             src={"http://34.210.127.92:8000" + this.state.user.image}
           />
-          <div className="twelve wide column">
+          <div className="ten wide column">
             <div className="ui grid">
               <div className="row usersName">
                 {this.state.user.first_name + " " + this.state.user.last_name}
@@ -356,6 +452,7 @@ class ProfilePage extends React.Component {
               </div>
             </div>
           </div>
+          <div className="two wide column">{spotifyButton}</div>
           <div className="two wide column">{editFollowButton}</div>
         </div>
         <div className="row">
@@ -421,6 +518,7 @@ class ProfilePage extends React.Component {
               <div className="item userData">
                 <b>concerts</b> &nbsp; {this.state.user.concerts.length}
               </div>
+              {spotifyData}
             </div>
           </div>
           <div className="ui bottom attached tab segment" id="followedUsersTab">
