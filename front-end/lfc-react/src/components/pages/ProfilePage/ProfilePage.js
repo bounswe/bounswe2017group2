@@ -12,6 +12,7 @@ import decode from "jwt-decode";
 let theToken = localStorage.getItem("lfcJWT");
 let userID;
 let isLoggedIn = false;
+let profileID;
 
 class MiniConcertDetail extends React.Component {
   constructor(props) {
@@ -179,7 +180,7 @@ class ProfilePage extends React.Component {
       axios
         .post(
           "http://34.210.127.92:8000/user/" +
-            this.props.match.params.userID +
+            profileID +
             "/follow/",
           {},
           {
@@ -194,7 +195,7 @@ class ProfilePage extends React.Component {
       axios
         .post(
           "http://34.210.127.92:8000/user/" +
-            this.props.match.params.userID +
+            profileID +
             "/unfollow/",
           {},
           {
@@ -225,7 +226,20 @@ class ProfilePage extends React.Component {
   }
 
   componentWillMount() {
-    let profileID = this.props.match.params.userID;
+
+    
+    if (localStorage.getItem("lfcJWT")) {
+      userID = decode(localStorage.lfcJWT).user_id;
+      isLoggedIn = true;
+    }
+
+    if(this.props.match.params.userID){
+      profileID=this.props.match.params.userID;
+    }
+    else{
+      profileID=userID;
+    }
+
     axios.get("http://34.210.127.92:8000/user/" + profileID + "/").then(
       response => {
         var userData = response.data;
@@ -267,17 +281,12 @@ class ProfilePage extends React.Component {
   }
 
   render() {
-    if (localStorage.getItem("lfcJWT")) {
-      userID = decode(localStorage.lfcJWT).user_id;
-      isLoggedIn = true;
-    }
 
     let editFollowButton;
-    let profileID = this.props.match.params.userID;
     let followedUsersList = this.state.user.following.map(usr => (
       <MiniUserDetail
         user={usr}
-        isRemovable={isLoggedIn && userID == this.props.match.params.userID}
+        isRemovable={isLoggedIn && userID == profileID}
       />
     ));
     let followersList = this.state.user.followers.map(usr => (
@@ -320,13 +329,13 @@ class ProfilePage extends React.Component {
     var attendedConcerts = this.state.attended.map(cncrt => (
       <MiniConcertDetail
         concert={cncrt}
-        isCurrentUser={isLoggedIn && userID == this.props.match.params.userID}
+        isCurrentUser={isLoggedIn && userID == profileID}
       />
     ));
     var willAttendConcerts = this.state.willAttend.map(cncrt => (
       <MiniConcertDetail
         concert={cncrt}
-        isCurrentUser={isLoggedIn && userID == this.props.match.params.userID}
+        isCurrentUser={isLoggedIn && userID == profileID}
       />
     ));
     var age = Math.floor(

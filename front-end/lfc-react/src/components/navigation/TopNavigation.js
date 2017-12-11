@@ -6,6 +6,27 @@ import { Link } from "react-router-dom";
 import decode from "jwt-decode";
 // import gravatarUrl from "gravatar-url";
 import * as actions from "../../actions/auth";
+import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
+import axios from "axios";
+
+const theToken = localStorage.lfcJWT;
+setAuthorizationHeader(theToken);
+
+function handleSpotifyConnect() {
+  axios
+    .post(
+    "http://34.210.127.92:8000/user/spotify/authorize",
+    {"redirect_type":"frontend"}
+    )
+    .then(
+    response => {
+      window.location.href=response.data.url;
+    },
+    error => {
+      console.log("refresh");
+    }
+    );
+}
 
 const TopNavigation = ({ isAuthenticated, logout }) => (
   <Menu secondary pointing>
@@ -13,7 +34,7 @@ const TopNavigation = ({ isAuthenticated, logout }) => (
       LookingForConcerts
     </Menu.Item>
     <Menu.Item>
-      <Button color="green">Connect to Spotify</Button>
+      <Button color="green" onClick={() => handleSpotifyConnect()}>Connect to Spotify</Button>
     </Menu.Item>
     <Menu.Item>
       <Form onSubmit={this.onSubmit}>
@@ -36,15 +57,15 @@ const TopNavigation = ({ isAuthenticated, logout }) => (
           <Menu.Item onClick={() => logout()}>Logout</Menu.Item>
         </Menu>
       ) : (
-        <Menu secondary>
-          <Menu.Item as={Link} to="/login">
-            Login
+          <Menu secondary>
+            <Menu.Item as={Link} to="/login">
+              Login
           </Menu.Item>
-          <Menu.Item as={Link} to="/signup">
-            Signup
+            <Menu.Item as={Link} to="/signup">
+              Signup
           </Menu.Item>
-        </Menu>
-      )}
+          </Menu>
+        )}
     </Menu.Menu>
   </Menu>
 );
