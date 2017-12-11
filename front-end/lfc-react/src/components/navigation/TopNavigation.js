@@ -28,7 +28,7 @@ const TopNavigation = ({ isAuthenticated, logout }) => (
         <Menu secondary>
           <Menu.Item
             as={Link}
-            to={"/user/" + decode(localStorage.lfcJWT).user_id + "/"}
+            to={"/me"}
           >
             Profile
           </Menu.Item>

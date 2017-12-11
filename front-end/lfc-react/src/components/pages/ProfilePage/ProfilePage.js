@@ -422,7 +422,7 @@ class ProfilePage extends React.Component {
 
     let spotifyData;
 
-    if (spotifyProfile) {
+    if (spotifyProfile && userID==profileID) {
       spotifyData = (
         <div className="item userData">
           <b>spotify name</b> &nbsp; {spotifyProfile.display_name}
