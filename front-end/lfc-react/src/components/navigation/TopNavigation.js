@@ -12,29 +12,10 @@ import axios from "axios";
 const theToken = localStorage.lfcJWT;
 setAuthorizationHeader(theToken);
 
-function handleSpotifyConnect() {
-  axios
-    .post(
-    "http://34.210.127.92:8000/user/spotify/authorize",
-    {"redirect_type":"frontend"}
-    )
-    .then(
-    response => {
-      window.location.href=response.data.url;
-    },
-    error => {
-      console.log("refresh");
-    }
-    );
-}
-
 const TopNavigation = ({ isAuthenticated, logout }) => (
   <Menu secondary pointing>
     <Menu.Item header as={Link} to="/home">
       LookingForConcerts
-    </Menu.Item>
-    <Menu.Item>
-      <Button color="green" onClick={() => handleSpotifyConnect()}>Connect to Spotify</Button>
     </Menu.Item>
     <Menu.Item>
       <Form onSubmit={this.onSubmit}>
