@@ -228,8 +228,10 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
                     callRefresh.enqueue(new Callback<RefreshResponse>() {
                         @Override
                         public void onResponse(Call<RefreshResponse> call, Response<RefreshResponse> response) {
-                            LoginActivity.accessToken = response.body().access;
-                            postRequestMethod();
+                            if (response.body() != null) {
+                                LoginActivity.accessToken = response.body().access;
+                                postRequestMethod();
+                            }
                         }
 
                         @Override
@@ -348,7 +350,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
 
         final RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
-        String tag = tagEditText.getText().toString().replace(' ', '+').trim();
+        String tag = tagEditText.getText().toString().replaceAll(" ", "%20").trim();
         Map<String, String> map = new HashMap<>();
         map.put("Authorization", "Bearer " + LoginActivity.accessToken);
 
