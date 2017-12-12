@@ -807,6 +807,9 @@ def get_tags(request, search_str):
     if (not request.user.is_authenticated):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
 
+    if search_str is None:
+        return Response({'Error':'Please provide a search parameter'},status=status.HTTP_400_BAD_REQUEST)
+
     API_ENDPOINT = "https://www.wikidata.org/w/api.php"
     query = search_str
     params = {
@@ -825,13 +828,12 @@ def get_tags(request, search_str):
     tags = []
     for i in range(lenght):
         if 'description' in json_response[i]:
-            if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)):
-                value   = json_response[i]['label']
-                context = json_response[i]['description']
-                uri     = json_response[i]['concepturi']
-                t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
-                print(t)
-                tags.append(json.loads(t))
+            value   = json_response[i]['label']
+            context = json_response[i]['description']
+            uri     = json_response[i]['concepturi']
+            t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
+            print(t)
+            tags.append(json.loads(t))
 
     return Response(tags, status.HTTP_200_OK)
 
@@ -917,23 +919,23 @@ RECOMMENDATION FUNCTIONS
 def get_recommendations(request):
     if not request.user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
-    
+
     #spotify ids of the top artists info from spotify
     artistIDs = []
     #Concerts that are already being followed. These should not be in recommendations. Also prefetches the related artists with those concerts
     subscribedconcerts = request.user.concerts.all()
     #Concerts that can be recommended
     recommendableconcerts = Concert.objects.all()
-    
+
     #Get top artist info from spotify if the user connected his/her account with his/her spotify account.
     if request.user.spotify_refresh_token is not None:
-        
+
         #Get access token
         result = spotify_get_access_token(request.user)
         if 'error' in result:
             return Response(result['error'], status = result['status'])
         access_token = result
-        
+
         #use access token to get current top artists
         sp = spotipy.Spotify(access_token)
         results = sp.current_user_top_artists(limit=20, offset=0, time_range='medium_term')
@@ -941,10 +943,10 @@ def get_recommendations(request):
             return Response(results['error'], status = results['status'])
         for item in results['items']:
             artistIDs.append(item['id'])
-    
+
     #Get artists from the subscribed concerts
     artists = Artist.objects.filter(concerts__in=subscribedconcerts)
-    
+
     #get recommended concerts
     recommendedConcerts = recommendableconcerts.filter(Q(artist__in=artists)|Q(artist__spotify_id__in=artistIDs))
     print(len(recommendedConcerts))
