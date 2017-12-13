@@ -296,6 +296,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         Map<String, String> map = new HashMap<>();
         map.put("query", venueEditText.getText().toString().replace(' ', '+').trim());
         map.put("key", Secret.GOOGLE_PLACES_API_KEY);
+        map.put("region", "tr");
 
         Call<JsonElement> call = controller.searchForVenue(map);
         call.enqueue(new Callback<JsonElement>() {
