@@ -22,7 +22,7 @@
 
             <EditText
                 android:layout_width="0dp"
-                android:layout_weight="4"
+                android:layout_weight="3.72"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:hint="Search"
@@ -33,7 +33,8 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="go"/>
+                android:text="SEARCH"/>
+
 
         </LinearLayout>
 
@@ -86,6 +87,16 @@
                 android:layout_height="60dp"
                 android:onClick="createConcert"
                 android:id="@+id/create_concert_btn" />
+
+            <Button
+                android:text="Advanced Search"
+                android:background="@color/buttonColor"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_height="60dp"
+                android:onClick="advancedSearch"
+                android:id="@+id/advanced_search_btn" />
 
             <Button
                 android:id="@+id/spotifyButton"

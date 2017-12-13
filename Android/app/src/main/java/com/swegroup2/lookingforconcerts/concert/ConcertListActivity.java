@@ -53,6 +53,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     public static List<ConcertDto> concerts;
     public static UserDto userDto;
     static Button profile;
+    private Button advancedSearchButton;
 
     private SearchView mSearch;
 
@@ -118,6 +119,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         searchAdapter = new SearchListAdapter(this, this);
         searchRecyclerView.setAdapter(searchAdapter);
 
+        advancedSearchButton = (Button) findViewById(R.id.advanced_search_btn);
 
         getConcerts();
         getProfileInfo(this);
@@ -219,6 +221,12 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
                 Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void advancedSearch(View view) {
+        Intent intent = new Intent(this, AdvancedSearchActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 
