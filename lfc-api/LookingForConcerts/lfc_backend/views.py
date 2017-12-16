@@ -46,6 +46,8 @@ from rest_framework import permissions
 #     permission_classes = (permissions.AllowAny, )
 
 # The actual python functions that do the backend work.
+
+
 class FrontendAppView(View):
     """
     Serves the compiled frontend entry point (only works if you have run `yarn
@@ -66,6 +68,7 @@ class FrontendAppView(View):
                 """,
                 status=501,
             )
+
 
 '''
 USER FUNCTIONS
@@ -223,6 +226,27 @@ def get_spotify_profile(request):
     results = sp.current_user()
     return Response(results, status = status.HTTP_200_OK)
 
+@api_view(['GET'])
+def get_spotify_profile(request):
+    '''
+    returns the Spotify profile of the logged in user. Raises an error if the account is not connected to Spotify.
+    '''
+    if not request.user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    elif request.user.spotify_refresh_token is None:
+        return Response({'error':'The account is not connected to Spotify.'}, status = status.HTTP_400_BAD_REQUEST)
+
+    result = spotify_get_access_token(request.user)
+    if 'error' in result:
+        return Response(result['error'], status = result['status'])
+    else:
+        access_token = result
+
+    print("ACCESS_TOKEN:" + str(access_token))
+    sp = spotipy.Spotify(access_token)
+    results = sp.current_user()
+    return Response(results, status = status.HTTP_200_OK)
+
 # I'm using this to test it without the front-end.
 @api_view(['GET'])
 def spotify_redirect(request):
@@ -252,9 +276,9 @@ def spotify_redirect(request):
 
     client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
-    #redirect_uri = request.GET.get('redirect_uri') # normally, front-end will provide this as a parameter.
-    # Now, since I know the redirect uri I hard coded it.
-    redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['backend_redirect_uri']
+
+    # Hard-coded redirect uri for testing purposes.
+    redirect_uri = "http://localhost:8000/spotify/redirect"
 
     TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 
@@ -296,6 +320,7 @@ def spotify_redirect(request):
     else:
         Response(status = r.status_code)
 
+
 # This will be used with the front-end
 @api_view(['POST'])
 def spotify_connect(request):
@@ -305,18 +330,18 @@ def spotify_connect(request):
     print(request.user.username)
     print(request.session['username'])
 
-    if(request.user.username != request.session['username']):
-        return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
-
-    print("REDIRECT STATE:" + str(request.data['state']))
-    # check state to make sure it is the same user.
-    if 'spotify_state' in request.session:
-        if request.data['state']==request.session['spotify_state']:
-            print("Spotify connect: states matched.")
-        else:
-            return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({'error':'spotify state not found in session.'}, status = status.HTTP_400_BAD_REQUEST)
+    # if(request.user.username != request.session['username']):
+    #     return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
+    #
+    # print("REDIRECT STATE:" + str(request.data['state']))
+    # # check state to make sure it is the same user.
+    # if 'spotify_state' in request.session:
+    #     if request.data['state']==request.session['spotify_state']:
+    #         print("Spotify connect: states matched.")
+    #     else:
+    #         return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
+    # else:
+    #     return Response({'error':'spotify state not found in session.'}, status = status.HTTP_400_BAD_REQUEST)
 
     if request.data['error'] is not None:
         return Response({'error':'The user did not give authorization for connecting to Spotify'}, status = status.HTTP_401_UNAUTHORIZED)
@@ -327,8 +352,10 @@ def spotify_connect(request):
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
 
     redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['frontend_redirect_uri']
-    if request.data['redirect_type'] =='android':
-            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
+
+    if 'redirect_type' in request.data:
+        if request.data['redirect_type'].lower() =='android':
+                redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
 
     TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 
@@ -379,6 +406,7 @@ def spotify_authorize(request):
     You will receive code and state as a response from Spotify if the user gives authorization.
     Else, you will receive error and state as a response.
     Call the user/spotify/connect ENDPOINT with parameters: code/error and state to complete the Spotify connection.
+
     '''
     if not request.user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
@@ -397,12 +425,14 @@ def spotify_authorize(request):
 
     client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
+
     redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['backend_redirect_uri']
 
-    if request.data['redirect_type'] == 'frontend':
-            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['frontend_redirect_uri']
-    elif request.data['redirect_type'] =='android':
-            redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
+    if 'redirect_type' in request.data:
+        if request.data['redirect_type'].lower() == 'frontend':
+                redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['frontend_redirect_uri']
+        elif request.data['redirect_type'].lower() =='android':
+                redirect_uri = settings.SOCIALACCOUNT_PROVIDERS['spotify']['android_redirect_uri']
 
     # If you generate a random string or encode the hash of some client state (e.g., a cookie)
     # in this state variable, you can validate the response to additionally ensure that the
@@ -806,11 +836,16 @@ def get_average_ratings(request,pk):
         return Response({'error':'concert not found.'},status = status.HTTP_404_NOT_FOUND)
     ratings = RatingSerializer(concert.ratings.all(), many=True).data
 
-    avg_ratings ={}
-    avg_ratings['concert_atmosphere'] = np.mean([rating['concert_atmosphere'] for rating in ratings])
-    avg_ratings['artist_costumes'] = np.mean([rating['artist_costumes'] for rating in ratings])
-    avg_ratings['music_quality'] = np.mean([rating['music_quality'] for rating in ratings])
-    avg_ratings['stage_show'] = np.mean([rating['stage_show'] for rating in ratings])
+    avg_ratings ={'concert_atmosphere':None, 'artist_costumes': None, 'music_quality': None, 'stage_show': None}
+    concert_atmosphere = [rating['concert_atmosphere'] for rating in ratings]
+    artist_costumes = [rating['artist_costumes'] for rating in ratings]
+    music_quality = [rating['music_quality'] for rating in ratings]
+    stage_show = [rating['stage_show'] for rating in ratings]
+
+    if len(concert_atmosphere)>0: avg_ratings['concert_atmosphere'] = np.mean(concert_atmosphere)
+    if len(artist_costumes)>0: avg_ratings['artist_costumes'] = np.mean(artist_costumes)
+    if len(music_quality)>0: avg_ratings['music_quality'] = np.mean(music_quality)
+    if len(stage_show)>0: avg_ratings['stage_show'] = np.mean(stage_show)
 
     return Response(avg_ratings,status = status.HTTP_200_OK)
 
@@ -827,7 +862,10 @@ def get_tags(request, search_str):
     if (not request.user.is_authenticated):
         return Response({'Error':'User is not authenticated'},status=status.HTTP_401_UNAUTHORIZED)
 
+
     API_ENDPOINT = "https://www.wikidata.org/w/api.php"
+    if search_str is None:
+        return Response({'Error':'Please enter a search string.'},status=status.HTTP_400_BAD_REQUEST)
     query = search_str
     params = {
         'action' : 'wbsearchentities',
@@ -845,7 +883,7 @@ def get_tags(request, search_str):
     tags = []
     for i in range(lenght):
         if 'description' in json_response[i]:
-            if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)):
+            if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)): # we might remove this filter
                 value   = json_response[i]['label']
                 context = json_response[i]['description']
                 uri     = json_response[i]['concepturi']
@@ -937,23 +975,23 @@ RECOMMENDATION FUNCTIONS
 def get_recommendations(request):
     if not request.user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
-    
+
     #spotify ids of the top artists info from spotify
     artistIDs = []
     #Concerts that are already being followed. These should not be in recommendations. Also prefetches the related artists with those concerts
     subscribedconcerts = request.user.concerts.all()
     #Concerts that can be recommended
     recommendableconcerts = Concert.objects.all()
-    
+
     #Get top artist info from spotify if the user connected his/her account with his/her spotify account.
     if request.user.spotify_refresh_token is not None:
-        
+
         #Get access token
         result = spotify_get_access_token(request.user)
         if 'error' in result:
             return Response(result['error'], status = result['status'])
         access_token = result
-        
+
         #use access token to get current top artists
         sp = spotipy.Spotify(access_token)
         results = sp.current_user_top_artists(limit=20, offset=0, time_range='medium_term')
@@ -961,10 +999,10 @@ def get_recommendations(request):
             return Response(results['error'], status = results['status'])
         for item in results['items']:
             artistIDs.append(item['id'])
-    
+
     #Get artists from the subscribed concerts
     artists = Artist.objects.filter(concerts__in=subscribedconcerts)
-    
+
     #get recommended concerts
     recommendedConcerts = recommendableconcerts.filter(Q(artist__in=artists)|Q(artist__spotify_id__in=artistIDs))
     print(len(recommendedConcerts))
