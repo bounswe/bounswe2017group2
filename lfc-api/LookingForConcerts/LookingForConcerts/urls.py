@@ -103,7 +103,7 @@ urlpatterns = [
     url(r'^concert_image/(?P<pk>\d+)/$', ConcertShowImage, name='concert_image'),
     url(r'^upload_user_image/', UserImageView.as_view(), name='user_image_upload'),
     url(r'^user_image/(?P<pk>\d+)/$', UserShowImage, name='user_image'),
-    url(r'^', views.FrontendAppView.as_view()),
+    
     # REPORT
     #url('^', include('django.contrib.auth.urls'))
     # auth.urls includes:
@@ -122,3 +122,8 @@ if settings.ADMIN_ENABLED:
         url(r'^admin/', admin.site.urls),
         # .. other stuff you want to be dev-only
         )
+
+urlpatterns.append(
+	url(r'^', views.FrontendAppView.as_view()),
+	)
+
