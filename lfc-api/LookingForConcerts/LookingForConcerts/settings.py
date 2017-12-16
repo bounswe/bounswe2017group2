@@ -87,25 +87,26 @@ SIMPLE_JWT = {
 }
 
 HOST = 'http://34.210.127.92'
-PORT = '8000'
-BASE_URL = HOST+':'+PORT +'/'
-HOME_URL = BASE_URL + 'home/'
-LOGIN_URL = BASE_URL + 'login/'
+
+BACKEND_PORT = '8000'
+FRONTEND_PORT = '8000'
+ANDROID_PORT = '8000'
+BASE_URL = HOST+':'+BACKEND_PORT +'/'
 
 SWAGGER_SETTINGS = {
 'JSON_EDITOR': True,
 }
-
 
 SOCIALACCOUNT_PROVIDERS= {
     'spotify': {
         'client_id': 'f868164aafa94586aa37fa23926f1830',
         'client_secret':'fcad57195d6144fa82959e7516a0e07e',
         'backend_redirect_uri': BASE_URL + 'spotify/redirect',
-        'frontend_redirect_uri': HOME_URL,
-        'android_redirect_uri': HOME_URL,
+        'frontend_redirect_uri': HOST + ":" + FRONTEND_PORT + "/home",
+        'android_redirect_uri': HOST + ":" + ANDROID_PORT + "/home",
     }
 }
+
 #LOGIN_REDIRECT_URL = LOGIN_URL
 #SOCIALACCOUNT_QUERY_EMAIL = True
 #SOCIALACCOUNT_PROVIDERS = {
