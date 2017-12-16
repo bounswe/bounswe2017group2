@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist, ConcertImage, UserImage
 from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
 from lfc_backend.forms import ConcertImageForm, UserImageForm
-from django.views.generic import FormView, DetailView, ListView
-from django.core.urlresolvers import reverse
+from django.views.generic import FormView, DetailView, ListView, View
+from django.urls import reverse
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -24,7 +24,7 @@ import spotipy # Lightweight Python library for the Spotify Web API
 import traceback
 from spotipy.oauth2 import SpotifyClientCredentials # for connecting Spotify when doing artist search
 
-
+import os
 import requests # for sending requests
 import json # for getting the response body as json
 import re # for regular expressions
@@ -46,6 +46,26 @@ from rest_framework import permissions
 #     permission_classes = (permissions.AllowAny, )
 
 # The actual python functions that do the backend work.
+class FrontendAppView(View):
+    """
+    Serves the compiled frontend entry point (only works if you have run `yarn
+    run build`).
+    """
+
+    def get(self, request):
+        try:
+            with open(os.path.join(settings.REACT_APP_DIR, 'build', 'index.html')) as f:
+                return HttpResponse(f.read())
+        except FileNotFoundError:
+            logging.exception('Production build of app not found')
+            return HttpResponse(
+                """
+                This URL is only used when you have built the production
+                version of the app. Visit http://localhost:3000/ instead, or
+                run `yarn run build` to test the production version.
+                """,
+                status=501,
+            )
 
 '''
 USER FUNCTIONS
