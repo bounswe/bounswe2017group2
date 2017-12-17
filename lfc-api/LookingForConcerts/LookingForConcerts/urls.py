@@ -58,13 +58,14 @@ urlpatterns = [
     url(r'^users/$',views.list_users), # lists all the users registered to our app
     url(r'^user/me/$', views.get_user_info), # returns the logged in user object; requires authorization
     url(r'^user/edit_profile/$', views.edit_profile), # updates the information of the user
+    url(r'^user/recommendation_by_followed_users/$', views.get_recommendation_by_followed_users), # recommendations based on followed users
 
     # SPOTIFY
     url(r'^spotify/redirect$', views.spotify_redirect, name='spotify_redirect'),
 
-    url(r'^user/spotify/authorize/$', views.spotify_authorize, name='spotify_authorize'), # sets up the scope and sends the uri to the Spotify connect page
-    url(r'^user/spotify/connect/$', views.spotify_connect, name='spotify_connect'), # connects the Spotify account of the user to his LFC account
-    url(r'^user/spotify/disconnect/$', views.spotify_disconnect, name='spotify_disconnect'), # disconnects the account from Spotify
+    url(r'^user/spotify/authorize$', views.spotify_authorize, name='spotify_authorize'), # sets up the scope and sends the uri to the Spotify connect page
+    url(r'^user/spotify/connect$', views.spotify_connect, name='spotify_connect'), # connects the Spotify account of the user to his LFC account
+    url(r'^user/spotify/disconnect$', views.spotify_disconnect, name='spotify_disconnect'), # disconnects the account from Spotify
     url(r'^user/spotify/profile$', views.get_spotify_profile, name='get_spotify_profile'), # returns the Spotify profile of the logged in user.
 
     url(r'^user/(?P<pk>[0-9]+)/$', views.get_user_with_pk), #returns the user information of the user with the pk as its id
@@ -97,13 +98,13 @@ urlpatterns = [
     url(r'^locations/$',views.list_locations), # lists all locations in DB
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
     # TAG
-    url(r'^tags/(?P<search_str>[\w\s*\-]+)/$',views.get_tags),
+    url(r'^tags/(?P<search_str>[\w\-]+)/$',views.get_tags),
     # IMAGE
     url(r'^upload_concert_image/', ConcertImageView.as_view(), name='concert_image_upload'),
     url(r'^concert_image/(?P<pk>\d+)/$', ConcertShowImage, name='concert_image'),
     url(r'^upload_user_image/', UserImageView.as_view(), name='user_image_upload'),
     url(r'^user_image/(?P<pk>\d+)/$', UserShowImage, name='user_image'),
-    
+
     # REPORT
     #url('^', include('django.contrib.auth.urls'))
     # auth.urls includes:
@@ -119,11 +120,6 @@ urlpatterns = [
 
 if settings.ADMIN_ENABLED:
     urlpatterns.append(
-        url(r'^admin/', admin.site.urls),
+        url(r'^admin/', include(admin.site.urls)),
         # .. other stuff you want to be dev-only
         )
-
-urlpatterns.append(
-	url(r'^', views.FrontendAppView.as_view()),
-	)
-
