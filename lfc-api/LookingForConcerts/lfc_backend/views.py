@@ -1010,3 +1010,23 @@ def get_recommendations(request):
     serializer = ConcertSerializer(recommendedConcerts, many = True)
 
     return Response(serializer.data, status = status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_recommendation_by_followed_users(request):
+    '''
+    Get recommended concerts based on followed users
+    '''
+
+    if not request.user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    subscribed_concerts = request.user.concerts.all()
+    followed_users = request.user.following.all()
+    recommended_concerts = Concert.objects.all()
+
+    recommended_concerts = recommended_concerts.filter(Q(attendees__in=followed_users))
+    recommended_concerts = recommended_concerts.difference(subscribed_concerts)
+
+    serializer = ConcertSerializer(recommended_concerts, many = True)
+
+    return Response(serializer.data, status = status.HTTP_200_OK)
