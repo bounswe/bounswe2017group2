@@ -32,7 +32,7 @@ const TopNavigation = ({ isAuthenticated, logout }) => (
           >
             Profile
           </Menu.Item>
-          <Menu.Item as={Link} to="/">
+          <Menu.Item as={Link} to="/createconcert/">
             Create a Concert
           </Menu.Item>
           <Menu.Item onClick={() => logout()}>Logout</Menu.Item>

@@ -37,8 +37,8 @@ class ConcertCreationForm extends React.Component {
             price_min: 0,
             price_max: 0,
             tags: [],
-            location: {'venue':'',
-                       'coordinates':''},
+            location: {'venue':'Test Venue',
+                       'coordinates':'0.0 0.0'},
             image: null,
             seller_url: null
         },
@@ -48,11 +48,15 @@ class ConcertCreationForm extends React.Component {
         errors: {}
     };
     selectArtist = (artistData) => {
+      console.log(artistData);
+      console.log(window.location.host);
       this.setState({
         ...this.state,
         data: { ...this.state.data, ['artist']: artistData }
       });
+
     }
+
     onChange = e =>
       this.setState({
         ...this.state,
@@ -64,16 +68,19 @@ class ConcertCreationForm extends React.Component {
       const errors = this.validate(this.state.data);
       this.setState({ errors });
       if (Object.keys(errors).length === 0) {
-        const theToken = localStorage.lfcJWT;
+        //const theToken = localStorage.lfcJWT;
         console.log(theToken);
         	console.log(JSON.stringify(this.state.data));
         axios.post('http://34.210.127.92:8000/newconcert/', this.state.data,{
           'Content-Type': 'application/json',
+          Authorization: "Bearer " + theToken
           
       }
-      ).then(res =>res.json())
-      .then((responseJson) => {
+      ).then((responseJson) => {
           console.log(responseJson);
+          window.open(window.location.host+"/concert/"+responseJson.data.concert_id,"_self")
+      },error=>{
+        console.log(error);
       }
     );
       }
@@ -156,8 +163,17 @@ class ConcertCreationForm extends React.Component {
               />
             </label>
           </Form.Field>
+          <Form.Field>
+            <label>
+            Venue name
+            <input
+
+            />
+            </label>
+          </Form.Field>
+          <Form.Field>
           <ArtistForm onArtistSelected={this.selectArtist} />
-          
+          </Form.Field>
           <Button primary>Create Concert</Button>
         </Form>
       );
@@ -176,7 +192,7 @@ class ArtistForm extends React.Component{
           selectedIndex: null,
           value: '',
           artists: [],
-          selectedArtist:{}
+          
   };
 
   this.handleChange = this.handleChange.bind(this);
@@ -190,15 +206,12 @@ class ArtistForm extends React.Component{
   handleSubmit(event) {
       event.preventDefault();
       var data={'name':this.state.value};
-      console.log(data);
 
       axios.get("http://34.210.127.92:8000/searchartists/",{
           params:data
       }
       ).then(resp => {
-        console.log(resp.data);
         this.setState({artists:resp.data});
-        console.log(this.state.artists);
       }).catch(err => {console.log(err)});
 
   }
@@ -207,9 +220,11 @@ class ArtistForm extends React.Component{
   
   
   handleClick(e, data){
-    this.setState({selectedArtist:this.state.artists[data.value]});
-    this.props.onArtistSelected(this.state.selectedArtist);
-    console.log(this.state.selectedArtist);
+    let index=data.value;
+
+    //this.setState({selectedArtist:this.state.artists[data.value]});
+    let selectedArtist=this.state.artists[index]
+    this.props.onArtistSelected(selectedArtist);
   }
   render() {
   var artists=[];
@@ -223,6 +238,7 @@ class ArtistForm extends React.Component{
     
   );
   }
+  //console.log(artists);
   return (
     <div>
     <label>
