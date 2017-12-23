@@ -1,11 +1,11 @@
 package com.swegroup2.lookingforconcerts;
 
-
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import com.swegroup2.lookingforconcerts.concert.Artist;
 import com.swegroup2.lookingforconcerts.concert.ConcertComment;
 import com.swegroup2.lookingforconcerts.concert.ConcertDto;
 import com.swegroup2.lookingforconcerts.concert.ConcertResponse;
+import com.swegroup2.lookingforconcerts.concert.Ratings;
 import com.swegroup2.lookingforconcerts.user.UserDto;
 import com.swegroup2.lookingforconcerts.user.UserResponse;
 
@@ -34,10 +34,13 @@ public interface RestInterfaceController {
     Call<ConcertResponse> createConcert(@Body ConcertDto concertDto, @HeaderMap Map<String, String> headermap);
 
     @GET("/maps/api/place/textsearch/json")
-    Call<JsonObject> searchForVenue(@QueryMap Map<String, String> queryMap);
+    Call<JsonElement> searchForVenue(@QueryMap Map<String, String> queryMap);
 
     @GET("/concerts/")
     Call<List<ConcertDto>> getAllConcerts();
+
+    @GET("/concerts/get_recommended_concerts/")
+    Call<List<ConcertDto>> getRecommendedConcerts(@HeaderMap Map<String, String> headermap);
 
     @GET("/user/me/")
     Call<UserDto> getUserProfile(@HeaderMap Map<String, String> headermap);
@@ -48,9 +51,11 @@ public interface RestInterfaceController {
     @POST("/concert/{id}/unsubscribe/")
     Call<ConcertResponse> unAttend(@Path("id") int id, @HeaderMap Map<String, String> headermap);
 
+    @POST("/concert/{id}/rate/")
+    Call<ConcertResponse> rate(@Body Ratings ratings, @Path("id") int id, @HeaderMap Map<String, String> headermap);
+
     @GET("/concerts/search/")
     Call<List<ConcertDto>> searchConcert(@Query("search") String search);
-
 
     @POST("/signup/")
     Call<UserResponse> signUp(@Body UserDto userDto);
@@ -64,4 +69,8 @@ public interface RestInterfaceController {
     @POST("/upload_user_image/")
     Call<UserResponse> uploadImage(@Body UserDto userDto);
 
+    @GET("/tags/{tag}/")
+    Call<List<com.swegroup2.lookingforconcerts.concert.Tag>> searchTags(@Path("tag") String tag,
+                                                                        @HeaderMap Map<String,
+            String> headerMap);
 }

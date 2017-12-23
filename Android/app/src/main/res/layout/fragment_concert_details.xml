@@ -5,13 +5,13 @@
     android:background="#FFFFFF"
     tools:context="com.swegroup2.lookingforconcerts.concert.ConcertDetails">
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:id="@+id/linearLayout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
@@ -70,10 +70,42 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+
+            </com.google.android.gms.maps.MapView>
+
+            <TextView
+                android:id="@+id/seller_url"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="web"/>
+
             <TextView
                 android:id="@+id/comments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/detailed_ratings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Rate for Concert Atmosphere"/>
+
+            <RatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ratingBar" />
+
+            <Button
+                android:id="@+id/rate_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rate" />
+
 
             <EditText
                 android:id="@+id/comment_edittext"
@@ -90,8 +122,6 @@
 
         </LinearLayout>
 
-
-    </RelativeLayout>
-
+    </ScrollView>
 
 </FrameLayout>

@@ -5,6 +5,7 @@ import { Route } from "react-router-dom";
 // import HomePage from "./components/pages/HomePage";
 import LoginPage from "./components/pages/LoginPage";
 import DashboardPage from "./components/pages/DashboardPage";
+import EditProfile from "./components/pages/EditProfile";
 import ConcertDetailPage from "./components/pages/ConcertDetailPage/ConcertDetailPage";
 import ProfilePage from "./components/pages/ProfilePage/ProfilePage";
 import SignupPage from "./components/pages/SignupPage";
@@ -15,9 +16,16 @@ import TopNavigation from "./components/navigation/TopNavigation";
 const App = ({ location, isAuthenticated }) => (
   <div className="ui container">
     <TopNavigation />
+
     <Route location={location} path="/" exact component={DashboardPage} />
     <Route location={location} path="/concert/:concertID/" exact component={ConcertDetailPage} />
     <Route location={location} path="/user/:userID/" exact component={ProfilePage} />
+    <Route location={location} path="/me/" exact component={ProfilePage} />
+	<Route location={location} path="/EditProfile/" exact component={EditProfile} />
+
+    <Route location={location} path="/home" exact component={DashboardPage} />
+
+
     <GuestRoute location={location} path="/login" exact component={LoginPage} />
     <GuestRoute
       location={location}

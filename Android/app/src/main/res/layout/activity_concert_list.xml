@@ -6,6 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -59,37 +62,72 @@
 
         </android.support.v7.widget.RecyclerView>
 
-
-        <Button
-            android:id="@+id/create_concert_btn"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:onClick="createConcert"
-            android:text="Create Concert" />
+            android:orientation="horizontal">
 
-        <Button
-            android:text="PROFILE"
+            <Button
+                android:text="PROFILE"
+                android:layout_width="0dp"
+                android:background="@color/buttonColor"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_height="60dp"
+                android:onClick="profile"
+                android:id="@+id/profile" />
+
+            <Button
+                android:text="Create Concert"
+                android:background="@color/buttonColor"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_height="60dp"
+                android:onClick="createConcert"
+                android:id="@+id/create_concert_btn" />
+
+            <Button
+                android:id="@+id/spotifyButton"
+                android:background="@color/buttonColor"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_height="60dp"
+                android:text="SPOTIFY" />
+
+            <Button
+                android:id="@+id/logout_btn"
+                android:background="@color/buttonColor"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_height="60dp"
+                android:onClick="logoutFunc"
+                android:text="Logout" />
+
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/recommendation_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="profile"
-            android:id="@+id/profile" />
+            android:text="More Concerts You Might Like"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
 
-        <Button
-            android:id="@+id/spotifyButton"
+        <android.support.v7.widget.RecyclerView
+            android:focusable="true"
+            android:id="@+id/recommendation_rv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CONNECT TO SPOTIFY" />
+            android:layout_height="match_parent"
+            android:layout_margin="8dp">
 
-        <Button
-            android:id="@+id/logout_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:onClick="logoutFunc"
-            android:text="Logout" />
+        </android.support.v7.widget.RecyclerView>
 
         <android.support.v7.widget.RecyclerView
             android:focusable="true"
@@ -103,6 +141,7 @@
 
 
 
-    </LinearLayout>
 
+    </LinearLayout>
+    </ScrollView>
 </FrameLayout>

@@ -36,7 +36,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
 
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View view = inflater.inflate(R.layout.list_item, parent, false);
+        View view = inflater.inflate(R.layout.concert_list_item, parent, false);
 
         return new ConcertListAdapterViewHolder(view);
     }

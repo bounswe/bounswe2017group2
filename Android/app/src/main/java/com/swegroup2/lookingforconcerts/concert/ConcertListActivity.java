@@ -13,20 +13,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.swegroup2.lookingforconcerts.SearchListAdapter;
-import com.swegroup2.lookingforconcerts.login.LoginActivity;
 import com.swegroup2.lookingforconcerts.R;
 import com.swegroup2.lookingforconcerts.RefreshDto;
 import com.swegroup2.lookingforconcerts.RefreshResponse;
 import com.swegroup2.lookingforconcerts.RestInterfaceController;
+import com.swegroup2.lookingforconcerts.adapters.SearchListAdapter;
+import com.swegroup2.lookingforconcerts.login.LoginActivity;
 import com.swegroup2.lookingforconcerts.user.UserDto;
 import com.swegroup2.lookingforconcerts.user.UserProfileActivity;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,15 +42,17 @@ import static com.swegroup2.lookingforconcerts.login.LoginActivity.refreshToken;
 
 public class ConcertListActivity extends AppCompatActivity implements ConcertListAdapter.ConcertListAdapterOnClickHandler, SearchListAdapter.SearchListAdapterOnClickHandler {
     private RecyclerView recyclerView;
+    private RecyclerView horizontalRecyclerView;
     private RecyclerView searchRecyclerView;
     private ConcertListAdapter adapter;
+    private ConcertListAdapter horizontalAdapter;
     private SearchListAdapter searchAdapter;
     private Button createConcertButton;
     private Button logoutButton;
+    private TextView recommendationText;
     public static List<ConcertDto> concerts;
     public static UserDto userDto;
     static Button profile;
-
 
     private SearchView mSearch;
 
@@ -72,6 +72,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
 
         recyclerView = (RecyclerView) findViewById(R.id.concert_list_rv);
+       horizontalRecyclerView = (RecyclerView) findViewById(R.id.recommendation_rv);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
@@ -79,8 +80,17 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         adapter = new ConcertListAdapter(this);
         recyclerView.setAdapter(adapter);
 
+        LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        horizontalRecyclerView.setLayoutManager(horizontalLayoutManager);
+
+        horizontalAdapter = new ConcertListAdapter(this);
+        horizontalRecyclerView.setAdapter(horizontalAdapter);
+
+        recommendationText = (TextView) findViewById(R.id.recommendation_text);
+
         createConcertButton = (Button) findViewById(R.id.create_concert_btn);
         profile = (Button) findViewById(R.id.profile);
+
 
         spotifyButton = (Button) findViewById(R.id.spotifyButton);
 
@@ -111,6 +121,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
         getConcerts();
         getProfileInfo(this);
+        getRecommendedConcerts();
 
 
     }
@@ -153,6 +164,36 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         );
     }
 
+    public void getRecommendedConcerts() {
+        LoginActivity.refresh(this);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://34.210.127.92:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
+
+        Call<List<ConcertDto>> call = controller.getRecommendedConcerts(map);
+
+        call.enqueue(new Callback<List<ConcertDto>>() {
+                         @Override
+                         public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
+                             concerts = response.body();
+                             horizontalAdapter.setConcertData(concerts);
+                         }
+
+                         @Override
+                         public void onFailure(Call<List<ConcertDto>> call, Throwable t) {
+                             Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+                         }
+                     }
+
+        );
+    }
+
     private void searchConcert() {
         refresh();
         Retrofit retrofit = new Retrofit.Builder()
@@ -163,14 +204,11 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         String search = concertSearch.getText().toString();
-        Toast.makeText(ConcertListActivity.this, search, Toast.LENGTH_SHORT).show();
 
         Call<List<ConcertDto>> call = controller.searchConcert(search);
         call.enqueue(new Callback<List<ConcertDto>>() {
             @Override
             public void onResponse(Call<List<ConcertDto>> call, Response<List<ConcertDto>> response) {
-                //Toast.makeText(ConcertListActivity.this, response.body().get(0).name, Toast.LENGTH_SHORT).show();
-
                 searchAdapter.setConcertData(new ArrayList<ConcertDto>());
                 searchAdapter.setConcertData(response.body());
                 searchRecyclerView.setVisibility(View.VISIBLE);
@@ -204,7 +242,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
                     accessToken = response.body().access;
                     Log.d("FS", "accessToken " + accessToken);
                 }
-
             }
 
             @Override
@@ -223,7 +260,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         RestInterfaceController controller = retrofit.create(RestInterfaceController.class);
 
         Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Bearer " + accessToken);
+        map.put("Authorization", "Bearer " + LoginActivity.accessToken);
 
         Call<UserDto> call = controller.getUserProfile(map);
 
