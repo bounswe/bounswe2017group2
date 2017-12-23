@@ -34,6 +34,7 @@
         <activity android:name=".concert.ConcertListActivity"></activity>
         <activity android:name=".login.SignupActivity"></activity>
         <activity android:name=".user.UserProfileActivity"></activity>
+        <activity android:name=".concert.AdvancedSearchActivity"></activity>
     </application>
 
 </manifest>
