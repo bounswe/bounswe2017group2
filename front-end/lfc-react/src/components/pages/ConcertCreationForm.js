@@ -47,11 +47,9 @@ class GoogleLocationChooser extends React.Component{
   handleSubmit(event) {
   event.preventDefault();
   var data={'name':this.state.value};
-  console.log(data);	
   return fetch('https://maps.googleapis.com/maps/api/geocode/json?key='+googleMapKey+'&region=tr&address='+this.state.value)
   .then((response) => response.json())
   .then((responseJson) => {
-    console.log(responseJson);
     this.setState({results:responseJson.results});
     this.setState({lat:responseJson.results[0].geometry.location.lat});
     this.setState({lng:responseJson.results[0].geometry.location.lng}); 
@@ -132,8 +130,6 @@ class ConcertCreationForm extends React.Component {
         errors: {}
     };
     selectArtist = (artistData) => {
-      console.log(artistData);
-      console.log(window.location.host);
       this.setState({
         ...this.state,
         data: { ...this.state.data, ['artist']: artistData }
@@ -141,7 +137,6 @@ class ConcertCreationForm extends React.Component {
 
     }
     selectVenue = (venueData) =>{
-      console.log(venueData);
       this.setState({
         ...this.state,
         data: { ...this.state.data, ['location']: venueData }
@@ -158,8 +153,6 @@ class ConcertCreationForm extends React.Component {
       const errors = this.validate(this.state.data);
       this.setState({ errors });
       if (Object.keys(errors).length === 0) {
-        //const theToken = localStorage.lfcJWT;
-        console.log(theToken);
         	console.log(JSON.stringify(this.state.data));
         axios.post('http://34.210.127.92:8000/newconcert/', this.state.data,{
           'Content-Type': 'application/json',
@@ -167,7 +160,6 @@ class ConcertCreationForm extends React.Component {
           
       }
       ).then((responseJson) => {
-          console.log(responseJson);
           window.open("http://"+window.location.host+"/concert/"+responseJson.data.concert_id,"_self")
       },error=>{
         console.log(error);
@@ -341,7 +333,6 @@ class ArtistForm extends React.Component{
     
   );
   }
-  //console.log(artists);
   return (
     <div>
     <label>
