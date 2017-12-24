@@ -21,8 +21,7 @@ const App = ({ location, isAuthenticated }) => (
     <Route location={location} path="/concert/:concertID/" exact component={ConcertDetailPage} />
     <Route location={location} path="/user/:userID/" exact component={ProfilePage} />
     <Route location={location} path="/me/" exact component={ProfilePage} />
-	<Route location={location} path="/EditProfile/" exact component={EditProfile} />
-
+	  <Route location={location} path="/EditProfile/" exact component={EditProfile} />
     <Route location={location} path="/home" exact component={DashboardPage} />
 
 

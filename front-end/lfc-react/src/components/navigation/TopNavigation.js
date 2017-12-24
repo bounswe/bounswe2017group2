@@ -3,14 +3,12 @@ import PropTypes from "prop-types";
 import { Menu, Input, Button, Form } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import decode from "jwt-decode";
 // import gravatarUrl from "gravatar-url";
 import * as actions from "../../actions/auth";
-import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
-import axios from "axios";
+// import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
 
-const theToken = localStorage.lfcJWT;
-setAuthorizationHeader(theToken);
+// const theToken = localStorage.lfcJWT;
+// setAuthorizationHeader(theToken);
 
 const TopNavigation = ({ isAuthenticated, logout }) => (
   <Menu secondary pointing>
@@ -28,7 +26,7 @@ const TopNavigation = ({ isAuthenticated, logout }) => (
         <Menu secondary>
           <Menu.Item
             as={Link}
-            to={"/me"}
+            to="/me"
           >
             Profile
           </Menu.Item>
