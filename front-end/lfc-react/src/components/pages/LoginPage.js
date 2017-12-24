@@ -18,7 +18,7 @@ class LoginPage extends React.Component {
         <Grid.Column>
           <Image src={logo} size="medium" centered/> 
         </Grid.Column>
-      </Grid.Row> 
+      </Grid.Row>
 
       <Grid.Row> 
         <Grid.Column>

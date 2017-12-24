@@ -78,7 +78,7 @@ class LoginForm extends React.Component {
           </div>
           {errors.password && <InlineError text={errors.password} />}
         </Form.Field>
-        <Button fluid color='red'>Login</Button>
+        <Button fluid color='red'>LOG IN</Button>
       </Form>
     );
   }
