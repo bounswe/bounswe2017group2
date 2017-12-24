@@ -57,8 +57,8 @@ const ConcertsList = ({ concerts }) => (
 
 class DashboardPage extends React.Component {
   componentWillMount() {
-    // this.props.fetch();
-    this.props.search("nadia");
+    this.props.fetch();
+    // this.props.search("nadia");
   }
   render() {
     const { concerts } = this.props;
