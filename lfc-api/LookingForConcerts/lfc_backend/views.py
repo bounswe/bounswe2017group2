@@ -928,6 +928,7 @@ def upload_image(request):
     '''
     Uploads an image to the folder /media/images/ by using multipart form json type
     Returns the full url of image
+    Only supports jpg now, please do not upload any other format.
     '''
     if request.FILES.get('image'):
         file = request.FILES.get('image')
