@@ -4,9 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist, ConcertImage, UserImage
+from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist
 from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
-from lfc_backend.forms import ConcertImageForm, UserImageForm
 from django.views.generic import FormView, DetailView, ListView, View
 from django.urls import reverse
 from django.http import HttpResponse
@@ -39,6 +38,9 @@ from rest_framework_simplejwt.views import (
 )
 
 from rest_framework import permissions
+
+import datetime
+import os
 
 #from drf_openapi.views import SchemaView
 
@@ -900,7 +902,7 @@ COMMENT FUNCTIONS
 @api_view(['POST'])
 def create_comment(request,pk):
     '''
-    Adds a comment by the logged in user to the concert with given pk
+    Uploads an image to the folder /media/images/ by using multipart form json type
     '''
     if (not request.user.is_authenticated):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -920,53 +922,27 @@ def create_comment(request,pk):
 '''
 IMAGE FUNCTIONS
 '''
-class ConcertImageView(FormView):
-    '''
-    Uploads a concert image to the database
-    @return: url of the uploaded image
-    '''
-    template_name = 'concert_image_form.html'
-    form_class = ConcertImageForm
 
-    def form_valid(self, form):
-        concert_image = ConcertImage(
-            image=self.get_form_kwargs().get('files')['image'])
-        concert_image.save()
-        self.id = concert_image.id
-        return HttpResponse(concert_image.image.url)
+@api_view(['POST'])
+def upload_image(request):
+    '''
+    Uploads an image to the folder /media/images/
+    POST structure should be Multipart Form data in the following format;
+    name = image, value = image file path
+    Returns the full url of the image
+    '''
+    if request.FILES.get('image'):
+        file = request.FILES.get('image')
+        filename = request.FILES.get('image').name
+        content = file.read()
+        full_path = str(os.getcwd()) + "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + "-" + filename
+        new_file = open(full_path, "wb")
+        print ("Writing image...")
+        new_file.write(content)
+    else:
+        return Response({'error':'No file provided'}, status = status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
-def ConcertShowImage(request, pk):
-    '''
-    @param: pk, id of the cocert image
-    @return: url of that image
-    '''
-    img = ConcertImage.objects.get(pk=pk)
-    return HttpResponseRedirect(concert_image.image.url)
-
-class UserImageView(FormView):
-    '''
-    Uploads a user image to the database
-    @return: url of the uploaded image
-    '''
-    template_name = 'user_image_form.html'
-    form_class = UserImageForm
-
-    def form_valid(self, form):
-        user_image = UserImage(
-            image=self.get_form_kwargs().get('files')['image'])
-        user_image.save()
-        self.id = user_image.id
-        return HttpResponse(user_image.image.url)
-
-@api_view(['GET'])
-def UserShowImage(request, pk):
-    '''
-    @param: pk, id of the user image
-    @return: url of the image
-    '''
-    img = UsserImage.objects.get(pk=pk)
-    return HttpResponseRedirect(user_image.image.url)
+    return HttpResponse(full_path)
 
 '''
 RECOMMENDATION FUNCTIONS
