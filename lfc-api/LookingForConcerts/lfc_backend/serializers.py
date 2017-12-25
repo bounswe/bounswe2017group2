@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Rating, Comment, Image, Artist
+from lfc_backend.models import Annotation, AnnotationBody, AnnotationTarget, Selector
+
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
@@ -115,6 +117,18 @@ class ConcertSerializer(serializers.ModelSerializer):
         instance.price_max = validated_data.get('price_max', instance.price_max)
         #needs implementing for updating tags. Note 3
         #needs implementing for updating location. Also need the outcome of Google Maps API
+
+class SelectorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Selector
+        fields = ("type",
+                  "conformsTo",
+                  "value")
+
+# ADD THESE
+# class AnnotationTargetSerializer(serializers.ModelSerializer):
+# class AnnotationBodySerializer(serializers.ModelSerializer):
+# class AnnotationSerializer(serializers.ModelSerializer):
 
 '''
 NOTES:

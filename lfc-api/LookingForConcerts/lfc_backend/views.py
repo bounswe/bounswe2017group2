@@ -1030,3 +1030,31 @@ def get_recommendation_by_followed_users(request):
     serializer = ConcertSerializer(recommended_concerts, many = True)
 
     return Response(serializer.data, status = status.HTTP_200_OK)
+
+@api_view(['POST'])
+def create_annotation(request):
+    if not request.user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    print("Creating annotation...")
+
+@api_view(['GET'])
+def list_annotations(request, concert_id):
+        try:
+            concert = Concert.objects.get(pk=concert_id)
+        except ObjectDoesNotExist:
+            return Response(status = status.HTTP_404_NOT_FOUND)
+        annotations = concert.annotations.all()
+        serializer = AnnotationSerializer(annotations, many=True)
+        return Response(serializer.data)
+
+@api_view(['POST'])
+def annotation_detail(request, concert_id, pk):
+        if not request.user.is_authenticated:
+            return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+        print("Modifying annotation...")
+        try:
+            concert = Concert.objects.get(pk=concert_id)
+            annotation = concert.objects.get(pk=pk)
+        except ObjectDoesNotExist:
+            return Response(status = status.HTTP_404_NOT_FOUND)
+        # Do something with annotation

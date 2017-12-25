@@ -93,6 +93,9 @@ urlpatterns = [
     # RATING
     url(r'^concert/(?P<pk>[0-9]+)/rate/$', views.rate_concert), # adds a new rating by the logged in user to the concert specified by its primary key; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/average_ratings/$', views.get_average_ratings), # returns the average ratings for the concert specified by its primary key
+    # ANNOTATION
+    url(r"^concert/(?P<concert_id>\d+)/annotations$", views.list_annotations),
+    url(r"^concert/(?P<concert_id>\d+)/annotations/(?P<pk>\d+)$", views.annotation_detail),
 
     # LOCATION
     url(r'^locations/$',views.list_locations), # lists all locations in DB
@@ -104,6 +107,7 @@ urlpatterns = [
     url(r'^concert_image/(?P<pk>\d+)/$', ConcertShowImage, name='concert_image'),
     url(r'^upload_user_image/', UserImageView.as_view(), name='user_image_upload'),
     url(r'^user_image/(?P<pk>\d+)/$', UserShowImage, name='user_image'),
+
 
     # REPORT
     #url('^', include('django.contrib.auth.urls'))
