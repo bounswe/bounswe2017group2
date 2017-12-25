@@ -8,6 +8,7 @@ import decode from "jwt-decode";
 import * as actions from "../../actions/auth";
 import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
 import axios from "axios";
+import logo from './l4clogo1.png';
 
 const theToken = localStorage.lfcJWT;
 setAuthorizationHeader(theToken);
@@ -15,6 +16,7 @@ setAuthorizationHeader(theToken);
 const TopNavigation = ({ isAuthenticated, logout }) => (
   <Menu secondary pointing>
     <Menu.Item header as={Link} to="/home">
+      <img src={logo}/>
       LookingForConcerts
     </Menu.Item>
     <Menu.Item>
