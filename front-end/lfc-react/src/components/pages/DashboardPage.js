@@ -11,9 +11,9 @@ const ConcertItem = ({ concert }) => (
     <Image as={Link} to={"/concert/" + concert.concert_id}
       src={
         concert.artist &&
-        concert.artist.images &&
-        concert.artist.images[0] &&
-        concert.artist.images[0].url
+          concert.artist.images &&
+          concert.artist.images[0] &&
+          concert.artist.images[0].url
           ? concert.artist.images[0].url
           : ""
       }
@@ -21,7 +21,9 @@ const ConcertItem = ({ concert }) => (
     <Card.Content>
       <Card.Header as={Link} to={"/concert/" + concert.concert_id}>
         {" "}
-        {concert.artist ? concert.artist.name : ""}
+        <div className="concertNameLink">
+          {concert.artist ? concert.artist.name : ""}
+        </div>
       </Card.Header>
       <Card.Meta>
         <Icon name="calendar" /> {concert.date_time}
@@ -49,10 +51,10 @@ const ConcertsList = ({ concerts }) => (
         </div>
       </div>
     ) : (
-      concerts.map(concert => (
-        <ConcertItem concert={concert} key={concert.concert_id} />
-      ))
-    )}
+        concerts.map(concert => (
+          <ConcertItem concert={concert} key={concert.concert_id} />
+        ))
+      )}
   </div>
 );
 
