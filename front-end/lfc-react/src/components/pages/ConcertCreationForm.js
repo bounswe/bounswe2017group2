@@ -35,7 +35,7 @@ class GoogleLocationChooser extends React.Component{
         Enter venue name: 
         <input type="text" value={this.state.value} onChange={this.handleChange} />
       </label>
-      <input type="submit" value="Show Location" onClick={this.handleSubmit}/></div>
+      <Button primary onClick={this.handleSubmit}> Set Location </Button></div>
       <LocationMap lat={this.state.lat} lng={this.state.lng} venue_name={this.state.value}/>
       </div>
       );
@@ -151,12 +151,19 @@ class ConcertCreationForm extends React.Component {
       });
       
     }
-    onChange = e =>
+    selectTag=(tags)=>{
+      this.setState({
+        ...this.state,
+        data: { ...this.state.data, ['tags']: tags }
+      });
+    }
+    onChange = e =>{
+      if(e.target.name=="seller_url")e.target.value=e.target.value.replace(/^(https?:|)\/\//,'');
       this.setState({
         ...this.state,
         data: { ...this.state.data, [e.target.name]: e.target.value }
       });
-  
+    }
     onSubmit = e => {
       e.preventDefault();
       const errors = this.validate(this.state.data);
@@ -194,6 +201,7 @@ class ConcertCreationForm extends React.Component {
         lng=this.state.data.location.coordinates.substring(this.state.data.location.coordinates.indexOf(" ")+1,this.state.data.location.coordinates.length);
         venue_name=this.state.data.location.venue;
       }
+      let description=this.state.data['description'];
       return (
         <Form onSubmit={this.onSubmit} loading={loading}>
           {errors.global && (
@@ -258,9 +266,11 @@ class ConcertCreationForm extends React.Component {
               />
             </label>
           </Form.Field>
+
           <Form.Field>
           <ArtistForm onArtistSelected={this.selectArtist} />
           </Form.Field>
+
           <Form.Field>
             <GoogleLocationChooser onChange={this.selectVenue}/> 
             
@@ -275,6 +285,10 @@ class ConcertCreationForm extends React.Component {
               />
               </label>
             </Form.Field>
+            <Form.Field>
+              <TagForm  tagSelected={this.selectTag} />
+            </Form.Field>
+
           <Button primary>Create Concert</Button>
         </Form>
       );
@@ -285,12 +299,82 @@ class ConcertCreationForm extends React.Component {
   ConcertCreationForm.propTypes = {
     isAuthenticated: PropTypes.bool.isRequired,
 }
+class TagForm extends React.Component{
 
+  constructor(props){
+    super(props);
+    this.state ={
+        allTags: [],
+        selectedTags: [],
+        value: "",
+    
+  };
+  this.handleChange = this.handleChange.bind(this);
+  this.handleSubmit = this.handleSubmit.bind(this);
+  this.handleClick = this.handleClick.bind(this);
+  }
+  handleChange(event){
+    this.setState({value: event.target.value});
+  }
+  handleSubmit(event){
+    event.preventDefault();
+    axios.get("http://34.210.127.92:8000/tags/"+this.state.value+"/",{},{
+      'Content-Type': 'application/json',
+      Authorization: "Bearer " + theToken      
+    }
+    ).then(resp => {
+      let tags=this.state.allTags;
+      let newtags=tags.concat(resp.data.filter(function (item){
+        let duplicate=true;
+        for(let arraydata of tags){
+          if(arraydata['wikidata_uri']==item['wikidata_uri'])duplicate=false;
+        }
+        return duplicate;
+      }
+      ));
+      this.setState({allTags:newtags});
+      //console.log(this.state.allTags);
+    }).catch(err => {console.log(err)});
+  }
+  handleClick(event,data){
+      let indices=[];
+      indices=data.value;
+      let selectedtags=[];
+      let taglist=this.state.allTags;
+      for(let index of indices){
+          selectedtags.push(taglist[index]);
+      }
+      this.setState({selectedTags:selectedtags});
+      this.props.tagSelected(selectedtags);
+  }
+  render(){
+    let tags=[];
+    for(var i=0;i<this.state.allTags.length;i++){
+      tags.push({
+        text:this.state.allTags[i].value,
+        value:i,
+        key:this.state.allTags[i].wikidata_uri,
+  
+      }
+      
+    );
+    }
+    return(
+    <div>
+      <label>
+      Enter tag: 
+      <input type="text" value={this.state.value} onChange={this.handleChange} />
+      </label>
+      <Button primary  onClick={this.handleSubmit}> Find Tags</Button>
+      <Dropdown onChange={this.handleClick} placeholder="Select Tags" fluid multiple selection options={tags}/>
+      </div>
+  );
+  }
+}
 class ArtistForm extends React.Component{
   constructor(props) {
   super(props);
   this.state = {
-          selectedIndex: null,
           value: '',
           artists: [],
           
@@ -322,9 +406,7 @@ class ArtistForm extends React.Component{
   
   handleClick(e, data){
     let index=data.value;
-
-    //this.setState({selectedArtist:this.state.artists[data.value]});
-    let selectedArtist=this.state.artists[index]
+    let selectedArtist=this.state.artists[index];
     this.props.onArtistSelected(selectedArtist);
   }
   render() {
@@ -345,7 +427,7 @@ class ArtistForm extends React.Component{
       Enter artist name: 
       <input type="text" value={this.state.value} onChange={this.handleChange} />
     </label>
-    <input type="submit" value="List Artists" onClick={this.handleSubmit} />
+    <Button primary onClick={this.handleSubmit} > List Artists </Button>
     <Dropdown onChange={this.handleClick} placeholder='Select Artist' fluid selection options={artists} />
     </div>
     
