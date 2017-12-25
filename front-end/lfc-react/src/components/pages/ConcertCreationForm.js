@@ -8,8 +8,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Form, Button, Message, Dropdown } from "semantic-ui-react";
 import { isEmail, isLength } from "validator";
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import 'react-day-picker/lib/style.css';
 import InlineError from "..//messages/InlineError";
-import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
 const googleMapKey = "AIzaSyCrs1xLdXw8y4rfXc4tiJZZIWcwjmOR7BM";
 const theToken = localStorage.lfcJWT;
 //setAuthorizationHeader(theToken);	
@@ -142,6 +143,14 @@ class ConcertCreationForm extends React.Component {
         data: { ...this.state.data, ['location']: venueData }
       });
     }
+    dayChange = (day) =>{
+      if(day)
+      this.setState({
+        ...this.state,
+        data: { ...this.state.data, ['date_time']: day.getFullYear()+'-'+(day.getMonth()+1)+'-'+day.getDate() }
+      });
+      
+    }
     onChange = e =>
       this.setState({
         ...this.state,
@@ -220,12 +229,9 @@ class ConcertCreationForm extends React.Component {
           <Form.Field>
             <label htmlFor="date_time">
               Date
-              <input
-               
-                name="date_time"
-                value={data.date_time}
-                onChange={this.onChange}
-              />
+              <div>
+              <DayPickerInput onDayChange={this.dayChange}/>
+              </div>
             </label>
           </Form.Field>
   
