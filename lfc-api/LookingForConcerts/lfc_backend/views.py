@@ -6,7 +6,6 @@ from rest_framework.response import Response
 
 from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist
 from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
-from lfc_backend.forms import ConcertImageForm, UserImageForm
 from django.views.generic import FormView, DetailView, ListView, View
 from django.urls import reverse
 from django.http import HttpResponse
@@ -40,9 +39,8 @@ from rest_framework_simplejwt.views import (
 
 from rest_framework import permissions
 
-from django.core.files.storage import FileSystemStorage
-
 import datetime
+import os
 
 #from drf_openapi.views import SchemaView
 
@@ -904,7 +902,7 @@ COMMENT FUNCTIONS
 @api_view(['POST'])
 def create_comment(request,pk):
     '''
-    Adds a comment by the logged in user to the concert with given pk
+    Uploads an image to the folder /media/images/ by using multipart form json type
     '''
     if (not request.user.is_authenticated):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -927,12 +925,14 @@ IMAGE FUNCTIONS
 
 @api_view(['POST'])
 def upload_image(request):
-    assert request.method=="POST"
-    print ("receive.META.SERVER_PORT", request.META["SERVER_PORT"], request.POST)
+    '''
+    Uploads an image to the folder /media/images/ by using multipart form json type
+    Returns the full url of image
+    '''
     if request.FILES.get('image'):
         file = request.FILES.get('image')
         content = file.read()
-        filename = "media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + ".jpg"
+        filename = str(os.getcwd()) + "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + ".jpg"
         newFile = open(filename, "wb")
         print ("Writing image...")
         newFile.write(content)
