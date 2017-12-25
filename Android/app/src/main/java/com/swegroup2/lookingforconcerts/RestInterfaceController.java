@@ -57,6 +57,10 @@ public interface RestInterfaceController {
     @GET("/concerts/search/")
     Call<List<ConcertDto>> searchConcert(@Query("search") String search);
 
+    @GET("/concerts/advanced_search/")
+    Call<List<ConcertDto>> advancedSearch(@Query("concert_name") String concert_name, @Query("artist_name") String artist_name, @Query("location_venue") String location_venue,
+                                          @Query("tag_value") String tag_value, @Query("max_price") String max_price, @Query("min_price") String min_price);
+
     @POST("/signup/")
     Call<UserResponse> signUp(@Body UserDto userDto);
 

@@ -21,7 +21,6 @@ from django.conf.urls import include
 from django.conf.urls.static import static
 
 from django.views import generic
-from lfc_backend.views import ConcertImageView, ConcertShowImage, UserImageView, UserShowImage
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.views import get_swagger_view # for API Documentation with Swagger
 
@@ -62,9 +61,9 @@ urlpatterns = [
     # SPOTIFY
     url(r'^spotify/redirect$', views.spotify_redirect, name='spotify_redirect'),
 
-    url(r'^user/spotify/authorize$', views.spotify_authorize, name='spotify_authorize'), # sets up the scope and sends the uri to the Spotify connect page
-    url(r'^user/spotify/connect$', views.spotify_connect, name='spotify_connect'), # connects the Spotify account of the user to his LFC account
-    url(r'^user/spotify/disconnect$', views.spotify_disconnect, name='spotify_disconnect'), # disconnects the account from Spotify
+    url(r'^user/spotify/authorize/$', views.spotify_authorize, name='spotify_authorize'), # sets up the scope and sends the uri to the Spotify connect page
+    url(r'^user/spotify/connect/$', views.spotify_connect, name='spotify_connect'), # connects the Spotify account of the user to his LFC account
+    url(r'^user/spotify/disconnect/$', views.spotify_disconnect, name='spotify_disconnect'), # disconnects the account from Spotify
     url(r'^user/spotify/profile$', views.get_spotify_profile, name='get_spotify_profile'), # returns the Spotify profile of the logged in user.
 
     url(r'^user/(?P<pk>[0-9]+)/$', views.get_user_with_pk), #returns the user information of the user with the pk as its id
@@ -75,6 +74,7 @@ urlpatterns = [
     url(r'^user/deactivate/$', views.deactivate_user, name='deactivate_user'), # deactivates the account of the logged in user; requires authorization
     url(r'^user/delete/$', views.delete_user, name='delete_user'), # deletes the account of a given user; only admins are authorized.
     url(r'^user/delete_all/$', views.delete_all_users, name='delete_all_users'), # deletes all user accounts; only admins are authorized.
+    url(r'^user/recommendation_by_followed_users/$', views.get_recommendation_by_followed_users), # recommendations based on followed users
     # CONCERT
     url(r'^concert/(?P<pk>[0-9]+)/subscribe/$', views.subscribe_concert), # subscribes logged in user to the concert; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/unsubscribe/$', views.unsubscribe_concert), # unsubscribes logged in user from concert; requires authorization
@@ -97,12 +97,9 @@ urlpatterns = [
     url(r'^locations/$',views.list_locations), # lists all locations in DB
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
     # TAG
-    url(r'^tags/(?P<search_str>[\w\-]+)/$',views.get_tags),
+    url(r'^tags/(?P<search_str>[\w\s*\-]+)/$',views.get_tags),
     # IMAGE
-    url(r'^upload_concert_image/', ConcertImageView.as_view(), name='concert_image_upload'),
-    url(r'^concert_image/(?P<pk>\d+)/$', ConcertShowImage, name='concert_image'),
-    url(r'^upload_user_image/', UserImageView.as_view(), name='user_image_upload'),
-    url(r'^user_image/(?P<pk>\d+)/$', UserShowImage, name='user_image'),
+    url(r'^upload_image/', views.upload_image),
 
     # REPORT
     #url('^', include('django.contrib.auth.urls'))
@@ -119,6 +116,10 @@ urlpatterns = [
 
 if settings.ADMIN_ENABLED:
     urlpatterns.append(
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', admin.site.urls),
         # .. other stuff you want to be dev-only
         )
+
+urlpatterns.append(
+	url(r'^', views.FrontendAppView.as_view()),
+	)
