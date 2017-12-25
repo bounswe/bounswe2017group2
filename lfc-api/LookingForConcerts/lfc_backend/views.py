@@ -927,8 +927,9 @@ IMAGE FUNCTIONS
 def upload_image(request):
     '''
     Uploads an image to the folder /media/images/
-    enctype="multipart/form-data" should be added as json parameter
-    Returns the full url of image
+    POST structure should be Multipart Form data in the following format;
+    name = image, value = image file path
+    Returns the full url of the image
     '''
     if request.FILES.get('image'):
         file = request.FILES.get('image')
