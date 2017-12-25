@@ -181,7 +181,7 @@ class ProfilePage extends React.Component {
   handleSpotifyConnect() {
     axios
       .post(
-      "http://34.210.127.92:8000/user/spotify/authorize",
+      "http://34.210.127.92:8000/user/spotify/authorize/",
       { "redirect_type": "frontend" }
       )
       .then(
@@ -189,7 +189,7 @@ class ProfilePage extends React.Component {
         window.location.href = response.data.url;
       },
       error => {
-        console.log("refresh");
+        console.log(error);
       }
       );
   }
