@@ -16,9 +16,6 @@ import datetime
 
 # Models in our Database.
 
-class UserImage(models.Model):
-    image = models.FileField(upload_to='user/')
-
 class RegisteredUser(AbstractUser):
     """Registered User class"""
     # FIELDS COMING FROM AbstracUser
@@ -73,9 +70,6 @@ class Image(models.Model):
     height  = models.IntegerField()
     url = models.URLField()
     width = models.IntegerField()
-
-class ConcertImage(models.Model):
-    image = models.FileField(upload_to='concert/')
 
 class Concert(models.Model):
     concert_id = models.AutoField(primary_key=True)

@@ -21,7 +21,6 @@ from django.conf.urls import include
 from django.conf.urls.static import static
 
 from django.views import generic
-from lfc_backend.views import ConcertImageView, ConcertShowImage, UserImageView, UserShowImage
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.views import get_swagger_view # for API Documentation with Swagger
 
@@ -103,10 +102,7 @@ urlpatterns = [
     # TAG
     url(r'^tags/(?P<search_str>[\w\s*\-]+)/$',views.get_tags),
     # IMAGE
-    url(r'^upload_concert_image/', ConcertImageView.as_view(), name='concert_image_upload'),
-    url(r'^concert_image/(?P<pk>\d+)/$', ConcertShowImage, name='concert_image'),
-    url(r'^upload_user_image/', UserImageView.as_view(), name='user_image_upload'),
-    url(r'^user_image/(?P<pk>\d+)/$', UserShowImage, name='user_image'),
+    url(r'^upload_image/', views.upload_image),
 
 
     # REPORT
