@@ -20,9 +20,8 @@
     padding-top: 0px!important;
 }
 
-.tag {
-    color: grey;
-    font-size: 15pt;
+.ui.label:hover{
+    background-color: lightgrey;
 }
 
 .tagsRow {

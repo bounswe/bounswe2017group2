@@ -4,10 +4,11 @@ import { connect } from "react-redux";
 import { Image, Label, Icon, Card } from "semantic-ui-react";
 import { fetch } from "../../actions/concert";
 import { Link } from "react-router-dom";
+import "./design.css";
 
 const ConcertItem = ({ concert }) => (
   <Card>
-    <Image
+    <Image as={Link} to={"/concert/" + concert.concert_id}
       src={
         concert.artist &&
         concert.artist.images &&

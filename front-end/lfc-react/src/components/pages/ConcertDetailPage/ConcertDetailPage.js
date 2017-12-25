@@ -18,6 +18,7 @@ import { Button, Rating } from "semantic-ui-react";
 import "./design.css";
 import decode from "jwt-decode";
 import setAuthorizationHeader from "../../../utils/setAuthorizationHeader";
+import MiniUserDetail from "../ProfilePage/ProfilePage";
 
 //default from 'semantic-ui-react/dist/commonjs/collections/Table/TableRow';
 
@@ -278,6 +279,7 @@ class Concert extends React.PureComponent {
         }
         isLoggedIn = isAuthenticated;
 
+
         var visibleMessage = "";
         var invisibleMessage = "";
         var dateOfConcert = new Date(this.state.concert.date_time);
@@ -467,7 +469,7 @@ class Concert extends React.PureComponent {
         if (this.state.concert.price_max > this.state.concert.price_min) {
             price = (
                 <p>
-                    <b>Price:</b>&#8378;{this.state.concert.price_min}-&#8378;{
+                    <b>Price: </b>&#8378;{this.state.concert.price_min}-&#8378;{
                         this.state.concert.price_max
                     }
                 </p>
@@ -475,7 +477,7 @@ class Concert extends React.PureComponent {
         } else {
             price = (
                 <p>
-                    <b>Price:</b>&#8378;{this.state.concert.price_min}
+                    <b>Price: </b>&#8378;{this.state.concert.price_min}
                 </p>
             );
         }
@@ -495,23 +497,26 @@ class Concert extends React.PureComponent {
                 <div className="row tagsRow">
                     <div className="sixteen wide column">
                         {this.state.concert.tags.map(tag => (
-                            <div className="tag">{tag.value}</div>
+                            <div className="ui label">
+                                <i class="hashtag icon"></i>
+                                {tag.value}
+                            </div>
                         ))}
                     </div>
                 </div>
                 <div className="row">
                     <div className="ui list sixteen wide column">
                         <div className="item concertData">
-                            <b>Artist:</b>
+                            <b>Artist: </b>
                             {this.state.concert.artist.name}
                         </div>
                         <div className="item concertData">
-                            <b>Date:</b>
+                            <b>Date: </b>
                             {this.state.concert.date_time}
                         </div>
                         <div className="item concertData">{price}</div>
                         <div className="item concertData">
-                            <b>Location:</b>
+                            <b>Location: </b>
                             {this.state.concert.location.venue}
                         </div>
                     </div>
