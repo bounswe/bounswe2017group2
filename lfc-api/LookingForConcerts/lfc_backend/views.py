@@ -926,19 +926,22 @@ IMAGE FUNCTIONS
 @api_view(['POST'])
 def upload_image(request):
     '''
-    Uploads an image to the folder /media/images/ by using multipart form json type
+    Uploads an image to the folder /media/images/
+    enctype="multipart/form-data" should be added as json parameter
     Returns the full url of image
-    Only supports jpg now, please do not upload any other format.
     '''
     if request.FILES.get('image'):
         file = request.FILES.get('image')
+        filename = request.FILES.get('image').name
         content = file.read()
-        filename = str(os.getcwd()) + "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + ".jpg"
-        newFile = open(filename, "wb")
+        full_path = str(os.getcwd()) + "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + "-" + filename
+        new_file = open(full_path, "wb")
         print ("Writing image...")
-        newFile.write(content)
+        new_file.write(content)
+    else:
+        return Response({'error':'No file provided'}, status = status.HTTP_400_BAD_REQUEST)
 
-    return HttpResponse(filename)
+    return HttpResponse(full_path)
 
 '''
 RECOMMENDATION FUNCTIONS
