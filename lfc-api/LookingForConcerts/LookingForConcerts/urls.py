@@ -57,6 +57,7 @@ urlpatterns = [
     url(r'^users/$',views.list_users), # lists all the users registered to our app
     url(r'^user/me/$', views.get_user_info), # returns the logged in user object; requires authorization
     url(r'^user/edit_profile/$', views.edit_profile), # updates the information of the user
+    url(r'^user/(?P<reported_user_id>[0-9]+)/report/$', views.create_or_edit_user_report), # creates or edits a user report for the user with the given pk
 
     # SPOTIFY
     url(r'^spotify/redirect$', views.spotify_redirect, name='spotify_redirect'),

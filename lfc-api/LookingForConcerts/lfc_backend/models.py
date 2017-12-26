@@ -99,26 +99,37 @@ class Comment(models.Model):
     concert_id = models.ForeignKey(Concert, related_name = 'comments', on_delete = models.CASCADE, null = True)
     content = models.CharField(max_length = 600, default = "")
 
+class UserReport(models.Model):
+    '''
+        Reports to ban users that conduct abusive behavior
+    '''
+    user_report_id = models.AutoField(primary_key=True)
+    reporter = models.ForeignKey(RegisteredUser, related_name = 'sent_user_reports', on_delete = models.CASCADE, null=True)
+    reported = models.ForeignKey(RegisteredUser, related_name = 'received_user_reports', on_delete = models.CASCADE, null=True)
+    reason = models.CharField(max_length=250) # reason for reporting the user
+    class Meta:
+        unique_together=("reporter", "reported")
 
-class Report(models.Model):
+class ConcertReport(models.Model):
     '''
+        Reports to correct wrong concert information
     '''
-    report_id = models.AutoField(primary_key=True)
-    reporter = models.ForeignKey(RegisteredUser, related_name = 'reported_concerts', on_delete = models.DO_NOTHING)
-    content = models.CharField(max_length=200) #<---------------------------------------------------------------- NEED TO HAVE A STRUCTURE FOR REPORT
-
-
-class Concert_Report(Report):
-    '''
-    extends from Report class.
-    '''
-    report_type = models.PositiveSmallIntegerField()
-    # this number indicates the type of the concert report.
-    # 0: date & time
-    # 1: artist
-    # 2: location
-    # 3: venue
+    concert_report_id = models.AutoField(primary_key=True)
+    reporter = models.ForeignKey(RegisteredUser, related_name = 'concert_reports', on_delete = models.CASCADE)
+    REPORT_TYPES = (
+        ("ARTIST","artist"),
+        ("DATE","date"),
+        ("DESCRIPTION","description"),
+        ("LOCATION","location"),
+        ("TAG","tag"),
+        ("MIN_PRICE","min_price"),
+        ("MAX_PRICE","max_price"),
+        ("SELLER_URL","seller_url"),
+        ("IMAGE","image"),
+    )
+    report_type = models.CharField(choices=REPORT_TYPES, max_length=20, null=True)
     concert = models.ForeignKey(Concert, related_name = 'reports',on_delete = models.CASCADE)
+    suggestion = models.CharField(max_length=1000)  # the suggestion as an alternative to the reported information.
 
 class Rating(models.Model):
     '''

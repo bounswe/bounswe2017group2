@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist
-from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
+from lfc_backend.models import RegisteredUser, Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment,  Image, Artist
+from lfc_backend.serializers import ConcertSerializer, LocationSerializer, UserReportSerializer, ConcertReportSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
 from django.views.generic import FormView, DetailView, ListView, View
 from django.urls import reverse
 from django.http import HttpResponse
@@ -132,6 +132,24 @@ def edit_profile(request):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def search_users(request):
+    '''
+    searches users considering their username, first_name, last_name, spotify_display_name
+    '''
+    query = request.GET.get('query')
+    try:
+        users = RegisteredUser.objects.filter(
+                                            Q(username__contains=query)|
+                                            Q(first_name__contains=query)|
+                                            Q(last_name__contains=query)|
+                                            Q(spotify_display_name__contains=query)
+                                            )
+        serializer = RegisteredUserSerializer(users,many=True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    except:
+        traceback.print_exc()
+        return Response(status = status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def follow_user(request,pk):
@@ -885,13 +903,13 @@ def get_tags(request, search_str):
     tags = []
     for i in range(lenght):
         if 'description' in json_response[i]:
-            if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)): # we might remove this filter
-                value   = json_response[i]['label']
-                context = json_response[i]['description']
-                uri     = json_response[i]['concepturi']
-                t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
-                print(t)
-                tags.append(json.loads(t))
+            #if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)): # we might remove this filter
+            value   = json_response[i]['label']
+            context = json_response[i]['description']
+            uri     = json_response[i]['concepturi']
+            t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
+            print(t)
+            tags.append(json.loads(t))
 
     return Response(tags, status.HTTP_200_OK)
 
@@ -1034,3 +1052,35 @@ def annotation_detail(request, concert_id, pk):
         except ObjectDoesNotExist:
             return Response(status = status.HTTP_404_NOT_FOUND)
         # Do something with annotation
+
+@api_view(['POST','PUT'])
+def create_or_edit_user_report(request,reported_user_id):
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        reported_user = RegisteredUser.objects.get(pk=reported_user_id)
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    try:
+        user_report = reported_user.received_user_reports.get(reporter = user.pk)
+        if request.method == 'POST':
+            return Response({'error':'You have already reported this user.'},status = status.HTTP_404_NOT_FOUND)
+        elif request.method == 'PUT':
+            try:
+                serializer = UserReportSerializer(user_report, data = request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                return Response(serializer.data, status = status.HTTP_200_OK)
+            except:
+                return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    except:
+        serializer = UserReportSerializer(data=request.data)
+        if serializer.is_valid():
+            user_report = serializer.save()
+            user.sent_user_reports.add(user_report)
+            reported_user.received_user_reports.add(user_report)
+            return Response(serializer.data,status = status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)

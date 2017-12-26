@@ -1,25 +1,39 @@
 from rest_framework import serializers
-from lfc_backend.models import RegisteredUser,Concert, Tag, Report, Location, Rating, Comment, Image, Artist
+from lfc_backend.models import RegisteredUser,Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment, Image, Artist
 from lfc_backend.models import Annotation, AnnotationBody, AnnotationTarget, Selector
 
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 
-
 class FollowedFollowingUserSerializer(serializers.ModelSerializer):
     class Meta:
         model=RegisteredUser
         fields = ('id','username','email','first_name','last_name','birth_date','image')
 
+class UserReportSerializer(serializers.ModelSerializer):
+    reporter = serializers.PrimaryKeyRelatedField(read_only=True)
+    reported = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = UserReport
+        fields = ("reporter",
+          "reported",
+          "reason")
+    def update(self, instance, validated_data):
+        instance.reason = validated_data.get('reason',instance.reason)
+        instance.save()
+        return instance
+
 class RegisteredUserSerializer(serializers.ModelSerializer):
+    sent_user_reports = UserReportSerializer(many=True, read_only=True)
+    received_user_reports = UserReportSerializer(many=True, read_only=True)
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     concerts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     followers = FollowedFollowingUserSerializer(many=True, read_only=True)
     following = FollowedFollowingUserSerializer(many=True, read_only=True)
     class Meta:
         model=RegisteredUser
-        fields = ('id','username','email','password','first_name','last_name','spotify_display_name','birth_date','date_joined','is_active','image','comments','concerts','followers','following')
+        fields = ('id','username','email','password','first_name','last_name','spotify_display_name','birth_date','date_joined','is_active','image','comments','concerts','followers','following', 'sent_user_reports', 'received_user_reports')
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password']) # hash password
         registered_user = RegisteredUser.objects.create(**validated_data)
@@ -87,9 +101,10 @@ class ConcertSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     ratings = RatingSerializer(many=True, read_only=True)
     attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    concert_reports = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
-        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings', 'image', 'seller_url')
+        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings', 'image', 'seller_url', 'concert_reports')
         # location should be retrieved from Google API
         # tags should be retrieved from a 3rd party semantic tag repository such as; Wikidata.
 
@@ -118,13 +133,23 @@ class ConcertSerializer(serializers.ModelSerializer):
         #needs implementing for updating tags. Note 3
         #needs implementing for updating location. Also need the outcome of Google Maps API
 
+class ConcertReportSerializer(serializers.ModelSerializer):
+    reporter = RegisteredUserSerializer(read_only=True)
+    concert = ConcertSerializer(read_only=True)
+
+    class Meta:
+        model = ConcertReport
+        fields = ("reporter",
+          "concert",
+          "report_type",
+          "suggestion")
+
 class SelectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Selector
         fields = ("type",
                   "conformsTo",
                   "value")
-
 # ADD THESE
 # class AnnotationTargetSerializer(serializers.ModelSerializer):
 # class AnnotationBodySerializer(serializers.ModelSerializer):
