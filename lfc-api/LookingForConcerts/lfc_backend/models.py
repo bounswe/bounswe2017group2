@@ -99,26 +99,37 @@ class Comment(models.Model):
     concert_id = models.ForeignKey(Concert, related_name = 'comments', on_delete = models.CASCADE, null = True)
     content = models.CharField(max_length = 600, default = "")
 
+class UserReport(models.Model):
+    '''
+        Reports to ban users that conduct abusive behavior
+    '''
+    user_report_id = models.AutoField(primary_key=True)
+    reporter = models.ForeignKey(RegisteredUser, related_name = 'sent_user_reports', on_delete = models.CASCADE, null=True)
+    reported = models.ForeignKey(RegisteredUser, related_name = 'received_user_reports', on_delete = models.CASCADE, null=True)
+    reason = models.CharField(max_length=250) # reason for reporting the user
+    class Meta:
+        unique_together=("reporter", "reported")
 
-class Report(models.Model):
+class ConcertReport(models.Model):
     '''
+        Reports to correct wrong concert information
     '''
-    report_id = models.AutoField(primary_key=True)
-    reporter = models.ForeignKey(RegisteredUser, related_name = 'reported_concerts', on_delete = models.DO_NOTHING)
-    content = models.CharField(max_length=200) #<---------------------------------------------------------------- NEED TO HAVE A STRUCTURE FOR REPORT
-
-
-class Concert_Report(Report):
-    '''
-    extends from Report class.
-    '''
-    report_type = models.PositiveSmallIntegerField()
-    # this number indicates the type of the concert report.
-    # 0: date & time
-    # 1: artist
-    # 2: location
-    # 3: venue
+    concert_report_id = models.AutoField(primary_key=True)
+    reporter = models.ForeignKey(RegisteredUser, related_name = 'concert_reports', on_delete = models.CASCADE)
+    REPORT_TYPES = (
+        ("ARTIST","artist"),
+        ("DATE","date"),
+        ("DESCRIPTION","description"),
+        ("LOCATION","location"),
+        ("TAG","tag"),
+        ("MIN_PRICE","min_price"),
+        ("MAX_PRICE","max_price"),
+        ("SELLER_URL","seller_url"),
+        ("IMAGE","image"),
+    )
+    report_type = models.CharField(choices=REPORT_TYPES, max_length=20, null=True)
     concert = models.ForeignKey(Concert, related_name = 'reports',on_delete = models.CASCADE)
+    suggestion = models.CharField(max_length=1000)  # the suggestion as an alternative to the reported information.
 
 class Rating(models.Model):
     '''
@@ -134,3 +145,123 @@ class Rating(models.Model):
 
     class Meta: # a user can rate a concert only once.
         unique_together = ("owner", "concert")
+
+# W3C Standard Annotation model: https://www.w3.org/TR/annotation-model/
+# Each Annotation is connected to a Concert object and has a RegisteredUser creator
+class Annotation(models.Model):
+
+    MOTIVATIONS = (
+    ('ASSESSING', 'assessing'),
+    ('BOOKMARKING', 'bookmarking'),
+    ('CLASSIFYING', 'classifying'),
+    ('COMMENTING', 'commenting'),
+    ('DESCRIBING', 'describing'),
+    ('EDITING', 'editing'),
+    ('HIGHLIGHTING', 'highlighting'),
+    ('IDENTIFYING', 'identifying'),
+    ('LINKING', 'linking'),
+    ('MODERATING', 'moderating'),
+    ('QUESTIONING', 'questioning'),
+    ('REPLYING', 'replying'),
+    ('TAGGING', 'tagging'),
+    )
+    # we do not use rights field
+
+    # id created automatically
+    annotation_id = ("http://" + settings.HOST + ":" + settings.FRONTEND_PORT + "/annotations/{}").format(id)
+    concert = models.ForeignKey(Concert, related_name="annotations", on_delete=models.CASCADE, blank=True)
+    context = models.URLField(null=False, default="http://www.w3.org/ns/anno.jsonld")
+    type = models.CharField(max_length=255, null=False, default="Annotation")
+    motivation = models.CharField(choices=MOTIVATIONS, max_length=20, null=True) # the reason for creating this annotation
+    creator = models.ForeignKey(RegisteredUser, related_name="annotations", on_delete=models.CASCADE, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    upvotes = models.IntegerField(null=False, default=0)
+
+class AnnotationBodyAndTargetCommon(models.Model):
+    TYPES = (
+    ('TEXT', 'text'),
+    ('VIDEO', 'video'),
+    ('AUDIO', 'audio'),
+    ('IMAGE', 'image'),
+    )
+
+    MIMES = (
+    ('TEXT', (
+            ('PLAINTEXT', 'text/plain'),
+        )
+    ),
+    ('VIDEO', (
+            ('MPEGVIDEO', 'video/mpeg'),
+            ('AVIVIDEO', 'video/avi'),
+        )
+    ),
+    ('IMAGE', (
+            ('PNGIMAGE', 'image/png'),
+            ('BMPIMAGE', 'image/bmp'),
+            ('GIFIMAGE', 'image/gif'),
+            ('JPEGIMAGE', 'image/jpeg'),
+        )
+    ),
+    ('AUDIO', (
+            ('MIDIAUDIO', 'audio/midi'),
+            ('MPEGAUDIO', 'audio/mpeg'),
+        )
+    ),
+    ('unknown', 'Unknown'),
+    )
+
+    type = models.CharField(choices=TYPES, max_length=10)
+    format = models.CharField(choices=MIMES, max_length=15)
+
+    class Meta:
+        abstract = True
+
+# the body for our Annotation class
+class AnnotationBody(AnnotationBodyAndTargetCommon):
+    PURPOSES = (
+        ('ASSESSING', 'assessing'),
+        ('BOOKMARKING', 'bookmarking'),
+        ('CLASSIFYING', 'classifying'),
+        ('COMMENTING', 'commenting'),
+        ('DESCRIBING', 'describing'),
+        ('EDITING', 'editing'),
+        ('HIGHLIGHTING', 'highlighting'),
+        ('IDENTIFYING', 'identifying'),
+        ('LINKING', 'linking'),
+        ('MODERATING', 'moderating'),
+        ('QUESTIONING', 'questioning'),
+        ('REPLYING', 'replying'),
+        ('TAGGING', 'tagging'),
+    )
+    annotation = models.ForeignKey(Annotation, related_name="body", on_delete=models.CASCADE)
+    purpose = models.CharField(choices=PURPOSES, max_length=20, null=True)
+    value = models.CharField(max_length=255, null=False)
+
+# the target for our Annotation class
+class AnnotationTarget(AnnotationBodyAndTargetCommon):
+    annotation = models.ForeignKey(Annotation, related_name="target", on_delete=models.CASCADE)
+    target_id = models.CharField(max_length=255, null=False, default=("http://" + settings.HOST + ":" + settings.FRONTEND_PORT + "/concert/null/"))
+
+# W3C Specification for selectors
+# 4.2 Selectors
+# Many Annotations refer to part of a resource, rather than all of it, as the Target.
+# We call that part of the resource a Segment (of Interest).
+# A Selector is used to describe how to determine the Segment from within the Source resource.
+# The nature of the Selector will be dependent on the type of resource, as the methods
+# to describe Segments from various media-types will differ.
+# Multiple Selectors can be given to describe the same Segment in different ways
+# in order to maximize the chances that it will be discoverable later, and that
+# the consuming user agent will be able to use at least one of the Selectors.
+
+# Fragment Selector
+class Selector(models.Model):
+    SPECIFICATIONS = (
+        ('HTML', 'http://tools.ietf.org/rfc/rfc3236'),# HTML
+        ('TEXT', 'http://tools.ietf.org/rfc/rfc5147'),# Plain Text
+        ('MEDIA', 'http://www.w3.org/TR/media-frags/'), # Media
+        ('IMAGE', 'http://www.w3.org/TR/SVG/'),# SVG
+    )
+    target = models.ForeignKey(AnnotationTarget, related_name="selector", on_delete=models.CASCADE)
+    type = models.CharField(default="FragmentSelector", max_length=25, null=False)
+    conformsTo = models.CharField(choices=SPECIFICATIONS, max_length=50)
+    value = models.CharField(max_length=255, null=False)
