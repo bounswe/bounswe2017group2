@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-from lfc_backend.models import RegisteredUser, Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment,  Image, Artist
-from lfc_backend.serializers import ConcertSerializer, LocationSerializer, UserReportSerializer, ConcertReportSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
+from lfc_backend.models import RegisteredUser, Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment,  Image, Artist, Annotation
+from lfc_backend.serializers import ConcertSerializer, LocationSerializer, UserReportSerializer, ConcertReportSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer, AnnotationSerializer
 from django.views.generic import FormView, DetailView, ListView, View
 from django.urls import reverse
 from django.http import HttpResponse
@@ -1025,33 +1025,50 @@ def get_recommendation_by_followed_users(request):
 
     return Response(serializer.data, status = status.HTTP_200_OK)
 
+
+'''
+ANNOTATION FUNCTIONS
+'''
 @api_view(['POST'])
-def create_annotation(request):
+def create_annotation(request, concert_id):
     if not request.user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
-    print("Creating annotation...")
+    serializer = AnnotationSerializer(data = request.data)
+    if serializer.is_valid():
+        annotation = serializer.save()
+        request.user.annotations.add(annotation)
+        serializer = AnnotationSerializer(annotation)
+        return Response(serializer.data, status = status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def list_annotations(request, concert_id):
-        try:
-            concert = Concert.objects.get(pk=concert_id)
-        except ObjectDoesNotExist:
-            return Response(status = status.HTTP_404_NOT_FOUND)
-        annotations = concert.annotations.all()
-        serializer = AnnotationSerializer(annotations, many=True)
-        return Response(serializer.data)
+def list_annotations(request):
+    url = request.GET
+    annotations = Annotation.objects.all()
+    annotations = annotations.filter(Q(target__target_id__contains=request.GET.get('url')))
+    serializer = AnnotationSerializer(annotations, many=True)
+    return Response(serializer.data, status.HTTP_200_OK)
 
-@api_view(['POST'])
-def annotation_detail(request, concert_id, pk):
-        if not request.user.is_authenticated:
-            return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
-        print("Modifying annotation...")
-        try:
-            concert = Concert.objects.get(pk=concert_id)
-            annotation = concert.objects.get(pk=pk)
-        except ObjectDoesNotExist:
-            return Response(status = status.HTTP_404_NOT_FOUND)
-        # Do something with annotation
+@api_view(['GET'])
+def all_annotations(request):
+    annotations = Annotation.objects.all()
+    serializer = AnnotationSerializer(annotations, many=True)
+    return Response(serializer.data, status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+def delete_annotation(request, pk):
+    Annotation.objects.delete(pk = pk)
+    return Response(status = status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+def get_annotation(request, pk):
+    try:
+        annotation = Annotation.objects.get(pk = pk)
+        serializer = AnnotationSerializer(annotation)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response({'Error':'Annotation does not exist'}, status = status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST','PUT'])
 def create_or_edit_user_report(request,reported_user_id):

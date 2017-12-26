@@ -56,7 +56,7 @@ class RegisteredUserSerializer(serializers.ModelSerializer):
         return instance
 
 class CommentSerializer(serializers.ModelSerializer):
-    owner = RegisteredUserSerializer(read_only=True)
+    owner = FollowedFollowingUserSerializer(read_only=True)
     class Meta:
         model = Comment
         fields = ('content','owner',)
@@ -101,10 +101,10 @@ class ConcertSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     ratings = RatingSerializer(many=True, read_only=True)
     attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    concert_reports = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    reports = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
-        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings', 'image', 'seller_url', 'concert_reports')
+        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings', 'image', 'seller_url', 'reports')
         # location should be retrieved from Google API
         # tags should be retrieved from a 3rd party semantic tag repository such as; Wikidata.
 
@@ -154,6 +154,69 @@ class SelectorSerializer(serializers.ModelSerializer):
 # class AnnotationTargetSerializer(serializers.ModelSerializer):
 # class AnnotationBodySerializer(serializers.ModelSerializer):
 # class AnnotationSerializer(serializers.ModelSerializer):
+
+class AnnotationBodySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnnotationBody
+        fields =('type',
+                 'format',
+                 'purpose',
+                 'value'
+                 )
+
+class AnnotationTargetSerializer(serializers.ModelSerializer):
+    selector = SelectorSerializer(many=True)
+    class Meta:
+        model = AnnotationTarget
+        fields = ('type',
+                  'format',
+                  'target_id',
+                  'selector')
+    
+    def create(self, validated_data):
+        selector_datas = validated_data.pop("selector")
+        target = AnnotationTarget.objects.create(**validated_data)
+        for selector_data in selector_datas:
+            Selector.objects.create(target=target, **selector_data)
+        return target
+
+
+class AnnotationSerializer(serializers.ModelSerializer):
+    body = AnnotationBodySerializer(many=True)
+    target = AnnotationTargetSerializer(many=True)
+    creator = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Annotation
+        fields = ('id',
+                  'annotation_id',
+                  'context',
+                  'creator',
+                  'motivation', #Search it
+                  'created',
+                  'body',
+                  'target')
+    
+    def create(self, validated_data):
+        #Take body and target data to create new objects in neccessary tables
+        body_datas = validated_data.pop('body')
+        target_datas = validated_data.pop('target')
+        #create annotation
+        annotation = Annotation.objects.create(**validated_data)
+        #find target objects if not available create
+        for target_data in target_datas:
+            targetSerializer = AnnotationTargetSerializer(data = target_data)
+            if targetSerializer.is_valid():
+                target_object = targetSerializer.save()
+            
+            #add each object to annotation's target field
+            annotation.target.add(target_object)
+        #create body objects
+        for body_data in body_datas:
+            body_object = AnnotationBody.objects.create(**body_data)
+            #add each body object to annotation's body field
+            annotation.body.add(body_object)
+        return annotation
 
 '''
 NOTES:
