@@ -6,6 +6,9 @@
     "permissions": [
         "contextMenus"
     ],
+    "icons": {
+        "16": "l4clogo1.png"
+    },
     "background": {
         "scripts": ["background.js"]
     },

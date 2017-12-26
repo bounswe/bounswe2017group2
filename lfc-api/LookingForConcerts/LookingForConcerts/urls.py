@@ -57,6 +57,7 @@ urlpatterns = [
     url(r'^users/$',views.list_users), # lists all the users registered to our app
     url(r'^user/me/$', views.get_user_info), # returns the logged in user object; requires authorization
     url(r'^user/edit_profile/$', views.edit_profile), # updates the information of the user
+    url(r'^user/(?P<reported_user_id>[0-9]+)/report/$', views.create_or_edit_user_report), # creates or edits a user report for the user with the given pk
 
     # SPOTIFY
     url(r'^spotify/redirect$', views.spotify_redirect, name='spotify_redirect'),
@@ -92,6 +93,9 @@ urlpatterns = [
     # RATING
     url(r'^concert/(?P<pk>[0-9]+)/rate/$', views.rate_concert), # adds a new rating by the logged in user to the concert specified by its primary key; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/average_ratings/$', views.get_average_ratings), # returns the average ratings for the concert specified by its primary key
+    # ANNOTATION
+    url(r"^concert/(?P<concert_id>\d+)/annotations$", views.list_annotations),
+    url(r"^concert/(?P<concert_id>\d+)/annotations/(?P<pk>\d+)$", views.annotation_detail),
 
     # LOCATION
     url(r'^locations/$',views.list_locations), # lists all locations in DB
@@ -100,6 +104,7 @@ urlpatterns = [
     url(r'^tags/(?P<search_str>[\w\s*\-]+)/$',views.get_tags),
     # IMAGE
     url(r'^upload_image/', views.upload_image),
+
 
     # REPORT
     #url('^', include('django.contrib.auth.urls'))
