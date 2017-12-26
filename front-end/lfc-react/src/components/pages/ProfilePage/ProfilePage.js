@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import "./design.css";
 import decode from "jwt-decode";
+import { Modal, Button } from "semantic-ui-react";
 
 let theToken = localStorage.getItem("lfcJWT");
 let userID;
@@ -345,7 +346,7 @@ class ProfilePage extends React.Component {
   render() {
 
     let editFollowButton;
-    let spotifyButton
+    let spotifyReportButton
     let followedUsersList = this.state.user.following.map(usr => (
       <MiniUserDetail
         user={usr}
@@ -364,20 +365,33 @@ class ProfilePage extends React.Component {
           </Link>
         );
         if (!spotifyProfile) {
-          spotifyButton = (
+          spotifyReportButton = (
             <button className="ui icon right floated button" onClick={() => this.handleSpotifyConnect()}>
               <i className="spotify icon"></i>Connect
           </button>
           )
         }
         else {
-          spotifyButton = (
+          spotifyReportButton = (
             <button className="ui icon right floated button" onClick={() => this.handleSpotifyDisconnect()}>
               <i className="spotify icon"></i>Disconnect
           </button>
           )
         }
       } else {
+        spotifyReportButton = (
+          <Modal trigger={<Button>Report</Button>}>
+            <Modal.Header>Report User</Modal.Header>
+            <Modal.Content>
+              <div class="ui form">
+                <div class="field">
+                  <textarea placeholder="Write a reason..."></textarea>
+                </div>
+                <button class="ui button">Report</button>
+              </div>
+            </Modal.Content>
+          </Modal>
+        );
         if (
           !this.state.user.followers.find(function (user) {
             return user.id === userID;
@@ -422,7 +436,7 @@ class ProfilePage extends React.Component {
 
     let spotifyData;
 
-    if (spotifyProfile && userID==profileID) {
+    if (spotifyProfile && userID == profileID) {
       spotifyData = (
         <div className="item userData">
           <b>spotify name</b> &nbsp; {spotifyProfile.display_name}
@@ -452,7 +466,7 @@ class ProfilePage extends React.Component {
               </div>
             </div>
           </div>
-          <div className="two wide column">{spotifyButton}</div>
+          <div className="two wide column">{spotifyReportButton}</div>
           <div className="two wide column">{editFollowButton}</div>
         </div>
         <div className="row">
