@@ -1030,7 +1030,7 @@ def get_recommendation_by_followed_users(request):
 ANNOTATION FUNCTIONS
 '''
 @api_view(['POST'])
-def create_annotation(request, concert_id):
+def create_annotation(request):
     if not request.user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
     serializer = AnnotationSerializer(data = request.data)
