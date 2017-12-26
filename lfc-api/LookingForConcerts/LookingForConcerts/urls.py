@@ -94,9 +94,12 @@ urlpatterns = [
     url(r'^concert/(?P<pk>[0-9]+)/rate/$', views.rate_concert), # adds a new rating by the logged in user to the concert specified by its primary key; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/average_ratings/$', views.get_average_ratings), # returns the average ratings for the concert specified by its primary key
     # ANNOTATION
-    url(r"^concert/(?P<concert_id>\d+)/annotations$", views.list_annotations),
-    url(r"^concert/(?P<concert_id>\d+)/annotations/(?P<pk>\d+)$", views.annotation_detail),
-
+    url(r"^/concerts_annotations/$", views.list_annotations), #returns all annotations about a concert
+    #url(r"^concert/(?P<concert_id>\d+)/annotations/(?P<pk>\d+)$", views.annotation_detail),
+    url(r"^concert/(?P<concert_id>\d+)/new_annotation/$", views.create_annotation), #url for creating new annotation for the concert
+    url(r"^annotation/(?P<pk>\d+)/$", views.get_annotation), #returns a specific annotation
+    url(r"^annotation/(?P<pk>\d+)/$", views.delete_annotation), #deletes the annotation with pk
+    url(r"^annotations/$", views.all_annotations),#returns all annotations
     # LOCATION
     url(r'^locations/$',views.list_locations), # lists all locations in DB
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
