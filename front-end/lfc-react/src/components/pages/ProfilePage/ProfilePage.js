@@ -365,14 +365,14 @@ class ProfilePage extends React.Component {
         );
         if (!spotifyProfile) {
           spotifyButton = (
-            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyConnect()}>
+            <button className="ui icon right floated button" onClick={() => this.handleSpotifyConnect()}>
               <i className="spotify icon"></i>Connect
           </button>
           )
         }
         else {
           spotifyButton = (
-            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyDisconnect()}>
+            <button className="ui icon right floated button" onClick={() => this.handleSpotifyDisconnect()}>
               <i className="spotify icon"></i>Disconnect
           </button>
           )
