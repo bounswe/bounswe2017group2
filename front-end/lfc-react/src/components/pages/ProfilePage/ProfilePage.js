@@ -80,7 +80,7 @@ class MiniConcertDetail extends React.Component {
   }
 }
 
-class MiniUserDetail extends React.Component {
+export class MiniUserDetail extends React.Component {
   constructor(props) {
     super(props);
     this.handleRemove = this.handleRemove.bind(this);
