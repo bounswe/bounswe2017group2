@@ -14,11 +14,13 @@ import {
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import { Button, Rating, Label } from "semantic-ui-react";
+import { Button, Rating, Label, Popup } from "semantic-ui-react";
 import "./design.css";
 import decode from "jwt-decode";
 import setAuthorizationHeader from "../../../utils/setAuthorizationHeader";
 import MiniUserDetail from "../ProfilePage/ProfilePage";
+import Segment from "semantic-ui-react/dist/commonjs/elements/Segment/Segment";
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon";
 
 //default from 'semantic-ui-react/dist/commonjs/collections/Table/TableRow';
 
@@ -288,27 +290,27 @@ class Concert extends React.PureComponent {
             visibleMessage = "Attending";
             invisibleMessage = "Not Attending";
         } else {
-            if (averageRatings) {
+            if (averageRatings && averageRatings.music_quality) {
                 ratingsHeaders = (
                     <div class="ui grid">
                         <div class="four wide column center ratingHeaders">
                             <div>
-                                <h5>Music Quality: {averageRatings.music_quality}</h5>
+                                <h5>Music Quality: {Number(averageRatings.music_quality).toFixed(1)}</h5>
                             </div>
                         </div>
                         <div class="four wide column center ratingHeaders">
                             <div>
-                                <h5>Stage Show: {averageRatings.stage_show}</h5>
+                                <h5>Stage Show: {Number(averageRatings.stage_show).toFixed(1)}</h5>
                             </div>
                         </div>
                         <div class="four wide column center ratingHeaders">
                             <div>
-                                <h5>Artist Costumes: {averageRatings.artist_costumes}</h5>
+                                <h5>Artist Costumes: {Number(averageRatings.artist_costumes).toFixed(1)}</h5>
                             </div>
                         </div>
                         <div class="four wide column center ratingHeaders">
                             <div>
-                                <h5>Concert Atmosphere: {averageRatings.concert_atmosphere}</h5>
+                                <h5>Concert Atmosphere: {Number(averageRatings.concert_atmosphere).toFixed(1)}</h5>
                             </div>
                         </div>
                     </div>
@@ -485,109 +487,136 @@ class Concert extends React.PureComponent {
         return (
             <div className="ui grid raised segment">
                 <div className="row">
-                    <div className="fourteen wide column">
-                        <div className="ui red ribbon label" id="concertNameRibbon">
-                            <h1>{this.state.concert.name}</h1>
-                        </div>
-                    </div>
-                    <div className="two wide column">
-                            <a href={"http://" + this.state.concert.seller_url}>
-                                <button className="ui right floated  button">Buy</button>
-                            </a>
-                        </div>
-                    </div>
-                    <div className="row tagsRow">
-                        <div className="sixteen wide column">
-                            {this.state.concert.tags.map(tag => (
-                                <div className="ui label">
-                                    <i class="hashtag icon"></i>
-                                    {tag.value}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="ui list sixteen wide column">
-                            <div className="item concertData">
-                                <b>Artist: </b>
-                                {this.state.concert.artist.name}
-                            </div>
-                            <div className="item concertData">
-                                <b>Date: </b>
-                                {this.state.concert.date_time}
-                            </div>
-                            <div className="item concertData">{price}</div>
-                            <div className="item concertData">
-                                <b>Location: </b>
-                                {this.state.concert.location.venue}
+                    <div className="ui grid twelve wide column">
+                        <div className="row">
+                            <div className="fourteen wide column">
+                                <Label as="a" ribbon id="concertNameRibbon">
+                                    <h1>{this.state.concert.name}</h1>
+                                </Label>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="row">
-                        <img
-                            className="ui image five wide column"
-                            height="300px"
-                            src={this.state.concert.artist.images[0].url}
-                        />
-                        <div className="eleven wide column">
-                            <ConcertLocationMap isMarkerShown={true} />
-                        </div>
-                    </div>
-
-                    <div className="row">
-                        <div className="sixteen wide column">
-                            <p>{this.state.concert.description}</p>
-
-                            {ratingsHeaders}
-                            {rateButtons}
-
-                            {followConcertButton}
-                        </div>
-                    </div>
-
-                    <div className="row">
-                        <div className="sixteen wide column">
-                            <div className="ui comments">
-                                <h3 className="ui dividing header">Comments</h3>
-                                {this.state.concert.comments.map(comment => (
-                                    <div className="ui comment">
-                                        <div className="content">
-                                            <a className="author">
-                                                <Link className="Link" to={"/user/" + comment.owner.id}>
-                                                    {comment.owner.first_name} {comment.owner.last_name}
-                                                </Link>
-                                            </a>
-                                            <div className="text">{comment.content}</div>
-                                            <div className="actions">
-                                                <a>
-                                                    <i className="arrow up icon" />
-                                                </a>
-                                                <a>
-                                                    <i className="arrow down icon" />
-                                                </a>
-                                            </div>
-                                        </div>
+                        <div className="row tagsRow">
+                            <div className="sixteen wide column">
+                                {this.state.concert.tags.map(tag => (
+                                    <div className="ui label">
+                                        <i class="hashtag icon"></i>
+                                        {tag.value}
                                     </div>
                                 ))}
-
-                                {commentBox}
                             </div>
+                        </div>
+                        <div className="row">
+                            <div className="ui list sixteen wide column">
+                                <div className="item concertData">
+                                    <b>Artist: </b>
+                                    {this.state.concert.artist.name}
+                                </div>
+                                <div className="item concertData">
+                                    <b>Date: </b>
+                                    {this.state.concert.date_time}
+                                </div>
+                                <div className="item concertData">{price}
+                                </div>
+                                <div className="item concertData">
+                                    <b>Location: </b>
+                                    {this.state.concert.location.venue}
+                                </div>
+                                <a href={"http://" + this.state.concert.seller_url}>
+                                    <Button className="ui small button">Get ticket</Button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style={{ maxHeight: "300px", width: "280px", paddingTop: "20px" }}>
+                        {this.state.concert.attendees.length > 0 && (
+                            <div>
+                                <h4 className="center">
+                                    {this.state.concert.attendees.length} L4C user
+                                    {this.state.concert.attendees.length > 1 && ("s ")}
+                                    will attend this concert
+                                </h4>
+                                <div className="ui grid" style={{maxHeight: "253px", overflowY: "auto"}}>
+                                    <div className="sixteen wide column" style={{ padding: "2px" }}>
+                                        {this.state.concert.attendees.map(attendee => (
+                                            <div className="row" style={{ marginTop: "3px" }}>
+                                                <Segment>
+                                                    <Link className="Link" to={"user/" + attendee.id}>
+                                                        <Icon name="user circle" />{attendee.username}
+                                                    </Link>
+                                                </Segment>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="row">
+                    <img
+                        className="ui image five wide column"
+                        height="300px"
+                        src={this.state.concert.artist.images[0].url}
+                    />
+                    <div className="eleven wide column">
+                        <ConcertLocationMap isMarkerShown={true} />
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="sixteen wide column">
+                        <p>{this.state.concert.description}</p>
+
+                        {ratingsHeaders}
+                        {rateButtons}
+
+                        {followConcertButton}
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="sixteen wide column">
+                        <div className="ui comments">
+                            <h3 className="ui dividing header">Comments</h3>
+                            {this.state.concert.comments.map(comment => (
+                                <div className="ui comment">
+                                    <div className="content">
+                                        <a className="author">
+                                            <Link className="Link" to={"/user/" + comment.owner.id}>
+                                                {comment.owner.first_name} {comment.owner.last_name}
+                                            </Link>
+                                        </a>
+                                        <div className="text">{comment.content}</div>
+                                        <div className="actions">
+                                            <a>
+                                                <i className="arrow up icon" />
+                                            </a>
+                                            <a>
+                                                <i className="arrow down icon" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {commentBox}
                         </div>
                     </div>
                 </div>
-                );
+            </div >
+        );
     }
 }
 
 Concert.propTypes = {
-                    isAuthenticated: PropTypes.bool.isRequired,
+    isAuthenticated: PropTypes.bool.isRequired,
     userID: PropTypes.string
 };
 
 function mapStateToProps(state) {
     return {
-                    isAuthenticated: !!state.user.access_token,
+        isAuthenticated: !!state.user.access_token,
         token: state.user.access_token,
         userID: state.user.username
     };
