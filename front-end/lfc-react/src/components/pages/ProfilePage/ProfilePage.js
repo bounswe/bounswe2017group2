@@ -198,7 +198,7 @@ class ProfilePage extends React.Component {
   handleSpotifyDisconnect() {
     axios
       .post(
-      "http://34.210.127.92:8000/user/spotify/disconnect",
+      "http://34.210.127.92:8000/user/spotify/disconnect/",
       {}
       )
       .then(
@@ -262,7 +262,7 @@ class ProfilePage extends React.Component {
   }
 
   componentWillMount() {
-    axios.get("http://34.210.127.92:8000/user/spotify/profile").then(
+    axios.get("http://34.210.127.92:8000/user/spotify/profile/").then(
       response => {
         spotifyProfile = response.data;
       },
@@ -287,7 +287,7 @@ class ProfilePage extends React.Component {
     if (params.code) {
       axios
         .post(
-        "http://34.210.127.92:8000/user/spotify/connect",
+        "http://34.210.127.92:8000/user/spotify/connect/",
         {
           "code": params.code,
           "state": params.state,
