@@ -1,9 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 import { connect } from "react-redux";
+import { Label, Popup } from "semantic-ui-react";
+import { fetch } from "../../actions/concert";
+import { Link } from "react-router-dom";
 import { Image, Icon, Card } from "semantic-ui-react";
-import { fetch, search, fetchRecommended } from "../../actions/concert";
+import { search, fetchRecommended } from "../../actions/concert";
 import "./design.css";
 
 const ConcertItem = ({ concert }) => (
@@ -29,8 +31,36 @@ const ConcertItem = ({ concert }) => (
         <Icon name="calendar" /> {concert.date_time}
       </Card.Meta>
       <Card.Description>
-        Attendees: <Icon name="user" />
-        {concert.attendees.length}
+        <div>
+          {concert.attendees.length > 0 && (
+            <Popup
+              basic
+              trigger={<div>Attendees:<Icon name="user" /> {concert.attendees.length}</div>}
+              content={
+                <div style={{ maxHeight: "100px", overflowY: "auto" }} className="ui grid">
+                  <div className="sixteen wide column" style={{ padding: "2px" }}>
+                    {concert.attendees.map(attendee => (
+                      <div className="row" style={{ marginTop: "3px" }}>
+                        <Link to={"user/"+attendee.id}>
+                          <Label className="fluid">
+                            <Icon name="user circle" />{attendee.username}
+                          </Label>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              }
+              on="click"
+              style="backgo"
+              position="left bottom"
+            />
+          )}
+          {concert.attendees.length == 0 && (
+            <div>Attendees: <Icon name="user" /> 0</div>
+          )}
+        </div>
+
       </Card.Description>
     </Card.Content>
     <Card.Content extra>
