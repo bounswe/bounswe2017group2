@@ -80,7 +80,7 @@ class Concert(models.Model):
     # tags - implemented in tag --MANY TO MANY
     tags = models.ManyToManyField(Tag, related_name = 'concerts', blank=True)
     # comments - implemented in comment - ONE TO MANY
-    date_time = models.CharField(max_length=50 , null=True)
+    date_time = models.CharField(max_length=50)
     description =  models.CharField(max_length=2000, blank=True)
     price_min = models.IntegerField()
     price_max = models.IntegerField()
