@@ -9,7 +9,8 @@ import EditProfile from "./components/pages/EditProfile";
 import ConcertDetailPage from "./components/pages/ConcertDetailPage/ConcertDetailPage";
 import ProfilePage from "./components/pages/ProfilePage/ProfilePage";
 import SignupPage from "./components/pages/SignupPage";
-// import UserRoute from "./components/routes/UserRoute";
+import RecommendationPage from "./components/pages/RecommendationPage";
+import UserRoute from "./components/routes/UserRoute";
 import GuestRoute from "./components/routes/GuestRoute";
 import TopNavigation from "./components/navigation/TopNavigation";
 
@@ -23,7 +24,7 @@ const App = ({ location, isAuthenticated }) => (
     <Route location={location} path="/me/" exact component={ProfilePage} />
 	  <Route location={location} path="/EditProfile/" exact component={EditProfile} />
     <Route location={location} path="/home" exact component={DashboardPage} />
-
+    <UserRoute location={location} path="/recommended" exact component={RecommendationPage} />
 
     <GuestRoute location={location} path="/login" exact component={LoginPage} />
     <GuestRoute
