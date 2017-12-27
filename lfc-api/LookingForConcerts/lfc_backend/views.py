@@ -1031,12 +1031,11 @@ ANNOTATION FUNCTIONS
 '''
 @api_view(['POST'])
 def create_annotation(request):
-    if not request.user.is_authenticated:
-        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
     serializer = AnnotationSerializer(data = request.data)
     if serializer.is_valid():
         annotation = serializer.save()
-        request.user.annotations.add(annotation)
+        if(request.user.is_authenticated)
+            request.user.annotations.add(annotation)
         serializer = AnnotationSerializer(annotation)
         return Response(serializer.data, status = status.HTTP_201_CREATED)
     else:
