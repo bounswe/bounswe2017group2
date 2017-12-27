@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import "./design.css";
 import decode from "jwt-decode";
-import { Modal, Button } from "semantic-ui-react";
+import { Modal, Button, Popup } from "semantic-ui-react";
 
 let theToken = localStorage.getItem("lfcJWT");
 let userID;
@@ -167,7 +167,8 @@ class ProfilePage extends React.Component {
         concerts: [],
         date_joined: "",
         followers: [],
-        following: []
+        following: [],
+        received_user_reports: []
       },
       willAttend: [],
       attended: [],
@@ -180,6 +181,22 @@ class ProfilePage extends React.Component {
     this.handleSpotifyDisconnect = this.handleSpotifyDisconnect.bind(this);
     this.handleReportChange = this.handleReportChange.bind(this);
     this.handleReport = this.handleReport.bind(this);
+    this.handleDeleteReport = this.handleDeleteReport.bind(this);
+  }
+
+  handleDeleteReport(id) {
+    axios
+      .delete(
+      "http://34.210.127.92:8000/userreport/" + id + "/delete/",
+      )
+      .then(
+      response => {
+        window.location.reload();
+      },
+      error => {
+        console.log(error);
+      }
+      );
   }
 
   handleReportChange(event) {
@@ -377,7 +394,7 @@ class ProfilePage extends React.Component {
   render() {
 
     let editFollowButton;
-    let spotifyReportButton
+    let spotifyReportButton;
     let followedUsersList = this.state.user.following.map(usr => (
       <MiniUserDetail
         user={usr}
@@ -397,36 +414,60 @@ class ProfilePage extends React.Component {
         );
         if (!spotifyProfile) {
           spotifyReportButton = (
-            <button className="ui icon right floated button" onClick={() => this.handleSpotifyConnect()}>
+            <button className="ui icon button" onClick={() => this.handleSpotifyConnect()}>
               <i className="spotify icon"></i>Connect
           </button>
           )
         }
         else {
           spotifyReportButton = (
-            <button className="ui icon right floated button" onClick={() => this.handleSpotifyDisconnect()}>
+            <button className="ui icon button" onClick={() => this.handleSpotifyDisconnect()}>
               <i className="spotify icon"></i>Disconnect
           </button>
           )
         }
       } else {
-        spotifyReportButton = (
-          <Modal trigger={<Button>Report</Button>}>
-            <Modal.Header>Report User</Modal.Header>
-            <Modal.Content>
-              <div className="ui form">
-                <div className="field">
-                  <textarea
-                    placeholder="Write a reason..."
-                    value={this.state.reportText}
-                    onChange={this.handleReportChange}
-                  ></textarea>
+        var reported = false;
+        var ourReport;
+        for (var report of this.state.user.received_user_reports) {
+          if (report.reporter == userID) {
+            ourReport = report;
+            reported = true;
+            break;
+          }
+        }
+        if (reported) {
+          spotifyReportButton = (
+            <Popup
+              trigger={<button className="ui button" onClick={() => this.handleDeleteReport(report.user_report_id)}>Remove Report</button>}
+              content={
+                <div style={{ maxWidth: "300px" }}>
+                  {report.reason}
                 </div>
-                <button className="ui button" onClick={() => this.handleReport()}>Report</button>
-              </div>
-            </Modal.Content>
-          </Modal>
-        );
+              }
+              position="bottom center"
+            />
+          );
+        }
+        else {
+          spotifyReportButton = (
+            <Modal trigger={<Button>Report</Button>}>
+              <Modal.Header>Report User</Modal.Header>
+              <Modal.Content>
+                <div className="ui form">
+                  <div className="field">
+                    <textarea
+                      placeholder="Write a reason..."
+                      value={this.state.reportText}
+                      onChange={this.handleReportChange}
+                    ></textarea>
+                  </div>
+                  <button className="ui button" onClick={() => this.handleReport()}>Report</button>
+                </div>
+              </Modal.Content>
+            </Modal>
+          );
+        }
         if (
           !this.state.user.followers.find(function (user) {
             return user.id === userID;
@@ -486,7 +527,7 @@ class ProfilePage extends React.Component {
             height="130px"
             src={"http://34.210.127.92:8000" + this.state.user.image}
           />
-          <div className="ten wide column">
+          <div className="nine wide column">
             <div className="ui grid">
               <div className="row usersName">
                 {this.state.user.first_name + " " + this.state.user.last_name}
@@ -501,8 +542,7 @@ class ProfilePage extends React.Component {
               </div>
             </div>
           </div>
-          <div className="two wide column">{spotifyReportButton}</div>
-          <div className="two wide column">{editFollowButton}</div>
+          <div className="five wide column" style={{textAlign: "right"}}>{spotifyReportButton}{editFollowButton}</div>
         </div>
         <div className="row">
           <div className="ui top attached tabular menu">

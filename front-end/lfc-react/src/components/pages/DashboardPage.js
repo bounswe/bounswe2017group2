@@ -1,10 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Label, Popup } from "semantic-ui-react";
+import { Image, Label, Icon, Card, Popup } from "semantic-ui-react";
 import { fetch } from "../../actions/concert";
 import { Link } from "react-router-dom";
-import { Image, Icon, Card } from "semantic-ui-react";
 import { search, fetchRecommended } from "../../actions/concert";
 import "./design.css";
 
