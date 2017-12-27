@@ -15,7 +15,7 @@ function showAnnotations() {
     var annotations;
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "http://34.210.127.92:8000/list_annotations/?url=" + encodeURIComponent(window.location.href));
-    xhttp.setRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTE0MzgwNTQzLCJqdGkiOiI1ZjlmZTBhMGUxNDY0MjMzYTZmNGIyN2U2MTljMmNlYyIsInVzZXJfaWQiOjZ9.9rrhOEWpkCO-FXwL6QOv0bp697-ffeB_dSKTDGBmk0I");
+    xhttp.setRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTE0MzgzNTA0LCJqdGkiOiJmNjA0MWQ1MGVmMWY0MzkwOWUyZDFmNzY4ZTljODBlYyIsInVzZXJfaWQiOjZ9.QXzuwP-wPQDd_S5GNnrRZ0bN6aUjyyszJu22hz-H-JY");
     xhttp.onload = function () {
         annotations = JSON.parse(this.response);
         var oldAnnos = document.getElementsByClassName("annoPoi");
@@ -38,7 +38,7 @@ function showAnnotations() {
                 annoPointer[annoN].innerHTML = "<div class='ui empty circular label' style='background-color: #800000; position:absolute; left:" + annoX[annoN] + "px; top:" + annoY[annoN] + "px'></div>";
                 annoPointer[annoN].onmouseenter = function () {
                     var div = document.createElement("div");
-                    div.innerHTML = "<div class='ui raised segment' style='position:absolute; left:" + annoX[annoN] + "px; top:" + (annoY[annoN] + 15) + "px'><div class='content'><div class='description'>" + anno.body[0].value + "</div></div></div>"
+                    div.innerHTML = "<div class='ui raised segment' style='text-align:justify; max-width: 300px; position:absolute; left:" + annoX[annoN] + "px; top:" + (annoY[annoN] + 15) + "px'><div class='content'><div class='description'>" + anno.body[0].value + "</div></div></div>"
                     annoPointer[annoN].appendChild(div);
                 }
                 annoPointer[annoN].onmouseleave = function () {
