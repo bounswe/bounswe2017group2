@@ -521,21 +521,23 @@ class Concert extends React.PureComponent {
                                     <b>Location: </b>
                                     {this.state.concert.location.venue}
                                 </div>
-                                <a href={"http://" + this.state.concert.seller_url}>
-                                    <Button className="ui small button">Get ticket</Button>
-                                </a>
                             </div>
                         </div>
                     </div>
-                    <div style={{ maxHeight: "300px", width: "280px", paddingTop: "20px" }}>
-                        {this.state.concert.attendees.length > 0 && (
+                    {this.state.concert.attendees.length > 0 && (
+                        <div className="ui segment" style={{ maxHeight: "250px", width: "280px", paddingTop: "20px" }}>
                             <div>
-                                <h4 className="center">
-                                    {this.state.concert.attendees.length} L4C user
-                                    {this.state.concert.attendees.length > 1 && ("s ")}
-                                    will attend this concert
-                                </h4>
-                                <div className="ui grid" style={{maxHeight: "253px", overflowY: "auto"}}>
+                                <div className="center">
+                                    <Label attached="top">
+                                        {this.state.concert.attendees.length} L4C user
+                                        {this.state.concert.attendees.length > 1 && ("s ")}
+                                        will attend
+                                        <Label.Detail>
+                                            <a style={{ color: "#800000" }} href={"http://" + this.state.concert.seller_url}>Get ticket</a>
+                                        </Label.Detail>
+                                    </Label>
+                                </div>
+                                <div className="ui grid basic segment" style={{ maxHeight: "210px", overflowY: "auto" }}>
                                     <div className="sixteen wide column" style={{ padding: "2px" }}>
                                         {this.state.concert.attendees.map(attendee => (
                                             <div className="row" style={{ marginTop: "3px" }}>
@@ -549,8 +551,15 @@ class Concert extends React.PureComponent {
                                     </div>
                                 </div>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
+                    {this.state.concert.attendees.length == 0 && (
+                        <div style={{width: "280px", textAlign: "right" }}>
+                            <a href={"http://" + this.state.concert.seller_url}>
+                                <Button>Get ticket</Button>
+                            </a>
+                        </div>
+                    )}
                 </div>
 
                 <div className="row">
