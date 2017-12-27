@@ -137,7 +137,8 @@ class ConcertSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name',instance.name)
         instance.artist = validated_data.get('artist',instance.artist)
-        instance.date_time = validated_data.get('date_time',instance.date_time)
+        instance.date = validated_data.get('date',instance.date)
+        instance.time = validated_data.get('time',instance.time)
         instance.description = validated_data.get('description',instance.description)
         instance.price_min = validated_data.get('price_min', instance.price_min)
         instance.price_max = validated_data.get('price_max', instance.price_max)
