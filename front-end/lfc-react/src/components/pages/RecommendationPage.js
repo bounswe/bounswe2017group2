@@ -4,16 +4,15 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { Image, Icon, Card } from "semantic-ui-react";
 import { fetch, search, fetchRecommended } from "../../actions/concert";
-import "./design.css";
 
 const ConcertItem = ({ concert }) => (
   <Card>
-    <Image as={Link} to={"/concert/" + concert.concert_id}
+    <Image
       src={
         concert.artist &&
-          concert.artist.images &&
-          concert.artist.images[0] &&
-          concert.artist.images[0].url
+        concert.artist.images &&
+        concert.artist.images[0] &&
+        concert.artist.images[0].url
           ? concert.artist.images[0].url
           : ""
       }
@@ -21,9 +20,7 @@ const ConcertItem = ({ concert }) => (
     <Card.Content>
       <Card.Header as={Link} to={"/concert/" + concert.concert_id}>
         {" "}
-        <div className="concertNameLink">
-          {concert.artist ? concert.artist.name : ""}
-        </div>
+        {concert.artist ? concert.artist.name : ""}
       </Card.Header>
       <Card.Meta>
         <Icon name="calendar" /> {concert.date_time}
@@ -51,28 +48,22 @@ const ConcertsList = ({ concerts }) => (
         </div>
       </div>
     ) : (
-        concerts.map(concert => (
-          <ConcertItem concert={concert} key={concert.concert_id} />
-        ))
-      )}
+      concerts.map(concert => (
+        <ConcertItem concert={concert} key={concert.concert_id} />
+      ))
+    )}
   </div>
 );
 
 class DashboardPage extends React.Component {
   componentWillMount() {
-    // if(this.props.isAuthenticated) {
-    // this.props.fetchRecommended();
-    // } else {
-    // this.props.fetch();
-    // }
-    this.props.fetch();
-    // this.props.fetch();
-    // this.props.search("nadia");
+    this.props.fetchRecommended();
   }
   render() {
-    const { concerts } = this.props;
+    const { concerts, isAuthenticated } = this.props;
     return (
       <div className="ui container">
+        {isAuthenticated}
         <ConcertsList concerts={concerts} />
       </div>
     );
@@ -118,9 +109,6 @@ ConcertItem.propTypes = {
 
 DashboardPage.propTypes = {
   concerts: PropTypes.arrayOf(PropTypes.object).isRequired,
-  recommended: PropTypes.arrayOf(PropTypes.object).isRequired,
-  fetch: PropTypes.func.isRequired,
-  search: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
   fetchRecommended: PropTypes.func.isRequired
 
