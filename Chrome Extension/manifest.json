@@ -4,7 +4,10 @@
     "version": "0.1",
     "description": "A annotation application for websites",
     "permissions": [
-        "contextMenus"
+        "<all_urls>",
+        "contextMenus",
+        "webNavigation",
+        "tabs"
     ],
     "icons": {
         "16": "l4clogo1.png"

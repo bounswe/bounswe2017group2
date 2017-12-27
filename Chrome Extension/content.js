@@ -9,22 +9,26 @@ document.addEventListener('mouseup', function (mouse) {
 var annotations;
 var xhttp = new XMLHttpRequest();
 xhttp.open("GET", "http://34.210.127.92:8000/list_annotations/?url=" + encodeURIComponent(window.location.href));
-xhttp.setRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTE0MzM4NzYzLCJqdGkiOiI5YWQyODFlOGU5OWQ0ZjI4YWNhZTM5YTE3MDNkYzNlOCIsInVzZXJfaWQiOjZ9.wuvsNSTHGAe3qH8gIdLRrWyYfqLD418nCEYgMk5Y1fw");
+xhttp.setRequestHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTE0MzQ0OTIwLCJqdGkiOiI4ODg0YzAyMzU3N2M0NjkwODYwNWJhYzkxZDEzZjc2ZiIsInVzZXJfaWQiOjZ9.AFQxuf_HdVV0dkkZMGNO-fD5Hsupisg1fM6V5e3Y-Us");
 xhttp.onload = function () {
     annotations = JSON.parse(this.response);
+    while (1) {
+        var oldAnnos = document.getElementsByClassName("annoPoi");
+        if(oldAnnos.length==0) break;
+        document.body.removeChild(oldAnnos[0]);
+    }
     var annoPointer = new Array(annotations.length);
     var annoX = new Array(annotations.length);
     var annoY = new Array(annotations.length);
     for (annoN in annotations) {
         (function (annoN) {
             var anno = annotations[annoN];
-            console.log(anno);
             var coors = anno.target[0].target_id;
             coors = coors.substring(coors.indexOf('#'));
             annoX[annoN] = parseInt(coors.substring(4, coors.indexOf(',')));
             annoY[annoN] = parseInt(coors.substring(coors.indexOf(',') + 1));
             annoPointer[annoN] = document.createElement("div");
-            console.log(annoX[annoN] + ' ' + annoY[annoN] + ' ' + anno.body[0].value);
+            annoPointer[annoN].className += " annoPoi";
             annoPointer[annoN].innerHTML = "<div class='ui red empty circular label' style='position:absolute; left:" + annoX[annoN] + "px; top:" + annoY[annoN] + "px'></div>";
             annoPointer[annoN].onmouseenter = function () {
                 var div = document.createElement("div");
@@ -39,4 +43,5 @@ xhttp.onload = function () {
     }
 }
 xhttp.send();
+
 console.log("Start Page Script");
