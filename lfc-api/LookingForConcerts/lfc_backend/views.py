@@ -1154,7 +1154,7 @@ def create_concert_report(request, reported_concert_id):
     @params:
     report_type: choices
         "ARTIST",
-        "DATE",
+        "DATE_TIME",
         "DESCRIPTION",
         "LOCATION",
         "TAG",
@@ -1204,12 +1204,18 @@ def delete_concert_report(request, concert_report_id):
 
 @api_view(['GET'])
 def list_concert_reports(request):
+    '''
+    lists all concert reports
+    '''
     concert_reports = ConcertReport.objects.all()
     serializer = ConcertReportSerializer(concert_reports, many=True)
     return Response(serializer.data, status = status.HTTP_200_OK)
 
 @api_view(['POST'])
 def upvote_concert_report(request, concert_report_id):
+    '''
+    upvotes the concert report with the given id. If the upvotes reach a certain limit, the related concert info is automatically updated and the concert report is deleted.
+    '''
     LIMIT = 2
     user = request.user
 
@@ -1223,18 +1229,19 @@ def upvote_concert_report(request, concert_report_id):
         return Response({'error':'You cannot upvote your own concert report.'},status = status.HTTP_401_UNAUTHORIZED)
 
     upvoters = concert_report.upvoters.all()
-    print(upvoters)
-    print(user)
 
     if user not in upvoters:
         try:
             concert_report.upvoters.add(user)
+            upvoters = concert_report.upvoters.all()
             # IF THE UPVOTES REACH THE LIMIT, MODIFY THE RELATED CONCERT INFORMATION
             if len(upvoters) == LIMIT:
                 concert = concert_report.concert
-                data = ConcertSerializer(concert)
-                field = concert_report.report_type
-                print(field)
+                serializer = ConcertSerializer(concert)
+                field = concert_report.report_type.lower()
+                print("Current concert data:")
+                print(serializer.data)
+                print("Updating field: " + str(field))
                 #concert_report.delete()
                 return Response({'message':'Since upvotes reached the limit, the related concert information has been changed and the associated report has been deleted.'},status = status.HTTP_200_OK)
 
@@ -1245,3 +1252,31 @@ def upvote_concert_report(request, concert_report_id):
         return Response({'error':'You have already upvoted this concert report.'},status = status.HTTP_400_BAD_REQUEST)
 
     return Response(status = status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def cancel_upvote_concert_report(request, concert_report_id):
+    '''
+    cancels the upvote for the concert report with the given id
+    '''
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    concert_report = ConcertReport.objects.get(pk=concert_report_id)
+    reporter = concert_report.reporter
+
+    if user == reporter:
+        return Response(status = status.HTTP_401_UNAUTHORIZED)
+
+    upvoters = concert_report.upvoters.all()
+
+    if user in upvoters:
+        try:
+            concert_report.upvoters.remove(user)
+            return Response(status = status.HTTP_200_OK)
+        except:
+            return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+    else:
+        return Response({'error':'You have not upvoted this concert report.'},status = status.HTTP_400_BAD_REQUEST)
