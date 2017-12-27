@@ -171,12 +171,40 @@ class ProfilePage extends React.Component {
       },
       willAttend: [],
       attended: [],
-      accessToken: theToken
+      accessToken: theToken,
+      reportText: ""
     };
     this.handleTab = this.handleTab.bind(this);
     this.handleFollow = this.handleFollow.bind(this);
     this.handleSpotifyConnect = this.handleSpotifyConnect.bind(this);
     this.handleSpotifyDisconnect = this.handleSpotifyDisconnect.bind(this);
+    this.handleReportChange = this.handleReportChange.bind(this);
+    this.handleReport = this.handleReport.bind(this);
+  }
+
+  handleReportChange(event) {
+    this.setState({
+      reportText: event.target.value
+    });
+  }
+
+  handleReport() {
+    console.log(this.state.reportText);
+    axios
+      .post(
+      "http://34.210.127.92:8000/user/" + profileID + "/report/",
+      {
+        "reason": this.state.reportText
+      }
+      )
+      .then(
+      response => {
+        window.location.reload();
+      },
+      error => {
+        console.log(error);
+      }
+      );
   }
 
   handleSpotifyConnect() {
@@ -383,11 +411,15 @@ class ProfilePage extends React.Component {
           <Modal trigger={<Button>Report</Button>}>
             <Modal.Header>Report User</Modal.Header>
             <Modal.Content>
-              <div class="ui form">
-                <div class="field">
-                  <textarea placeholder="Write a reason..."></textarea>
+              <div className="ui form">
+                <div className="field">
+                  <textarea
+                    placeholder="Write a reason..."
+                    value={this.state.reportText}
+                    onChange={this.handleReportChange}
+                  ></textarea>
                 </div>
-                <button class="ui button">Report</button>
+                <button className="ui button" onClick={() => this.handleReport()}>Report</button>
               </div>
             </Modal.Content>
           </Modal>
