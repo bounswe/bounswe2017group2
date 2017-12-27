@@ -672,7 +672,8 @@ def advanced_search(request):
     tag_value = data.get('tag_value','')
     max_value = data.get('max_price','')
     min_value = data.get('min_price','')
-
+    date_start = data.get('start_date','')
+    date_end = data.get('end_date','')
 
 
     concerts = Concert.objects.all()
@@ -688,6 +689,10 @@ def advanced_search(request):
         concerts = concerts.filter(Q(price_max__lte=max_value))
     if min_value.isnumeric() :
         concerts = concerts.filter(Q(price_min__gte=min_value))
+    if date_start !='' :
+        concerts = concerts.filter(Q(date_time__gte=date_start))
+    if date_end !='' :
+        concerts = concerts.filter(Q(date_time_lte=date_end))
 
     try:
         serializer = ConcertSerializer(concerts,many=True)
@@ -1034,7 +1039,7 @@ def create_annotation(request):
     serializer = AnnotationSerializer(data = request.data)
     if serializer.is_valid():
         annotation = serializer.save()
-        if(request.user.is_authenticated)
+        if(request.user.is_authenticated):
             request.user.annotations.add(annotation)
         serializer = AnnotationSerializer(annotation)
         return Response(serializer.data, status = status.HTTP_201_CREATED)
