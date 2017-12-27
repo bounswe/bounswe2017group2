@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Form, Button, Message } from "semantic-ui-react";
+import { Form, Button, Message, Icon } from "semantic-ui-react";
 import { isEmail, isLength } from "validator";
 import InlineError from "..//messages/InlineError";
 
@@ -73,70 +73,71 @@ class SignupForm extends React.Component {
           </Message>
         )}
 
-        <Form.Field error={!!errors.first_name} width={5}>
-          <label htmlFor="first_name">
-            First Name
+        <Form.Field error={!!errors.first_name}>
             <input
               name="first_name"
               value={data.first_name}
               onChange={this.onChange}
+              placeholder="first name"
             />
-          </label>
           {errors.first_name && <InlineError text={errors.first_name} />}
         </Form.Field>
 
-        <Form.Field error={!!errors.last_name} width={5}>
+        <Form.Field error={!!errors.last_name}>
           <label htmlFor="last_name">
-            Last Name
             <input
               name="last_name"
               value={data.last_name}
               onChange={this.onChange}
+              placeholder="last name"
             />
           </label>
           {errors.last_name && <InlineError text={errors.last_name} />}
         </Form.Field>
 
-        <Form.Field error={!!errors.email} width={5}>
+        <Form.Field error={!!errors.email}>
           <label htmlFor="email">
-            Email
+            
             <input
               type="email"
               name="email"
               value={data.email}
               onChange={this.onChange}
+              placeholder="email"
             />
           </label>
           {errors.email && <InlineError text={errors.email} />}
         </Form.Field>
 
-        <Form.Field error={!!errors.username} width={5}>
+        <Form.Field error={!!errors.username}>
           <label htmlFor="username">
-            User name
+            
             <input
               name="username"
               value={data.username}
               onChange={this.onChange}
+              placeholder="user name"
             />
           </label>
           {errors.username && <InlineError text={errors.username} />}
         </Form.Field>
 
-        <Form.Field error={!!errors.password} width={5}>
+        <Form.Field error={!!errors.password}>
           <label htmlFor="password">
-            Password
+            
             <input
               type="password"
               id="password"
               name="password"
               value={data.password}
               onChange={this.onChange}
+              placeholder="password"
             />
           </label>
           {errors.password && <InlineError text={errors.password} />}
         </Form.Field>
 
-        <Button primary>Sign Up</Button>
+        <Button fluid color='red'>SIGN UP</Button>
       </Form>
     );
   }

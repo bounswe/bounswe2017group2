@@ -3,3 +3,5 @@ export const USER_LOGGED_OUT = "USER_LOGGED_OUT";
 export const USER_SIGNED_UP = "USER_SIGNED_UP";
 
 export const FETCH_CONCERTS = "FETCH_CONCERTS";
+export const SEARCH_CONCERTS = "SEARCH_CONCERTS";
+export const FETCH_RECOM = "FETCH_RECOM";

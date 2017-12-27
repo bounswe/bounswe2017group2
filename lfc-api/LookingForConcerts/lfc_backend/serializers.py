@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from lfc_backend.models import RegisteredUser,Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment, Image, Artist
 from lfc_backend.models import Annotation, AnnotationBody, AnnotationTarget, Selector
-
+import traceback
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
@@ -16,7 +16,9 @@ class UserReportSerializer(serializers.ModelSerializer):
     reported = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = UserReport
-        fields = ("reporter",
+        fields = (
+          "user_report_id",
+          "reporter",
           "reported",
           "reason")
     def update(self, instance, validated_data):
@@ -66,6 +68,12 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('value','context','wikidata_uri')
 
+class FullTagSerializer(serializers.ModelSerializer):
+    concerts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    class Meta:
+        model = Tag
+        fields = ('value','context','wikidata_uri','concerts')
+
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
@@ -100,7 +108,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     artist = ArtistSerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     ratings = RatingSerializer(many=True, read_only=True)
-    attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    attendees = FollowedFollowingUserSerializer(many=True, read_only=True)
     reports = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
@@ -118,7 +126,10 @@ class ConcertSerializer(serializers.ModelSerializer):
             location = Location.objects.create(**location_data)
         concert = Concert.objects.create(**validated_data)
         for tag_data in tags_data:
-            tag = Tag.objects.create(**tag_data)#creates tag object without adding concert to the concerts field<------- NEEDS A CHANGE look at notes 1
+            try:
+                tag = Tag.objects.get(wikidata_uri=tag_data['wikidata_uri'])#searches tag data in db
+            except:
+                tag = Tag.objects.create(**tag_data)#creates tag object without adding concert to the concerts field<------- NEEDS A CHANGE look at notes 1
             tag.concerts.add(concert) #adds concert to tags concerts field also adds tag to concerts tags field
         location.concerts.add(concert)
         return concert
@@ -134,15 +145,19 @@ class ConcertSerializer(serializers.ModelSerializer):
         #needs implementing for updating location. Also need the outcome of Google Maps API
 
 class ConcertReportSerializer(serializers.ModelSerializer):
-    reporter = RegisteredUserSerializer(read_only=True)
-    concert = ConcertSerializer(read_only=True)
+    reporter = serializers.PrimaryKeyRelatedField(read_only=True)
+    concert = serializers.PrimaryKeyRelatedField(read_only=True)
+    upvoters = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = ConcertReport
-        fields = ("reporter",
+        fields = (
+        "concert_report_id",
+            "reporter",
           "concert",
           "report_type",
-          "suggestion")
+          "suggestion",
+          "upvoters")
 
 class SelectorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -172,7 +187,7 @@ class AnnotationTargetSerializer(serializers.ModelSerializer):
                   'format',
                   'target_id',
                   'selector')
-    
+
     def create(self, validated_data):
         selector_datas = validated_data.pop("selector")
         target = AnnotationTarget.objects.create(**validated_data)
@@ -196,7 +211,7 @@ class AnnotationSerializer(serializers.ModelSerializer):
                   'created',
                   'body',
                   'target')
-    
+
     def create(self, validated_data):
         #Take body and target data to create new objects in neccessary tables
         body_datas = validated_data.pop('body')
@@ -208,7 +223,7 @@ class AnnotationSerializer(serializers.ModelSerializer):
             targetSerializer = AnnotationTargetSerializer(data = target_data)
             if targetSerializer.is_valid():
                 target_object = targetSerializer.save()
-            
+
             #add each object to annotation's target field
             annotation.target.add(target_object)
         #create body objects
