@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from lfc_backend.models import RegisteredUser,Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment, Image, Artist
 from lfc_backend.models import Annotation, AnnotationBody, AnnotationTarget, Selector
-
+import traceback
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
@@ -66,6 +66,12 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('value','context','wikidata_uri')
 
+class FullTagSerializer(serializers.ModelSerializer):
+    concerts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    class Meta:
+        model = Tag
+        fields = ('value','context','wikidata_uri','concerts')
+
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
@@ -100,7 +106,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     artist = ArtistSerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     ratings = RatingSerializer(many=True, read_only=True)
-    attendees = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    attendees = FollowedFollowingUserSerializer(many=True, read_only=True)
     reports = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
@@ -118,7 +124,10 @@ class ConcertSerializer(serializers.ModelSerializer):
             location = Location.objects.create(**location_data)
         concert = Concert.objects.create(**validated_data)
         for tag_data in tags_data:
-            tag = Tag.objects.create(**tag_data)#creates tag object without adding concert to the concerts field<------- NEEDS A CHANGE look at notes 1
+            try:
+                tag = Tag.objects.get(wikidata_uri=tag_data['wikidata_uri'])#searches tag data in db
+            except:
+                tag = Tag.objects.create(**tag_data)#creates tag object without adding concert to the concerts field<------- NEEDS A CHANGE look at notes 1
             tag.concerts.add(concert) #adds concert to tags concerts field also adds tag to concerts tags field
         location.concerts.add(concert)
         return concert
