@@ -115,10 +115,10 @@ class ConcertReport(models.Model):
         Reports to correct wrong concert information
     '''
     concert_report_id = models.AutoField(primary_key=True)
-    reporter = models.ForeignKey(RegisteredUser, related_name = 'concert_reports', on_delete = models.CASCADE)
+    reporter = models.ForeignKey(RegisteredUser, related_name = 'concert_reports', on_delete = models.CASCADE, null=True)
     REPORT_TYPES = (
         ("ARTIST","artist"),
-        ("DATE","date"),
+        ("DATE_TIME","date_time"),
         ("DESCRIPTION","description"),
         ("LOCATION","location"),
         ("TAG","tag"),
@@ -127,9 +127,10 @@ class ConcertReport(models.Model):
         ("SELLER_URL","seller_url"),
         ("IMAGE","image"),
     )
-    report_type = models.CharField(choices=REPORT_TYPES, max_length=20, null=True)
+    report_type = models.CharField(choices=REPORT_TYPES, max_length=20, blank=False)
     concert = models.ForeignKey(Concert, related_name = 'reports',on_delete = models.CASCADE, null=True)
     suggestion = models.CharField(max_length=1000)  # the suggestion as an alternative to the reported information.
+    upvoters = models.ManyToManyField(RegisteredUser, related_name = 'upvoted_concert_reports', blank=True)
 
 class Rating(models.Model):
     '''

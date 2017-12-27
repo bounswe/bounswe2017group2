@@ -16,7 +16,9 @@ class UserReportSerializer(serializers.ModelSerializer):
     reported = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = UserReport
-        fields = ("reporter",
+        fields = (
+          "user_report_id",
+          "reporter",
           "reported",
           "reason")
     def update(self, instance, validated_data):
@@ -143,15 +145,19 @@ class ConcertSerializer(serializers.ModelSerializer):
         #needs implementing for updating location. Also need the outcome of Google Maps API
 
 class ConcertReportSerializer(serializers.ModelSerializer):
-    reporter = RegisteredUserSerializer(read_only=True)
-    concert = ConcertSerializer(read_only=True)
+    reporter = serializers.PrimaryKeyRelatedField(read_only=True)
+    concert = serializers.PrimaryKeyRelatedField(read_only=True)
+    upvoters = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = ConcertReport
-        fields = ("reporter",
+        fields = (
+        "concert_report_id",
+            "reporter",
           "concert",
           "report_type",
-          "suggestion")
+          "suggestion",
+          "upvoters")
 
 class SelectorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -181,7 +187,7 @@ class AnnotationTargetSerializer(serializers.ModelSerializer):
                   'format',
                   'target_id',
                   'selector')
-    
+
     def create(self, validated_data):
         selector_datas = validated_data.pop("selector")
         target = AnnotationTarget.objects.create(**validated_data)
@@ -205,7 +211,7 @@ class AnnotationSerializer(serializers.ModelSerializer):
                   'created',
                   'body',
                   'target')
-    
+
     def create(self, validated_data):
         #Take body and target data to create new objects in neccessary tables
         body_datas = validated_data.pop('body')
@@ -217,7 +223,7 @@ class AnnotationSerializer(serializers.ModelSerializer):
             targetSerializer = AnnotationTargetSerializer(data = target_data)
             if targetSerializer.is_valid():
                 target_object = targetSerializer.save()
-            
+
             #add each object to annotation's target field
             annotation.target.add(target_object)
         #create body objects
