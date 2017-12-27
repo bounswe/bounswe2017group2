@@ -298,7 +298,7 @@ def spotify_redirect(request):
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
 
     # Hard-coded redirect uri for testing purposes.
-    redirect_uri = "http://localhost:8000/spotify/redirect"
+    redirect_uri = BASE_URL + "spotify/redirect/"
 
     TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 
@@ -1034,7 +1034,7 @@ def create_annotation(request):
     serializer = AnnotationSerializer(data = request.data)
     if serializer.is_valid():
         annotation = serializer.save()
-        if(request.user.is_authenticated)
+        if(request.user.is_authenticated):
             request.user.annotations.add(annotation)
         serializer = AnnotationSerializer(annotation)
         return Response(serializer.data, status = status.HTTP_201_CREATED)

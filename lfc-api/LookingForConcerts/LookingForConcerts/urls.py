@@ -55,17 +55,20 @@ urlpatterns = [
     url(r'^login/$', TokenObtainPairView.as_view()), # logs the user in
     url(r'^logout/$', logout, name='logout'), # logs the user out
     url(r'^users/$',views.list_users), # lists all the users registered to our app
+    # USER SEARCH
+    url(r'^users/search/$',views.search_users), # returns a list of users if their username, first_name, last_name or spotify_display_name contains the search query.
+
     url(r'^user/me/$', views.get_user_info), # returns the logged in user object; requires authorization
     url(r'^user/edit_profile/$', views.edit_profile), # updates the information of the user
     url(r'^user/(?P<reported_user_id>[0-9]+)/report/$', views.create_or_edit_user_report), # creates or edits a user report for the user with the given pk
 
     # SPOTIFY
-    url(r'^spotify/redirect$', views.spotify_redirect, name='spotify_redirect'),
+    url(r'^spotify/redirect/$', views.spotify_redirect, name='spotify_redirect'),
 
     url(r'^user/spotify/authorize/$', views.spotify_authorize, name='spotify_authorize'), # sets up the scope and sends the uri to the Spotify connect page
     url(r'^user/spotify/connect/$', views.spotify_connect, name='spotify_connect'), # connects the Spotify account of the user to his LFC account
     url(r'^user/spotify/disconnect/$', views.spotify_disconnect, name='spotify_disconnect'), # disconnects the account from Spotify
-    url(r'^user/spotify/profile$', views.get_spotify_profile, name='get_spotify_profile'), # returns the Spotify profile of the logged in user.
+    url(r'^user/spotify/profile/$', views.get_spotify_profile, name='get_spotify_profile'), # returns the Spotify profile of the logged in user.
 
     url(r'^user/(?P<pk>[0-9]+)/$', views.get_user_with_pk), #returns the user information of the user with the pk as its id
     url(r'^user/(?P<pk>[0-9]+)/follow/$', views.follow_user), # the logged in user follows the one with given pk; requires authorization
@@ -98,7 +101,7 @@ urlpatterns = [
     #url(r"^concert/(?P<concert_id>\d+)/annotations/(?P<pk>\d+)$", views.annotation_detail),
     url(r"^new_annotation/$", views.create_annotation), #url for creating new annotation for the concert
     url(r"^annotation/(?P<pk>\d+)/$", views.get_annotation), #returns a specific annotation
-    url(r"^annotation/(?P<pk>\d+)/delete$", views.delete_annotation), #deletes the annotation with pk
+    url(r"^annotation/(?P<pk>\d+)/delete/$", views.delete_annotation), #deletes the annotation with pk
     url(r"^all_annotations/$", views.all_annotations),#returns all annotations
     # LOCATION
     url(r'^locations/$',views.list_locations), # lists all locations in DB
