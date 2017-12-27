@@ -309,7 +309,10 @@ class ProfilePage extends React.Component {
   componentWillMount() {
     axios.get("http://34.210.127.92:8000/user/spotify/profile/").then(
       response => {
-        spotifyProfile = response.data;
+        spotifyProfile = null;
+        if (response.status == 200) {
+          spotifyProfile = response.data;
+        }
       },
       error => {
         console.log("refresh user");

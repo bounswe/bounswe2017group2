@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Form, Button, Message } from "semantic-ui-react";
+import { Form, Button, Message, Icon } from "semantic-ui-react";
 import InlineError from "../messages/InlineError";
 
 class LoginForm extends React.Component {
@@ -53,30 +53,32 @@ class LoginForm extends React.Component {
             <p>{errors.global}</p>
           </Message>
         )}
-        <Form.Field error={!!errors.username} width={5}>
-          <label htmlFor="username">
-            User Name
+        <Form.Field error={!!errors.username}>
+          <div className="ui left icon input">
+          <Icon name="user" />
             <input
               name="username"
               value={data.username}
               onChange={this.onChange}
+              placeholder= "user name"
             />
-          </label>
+          </div> 
           {errors.username && <InlineError text={errors.username} />}
         </Form.Field>
-        <Form.Field error={!!errors.password} width={5}>
-          <label htmlFor="password">
-            Password
+        <Form.Field error={!!errors.password}>
+          <div className="ui left icon input">
+          <Icon name="lock" />
             <input
               type="password"
               name="password"
               value={data.password}
               onChange={this.onChange}
+              placeholder="password"
             />
-          </label>
+          </div>
           {errors.password && <InlineError text={errors.password} />}
         </Form.Field>
-        <Button primary>Login</Button>
+        <Button fluid color='red'>LOG IN</Button>
       </Form>
     );
   }

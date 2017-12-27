@@ -4,6 +4,7 @@
 
 .concertNameLink:hover {
     color: #800000;
+<<<<<<< HEAD
 }
 
 .ui.button{
@@ -21,3 +22,29 @@
     color: white;
 }
 
+||||||| merged common ancestors
+}
+=======
+}
+
+.center {
+    text-align: center;
+}
+
+.ui.button{
+    background-color: #800000;
+    color: white;
+}
+
+.ui.button:hover{
+    background-color: #400000;
+    color: white;
+}
+
+.ui.button:focus{
+    background-color: #600000;
+    color: white;
+}
+
+
+>>>>>>> master

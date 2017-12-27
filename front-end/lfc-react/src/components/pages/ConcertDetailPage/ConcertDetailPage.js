@@ -14,11 +14,13 @@ import {
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import { Button, Rating } from "semantic-ui-react";
+import { Button, Rating, Label, Popup } from "semantic-ui-react";
 import "./design.css";
 import decode from "jwt-decode";
 import setAuthorizationHeader from "../../../utils/setAuthorizationHeader";
 import MiniUserDetail from "../ProfilePage/ProfilePage";
+import Segment from "semantic-ui-react/dist/commonjs/elements/Segment/Segment";
+import Icon from "semantic-ui-react/dist/commonjs/elements/Icon/Icon";
 
 //default from 'semantic-ui-react/dist/commonjs/collections/Table/TableRow';
 
@@ -288,27 +290,27 @@ class Concert extends React.PureComponent {
             visibleMessage = "Attending";
             invisibleMessage = "Not Attending";
         } else {
-            if (averageRatings) {
+            if (averageRatings && averageRatings.music_quality) {
                 ratingsHeaders = (
                     <div class="ui grid">
                         <div class="four wide column center ratingHeaders">
                             <div>
-                                <h5>Music Quality: {averageRatings.music_quality}</h5>
+                                <h5>Music Quality: {Number(averageRatings.music_quality).toFixed(1)}</h5>
                             </div>
                         </div>
                         <div class="four wide column center ratingHeaders">
                             <div>
-                                <h5>Stage Show: {averageRatings.stage_show}</h5>
+                                <h5>Stage Show: {Number(averageRatings.stage_show).toFixed(1)}</h5>
                             </div>
                         </div>
                         <div class="four wide column center ratingHeaders">
                             <div>
-                                <h5>Artist Costumes: {averageRatings.artist_costumes}</h5>
+                                <h5>Artist Costumes: {Number(averageRatings.artist_costumes).toFixed(1)}</h5>
                             </div>
                         </div>
                         <div class="four wide column center ratingHeaders">
                             <div>
-                                <h5>Concert Atmosphere: {averageRatings.concert_atmosphere}</h5>
+                                <h5>Concert Atmosphere: {Number(averageRatings.concert_atmosphere).toFixed(1)}</h5>
                             </div>
                         </div>
                     </div>
@@ -483,43 +485,81 @@ class Concert extends React.PureComponent {
         }
 
         return (
-            <div className="ui grid segment">
+            <div className="ui grid raised segment">
                 <div className="row">
-                    <div className="fourteen wide column">
-                        <h1>{this.state.concert.name}</h1>
-                    </div>
-                    <div className="two wide column">
-                        <a href={"http://" + this.state.concert.seller_url}>
-                            <button className="ui right floated  button">Buy</button>
-                        </a>
-                    </div>
-                </div>
-                <div className="row tagsRow">
-                    <div className="sixteen wide column">
-                        {this.state.concert.tags.map(tag => (
-                            <div className="ui label">
-                                <i class="hashtag icon"></i>
-                                {tag.value}
+                    <div className="ui grid twelve wide column">
+                        <div className="row">
+                            <div className="fourteen wide column">
+                                <Label as="a" ribbon id="concertNameRibbon">
+                                    <h1>{this.state.concert.name}</h1>
+                                </Label>
                             </div>
-                        ))}
+                        </div>
+                        <div className="row tagsRow">
+                            <div className="sixteen wide column">
+                                {this.state.concert.tags.map(tag => (
+                                    <div className="ui label">
+                                        <i class="hashtag icon"></i>
+                                        {tag.value}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="ui list sixteen wide column">
+                                <div className="item concertData">
+                                    <b>Artist: </b>
+                                    {this.state.concert.artist.name}
+                                </div>
+                                <div className="item concertData">
+                                    <b>Date: </b>
+                                    {this.state.concert.date_time}
+                                </div>
+                                <div className="item concertData">{price}
+                                </div>
+                                <div className="item concertData">
+                                    <b>Location: </b>
+                                    {this.state.concert.location.venue}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div className="row">
-                    <div className="ui list sixteen wide column">
-                        <div className="item concertData">
-                            <b>Artist: </b>
-                            {this.state.concert.artist.name}
+                    {this.state.concert.attendees.length > 0 && (
+                        <div className="ui segment" style={{ maxHeight: "250px", width: "280px", paddingTop: "20px" }}>
+                            <div>
+                                <div className="center">
+                                    <Label attached="top">
+                                        {this.state.concert.attendees.length} L4C user
+                                        {this.state.concert.attendees.length > 1 && ("s ")}
+                                        will attend
+                                        <Label.Detail>
+                                            <a style={{ color: "#800000" }} href={"http://" + this.state.concert.seller_url}>Get ticket</a>
+                                        </Label.Detail>
+                                    </Label>
+                                </div>
+                                <div className="ui grid basic segment" style={{ maxHeight: "210px", overflowY: "auto" }}>
+                                    <div className="sixteen wide column" style={{ padding: "2px" }}>
+                                        {this.state.concert.attendees.map(attendee => (
+                                            <div className="row" style={{ marginTop: "3px" }}>
+                                                <Segment>
+                                                    <Link className="Link" to={"/user/" + attendee.id}>
+                                                        <Icon name="user circle" />{attendee.username}
+                                                    </Link>
+                                                </Segment>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="item concertData">
-                            <b>Date: </b>
-                            {this.state.concert.date_time}
+                    )}
+                    {this.state.concert.attendees.length == 0 && (
+                        <div style={{paddingTop:"20px", width: "280px", textAlign: "right" }}>
+                            <a href={"http://" + this.state.concert.seller_url}>
+                                <Button>Get ticket</Button>
+                            </a>
                         </div>
-                        <div className="item concertData">{price}</div>
-                        <div className="item concertData">
-                            <b>Location: </b>
-                            {this.state.concert.location.venue}
-                        </div>
-                    </div>
+                    )}
                 </div>
 
                 <div className="row">
@@ -573,7 +613,7 @@ class Concert extends React.PureComponent {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 }
