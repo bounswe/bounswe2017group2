@@ -1034,7 +1034,8 @@ def create_annotation(request):
     serializer = AnnotationSerializer(data = request.data)
     if serializer.is_valid():
         annotation = serializer.save()
-        request.user.annotations.add(annotation)
+        if(request.user.is_authenticated)
+            request.user.annotations.add(annotation)
         serializer = AnnotationSerializer(annotation)
         return Response(serializer.data, status = status.HTTP_201_CREATED)
     else:
