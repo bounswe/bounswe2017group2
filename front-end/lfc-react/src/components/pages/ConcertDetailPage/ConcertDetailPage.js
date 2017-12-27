@@ -554,7 +554,7 @@ class Concert extends React.PureComponent {
                         </div>
                     )}
                     {this.state.concert.attendees.length == 0 && (
-                        <div style={{width: "280px", textAlign: "right" }}>
+                        <div style={{paddingTop:"20px", width: "280px", textAlign: "right" }}>
                             <a href={"http://" + this.state.concert.seller_url}>
                                 <Button>Get ticket</Button>
                             </a>
