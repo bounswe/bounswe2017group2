@@ -128,7 +128,7 @@ class ConcertReport(models.Model):
         ("IMAGE","image"),
     )
     report_type = models.CharField(choices=REPORT_TYPES, max_length=20, null=True)
-    concert = models.ForeignKey(Concert, related_name = 'reports',on_delete = models.CASCADE)
+    concert = models.ForeignKey(Concert, related_name = 'reports',on_delete = models.CASCADE, null=True)
     suggestion = models.CharField(max_length=1000)  # the suggestion as an alternative to the reported information.
 
 class Rating(models.Model):
@@ -169,20 +169,18 @@ class Annotation(models.Model):
 
     # id created automatically
     annotation_id = ("http://" + settings.HOST + ":" + settings.FRONTEND_PORT + "/annotations/{}").format(id)
-    concert = models.ForeignKey(Concert, related_name="annotations", on_delete=models.CASCADE, blank=True)
     context = models.URLField(null=False, default="http://www.w3.org/ns/anno.jsonld")
     type = models.CharField(max_length=255, null=False, default="Annotation")
     motivation = models.CharField(choices=MOTIVATIONS, max_length=20, null=True) # the reason for creating this annotation
-    creator = models.ForeignKey(RegisteredUser, related_name="annotations", on_delete=models.CASCADE, blank=True)
+    creator = models.ForeignKey(RegisteredUser, related_name="annotations", on_delete=models.CASCADE, null=True)
     created = models.DateTimeField(auto_now_add=True)
-    upvotes = models.IntegerField(null=False, default=0)
-
+    upvotes = models.IntegerField(null = True)
 class AnnotationBodyAndTargetCommon(models.Model):
     TYPES = (
-    ('TEXT', 'text'),
-    ('VIDEO', 'video'),
-    ('AUDIO', 'audio'),
-    ('IMAGE', 'image'),
+    ('TEXT', 'Text'),
+    ('VIDEO', 'Video'),
+    ('AUDIO', 'Audio'),
+    ('IMAGE', 'Image'),
     )
 
     MIMES = (
@@ -233,14 +231,14 @@ class AnnotationBody(AnnotationBodyAndTargetCommon):
         ('REPLYING', 'replying'),
         ('TAGGING', 'tagging'),
     )
-    annotation = models.ForeignKey(Annotation, related_name="body", on_delete=models.CASCADE)
+    annotation = models.ForeignKey(Annotation, related_name="body", on_delete=models.CASCADE, null=True)
     purpose = models.CharField(choices=PURPOSES, max_length=20, null=True)
     value = models.CharField(max_length=255, null=False)
 
 # the target for our Annotation class
 class AnnotationTarget(AnnotationBodyAndTargetCommon):
-    annotation = models.ForeignKey(Annotation, related_name="target", on_delete=models.CASCADE)
-    target_id = models.CharField(max_length=255, null=False, default=("http://" + settings.HOST + ":" + settings.FRONTEND_PORT + "/concert/null/"))
+    annotation = models.ForeignKey(Annotation, related_name="target", on_delete=models.CASCADE, null=True)
+    target_id = models.CharField(max_length=255, null=False, default=("http://" + settings.HOST + ":" + settings.FRONTEND_PORT + "/concert/null"))
 
 # W3C Specification for selectors
 # 4.2 Selectors
