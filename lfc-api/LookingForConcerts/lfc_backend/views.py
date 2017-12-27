@@ -73,6 +73,18 @@ class FrontendAppView(View):
 
 
 '''
+ARTIST FUNCTIONS
+'''
+@api_view(['GET'])
+def list_artists(request):
+    '''
+    returns all the artists
+    '''
+    artists = Artist.objects.all()
+    serializer = ArtistSerializer(artists, many=True)
+    return Response(serializer.data)
+
+'''
 USER FUNCTIONS
 '''
 @api_view(['GET'])
@@ -1235,16 +1247,72 @@ def upvote_concert_report(request, concert_report_id):
             concert_report.upvoters.add(user)
             upvoters = concert_report.upvoters.all()
             # IF THE UPVOTES REACH THE LIMIT, MODIFY THE RELATED CONCERT INFORMATION
-            if len(upvoters) == LIMIT:
-                concert = concert_report.concert
-                serializer = ConcertSerializer(concert)
-                field = concert_report.report_type.lower()
-                print("Current concert data:")
-                print(serializer.data)
-                print("Updating field: " + str(field))
-                #concert_report.delete()
-                return Response({'message':'Since upvotes reached the limit, the related concert information has been changed and the associated report has been deleted.'},status = status.HTTP_200_OK)
+            try:
+                if len(upvoters) == LIMIT:
+                    concert = concert_report.concert
+                    serializer = ConcertSerializer(concert)
+                    field = concert_report.report_type.lower()
+                    suggestion = concert_report.suggestion
+                    newdata = serializer.data
+                    if field == "artist":
+                        artist_data = json.loads(suggestion)
+                        artist_serializer = ArtistSerializer(data=artist_data)
+                        if artist_serializer.is_valid():
+                            artist = artist_serializer.save()
+                            old_artist = concert.artist
+                            old_artist.concerts.remove(concert)
+                            artist.concerts.add(concert)
+                        else:
+                            if artist_serializer.errors['spotify_id'][0] == "artist with this spotify id already exists.":
+                                artist = Artist.objects.get(spotify_id=artist_serializer.data['spotify_id'])
+                                old_artist = concert.artist
+                                old_artist.concerts.remove(concert)
+                                artist.concerts.add(concert)
+                            else:
+                                return Response(artist_serializer.errors, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    elif field == "date_time":
+                        concert.date_time = suggestion
+                        concert.save(update_fields=[field])
+                    elif field == "description":
+                        concert.description = suggestion
+                        concert.save(update_fields=[field])
+                    elif field == "location":
+                        location_data = json.loads(suggestion)
+                        location_serializer = LocationSerializer(data=location_data)
+                        if location_serializer.is_valid():
+                            location = Location.objects.get(**location_data)
+                            if location is None:
+                                location = location_serializer.save()
+                            old_location = concert.location
+                            old_location.concerts.remove(concert)
+                            location.concerts.add(concert)
+                        else:
+                            return Response(location_serializer.errors, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    elif field == "min_price":
+                        concert.description = int(suggestion)
+                        concert.save(update_fields=[field])
+                    elif field == "max_price":
+                        concert.description = int(suggestion)
+                        concert.save(update_fields=[field])
+                    elif field == "seller_url":
+                        concert.description = suggestion
+                        concert.save(update_fields=[field])
+                    elif field == "image":
+                        concert.description = suggestion
+                        concert.save(update_fields=[field])
+                    else:
+                        print("Field type inappropriate. Doing nothing.")
 
+                    print("Old concert data:")
+                    pprint.pprint(serializer.data)
+                    print("\nUpdated field: " + str(field) + "\n")
+                    print("New concert data:")
+                    pprint.pprint(ConcertSerializer(concert).data)
+
+                    concert_report.delete() # delete the concert report since the proposed change has been applied to the concert.
+                    return Response({'message':'Since upvotes reached the limit, the related concert information has been changed and the associated report has been deleted.'},status = status.HTTP_200_OK)
+            except:
+                return Response({'error':'Problem with changing concert information.'},status = status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response({'message':'Successfully upvoted concert report.'},status = status.HTTP_200_OK)
         except:
             return Response({'error':'could not add user to upvoters.'},status = status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1275,7 +1343,7 @@ def cancel_upvote_concert_report(request, concert_report_id):
     if user in upvoters:
         try:
             concert_report.upvoters.remove(user)
-            return Response(status = status.HTTP_200_OK)
+            return Response({'message':'Successfully removed the upvote.'},status = status.HTTP_200_OK)
         except:
             return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:

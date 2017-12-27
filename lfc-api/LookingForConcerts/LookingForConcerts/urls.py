@@ -81,6 +81,8 @@ urlpatterns = [
     url(r'^user/delete/$', views.delete_user, name='delete_user'), # deletes the account of a given user; only admins are authorized.
     url(r'^user/delete_all/$', views.delete_all_users, name='delete_all_users'), # deletes all user accounts; only admins are authorized.
     url(r'^user/recommendation_by_followed_users/$', views.get_recommendation_by_followed_users), # recommendations based on followed users
+    # ARTIST
+    url(r'^artists/$', views.list_artists), # lists all artists in DB
     # CONCERT
     url(r'^concert/(?P<pk>[0-9]+)/subscribe/$', views.subscribe_concert), # subscribes logged in user to the concert; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/unsubscribe/$', views.unsubscribe_concert), # unsubscribes logged in user from concert; requires authorization

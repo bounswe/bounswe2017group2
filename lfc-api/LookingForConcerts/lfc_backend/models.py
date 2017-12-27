@@ -121,7 +121,6 @@ class ConcertReport(models.Model):
         ("DATE_TIME","date_time"),
         ("DESCRIPTION","description"),
         ("LOCATION","location"),
-        ("TAG","tag"),
         ("MIN_PRICE","min_price"),
         ("MAX_PRICE","max_price"),
         ("SELLER_URL","seller_url"),
