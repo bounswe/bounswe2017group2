@@ -542,7 +542,7 @@ class Concert extends React.PureComponent {
                                         {this.state.concert.attendees.map(attendee => (
                                             <div className="row" style={{ marginTop: "3px" }}>
                                                 <Segment>
-                                                    <Link className="Link" to={"user/" + attendee.id}>
+                                                    <Link className="Link" to={"/user/" + attendee.id}>
                                                         <Icon name="user circle" />{attendee.username}
                                                     </Link>
                                                 </Segment>
