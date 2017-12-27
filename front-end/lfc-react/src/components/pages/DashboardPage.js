@@ -1,12 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Image, Label, Icon, Card, Popup } from "semantic-ui-react";
+import { Label, Popup } from "semantic-ui-react";
 import { fetch } from "../../actions/concert";
 import { Link } from "react-router-dom";
-import { connect } from "react-redux";
 import { Image, Icon, Card } from "semantic-ui-react";
-import { fetch, search, fetchRecommended } from "../../actions/concert";
+import { search, fetchRecommended } from "../../actions/concert";
 import "./design.css";
 
 const ConcertItem = ({ concert }) => (
