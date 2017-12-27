@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 
 from lfc_backend.models import RegisteredUser, Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment,  Image, Artist, Annotation
-from lfc_backend.serializers import ConcertSerializer, LocationSerializer, UserReportSerializer, ConcertReportSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer, AnnotationSerializer
+from lfc_backend.serializers import ConcertSerializer, LocationSerializer, UserReportSerializer, ConcertReportSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer, AnnotationSerializer,FullTagSerializer
 from django.views.generic import FormView, DetailView, ListView, View
 from django.urls import reverse
 from django.http import HttpResponse
@@ -912,6 +912,15 @@ def get_tags(request, search_str):
             tags.append(json.loads(t))
 
     return Response(tags, status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_all_tags(request):
+    '''
+    returns all the tags in the system
+    '''
+    tags = Tag.objects.all()
+    serializer = FullTagSerializer(tags, many=True)
+    return Response(serializer.data, status = status.HTTP_200_OK)
 
 '''
 COMMENT FUNCTIONS

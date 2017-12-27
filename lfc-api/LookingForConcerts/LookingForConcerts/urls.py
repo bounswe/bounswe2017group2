@@ -108,6 +108,7 @@ urlpatterns = [
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
     # TAG
     url(r'^tags/(?P<search_str>[\w\s*\-]+)/$',views.get_tags),
+    url(r'^all_tags/$', views.get_all_tags),
     # IMAGE
     url(r'^upload_image/', views.upload_image),
 
