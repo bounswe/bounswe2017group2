@@ -92,7 +92,7 @@ urlpatterns = [
     url(r'^concertreports/$', views.list_concert_reports), # lists all concert reports
     url(r'^concertreport/(?P<concert_report_id>[0-9]+)/delete/$', views.delete_concert_report), # deletes the concert report with the given id
     url(r'^concertreport/(?P<concert_report_id>[0-9]+)/upvote/$', views.upvote_concert_report), # upvotes the concert report with the given id
-
+    url(r'^concertreport/(?P<concert_report_id>[0-9]+)/cancel_upvote/$', views.cancel_upvote_concert_report), # cancels the upvote for the concert report with the given id
     # CONCERT SEARCH
     url(r'^concerts/search/$', views.search_concerts), # returns a list of concerts matching with data on their name, location, artist and tags.
     url(r'^concerts/advanced_search/$', views.advanced_search),
