@@ -132,7 +132,7 @@ class ConcertReport(models.Model):
     report_type = models.CharField(choices=REPORT_TYPES, max_length=20, blank=False)
     concert = models.ForeignKey(Concert, related_name = 'reports',on_delete = models.CASCADE, null=True)
     suggestion = models.CharField(max_length=1000)  # the suggestion as an alternative to the reported information.
-    upvoters = models.ForeignKey(RegisteredUser, related_name = 'upvoted_concert_reports', on_delete = models.CASCADE, null=True)
+    upvoters = models.ManyToManyField(RegisteredUser, related_name = 'upvoted_concert_reports', blank=True)
 
 class Rating(models.Model):
     '''

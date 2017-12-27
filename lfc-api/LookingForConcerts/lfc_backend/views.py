@@ -616,9 +616,7 @@ def create_concert(request):
             artist_serializer = ArtistSerializer(data = artist_data)
             if artist_serializer.is_valid():
                 artist = artist_serializer.save()
-                print("2")
         except:
-            print("1")
             return Response(artist_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
         #images creation and relating with artist
@@ -1084,7 +1082,7 @@ def create_or_edit_user_report(request,reported_user_id):
     '''
         Creates or edits a user report for the user with the given reported_user_id
     '''
-    LIMIT = 2
+    LIMIT = 3
     user = request.user
     if not user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
@@ -1093,6 +1091,9 @@ def create_or_edit_user_report(request,reported_user_id):
         reported_user = RegisteredUser.objects.get(pk=reported_user_id)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
+
+    if reported_user == user:
+        return Response({'error':'You cannot report yourself.'}, status = status.HTTP_401_UNAUTHORIZED)
 
     try:
         user_report = reported_user.received_user_reports.get(reporter = user.pk)
@@ -1124,6 +1125,9 @@ def delete_user_report(request, user_report_id):
     Deletes the user report with the given id
     '''
     user = request.user
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+
     try:
         user_report = UserReport.objects.get(pk=user_report_id)
     except:
@@ -1183,6 +1187,8 @@ def delete_concert_report(request, concert_report_id):
     Deletes the concert report with the given id
     '''
     user = request.user
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
     try:
         concert_report = ConcertReport.objects.get(pk=concert_report_id)
     except:
@@ -1204,18 +1210,21 @@ def list_concert_reports(request):
 
 @api_view(['POST'])
 def upvote_concert_report(request, concert_report_id):
-    LIMIT = 5
+    LIMIT = 2
     user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+
     concert_report = ConcertReport.objects.get(pk=concert_report_id)
     reporter = concert_report.reporter
 
     if user == reporter:
         return Response({'error':'You cannot upvote your own concert report.'},status = status.HTTP_401_UNAUTHORIZED)
 
-    if concert_report.upvoters.all() is None:
-        upvoters = []
-    else:
-        upvoters = concert_report.upvoters.all()
+    upvoters = concert_report.upvoters.all()
+    print(upvoters)
+    print(user)
 
     if user not in upvoters:
         try:
@@ -1229,9 +1238,9 @@ def upvote_concert_report(request, concert_report_id):
                 #concert_report.delete()
                 return Response({'message':'Since upvotes reached the limit, the related concert information has been changed and the associated report has been deleted.'},status = status.HTTP_200_OK)
 
-            return Response({'message':'Successfully upvoted.'},status = status.HTTP_200_OK)
+            return Response({'message':'Successfully upvoted concert report.'},status = status.HTTP_200_OK)
         except:
-            return Responde(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error':'could not add user to upvoters.'},status = status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         return Response({'error':'You have already upvoted this concert report.'},status = status.HTTP_400_BAD_REQUEST)
 
