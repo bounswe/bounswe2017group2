@@ -120,6 +120,7 @@ class ConcertReport(models.Model):
     REPORT_TYPES = (
         ("ARTIST","artist"),
         ("DATE","date"),
+        ("TIME","time"),
         ("DESCRIPTION","description"),
         ("LOCATION","location"),
         ("TAG","tag"),
