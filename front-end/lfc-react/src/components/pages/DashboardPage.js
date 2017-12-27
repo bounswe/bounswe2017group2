@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { Image, Icon, Card } from "semantic-ui-react";
-import { fetch, search } from "../../actions/concert";
+import { fetch, search, fetchRecommended } from "../../actions/concert";
 
 const ConcertItem = ({ concert }) => (
   <Card>
@@ -57,13 +57,19 @@ const ConcertsList = ({ concerts }) => (
 
 class DashboardPage extends React.Component {
   componentWillMount() {
+    if(this.props.isAuthenticated) {
+    this.props.fetchRecommended();
+    } else {
     this.props.fetch();
+    }
+    // this.props.fetch();
     // this.props.search("nadia");
   }
   render() {
-    const { concerts } = this.props;
+    const { concerts, isAuthenticated } = this.props;
     return (
       <div className="ui container">
+        {isAuthenticated}
         <ConcertsList concerts={concerts} />
       </div>
     );
@@ -109,14 +115,19 @@ ConcertItem.propTypes = {
 
 DashboardPage.propTypes = {
   concerts: PropTypes.arrayOf(PropTypes.object).isRequired,
+  recommended: PropTypes.arrayOf(PropTypes.object).isRequired,
   fetch: PropTypes.func.isRequired,
-  search: PropTypes.func.isRequired
+  search: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
+  fetchRecommended: PropTypes.func.isRequired
+
 };
 
 function mapStateToProps(state) {
   return {
-    concerts: state.concerts
+    concerts: state.concerts,
+    isAuthenticated: !!state.user.access_token
   };
 }
 
-export default connect(mapStateToProps, { fetch, search })(DashboardPage);
+export default connect(mapStateToProps, { fetch, search, fetchRecommended })(DashboardPage);
