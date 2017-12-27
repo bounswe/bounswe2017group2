@@ -80,7 +80,7 @@ class MiniConcertDetail extends React.Component {
   }
 }
 
-class MiniUserDetail extends React.Component {
+export class MiniUserDetail extends React.Component {
   constructor(props) {
     super(props);
     this.handleRemove = this.handleRemove.bind(this);
@@ -181,7 +181,7 @@ class ProfilePage extends React.Component {
   handleSpotifyConnect() {
     axios
       .post(
-      "http://34.210.127.92:8000/user/spotify/authorize",
+      "http://34.210.127.92:8000/user/spotify/authorize/",
       { "redirect_type": "frontend" }
       )
       .then(
@@ -189,7 +189,7 @@ class ProfilePage extends React.Component {
         window.location.href = response.data.url;
       },
       error => {
-        console.log("refresh");
+        console.log(error);
       }
       );
   }
@@ -197,7 +197,7 @@ class ProfilePage extends React.Component {
   handleSpotifyDisconnect() {
     axios
       .post(
-      "http://34.210.127.92:8000/user/spotify/disconnect",
+      "http://34.210.127.92:8000/user/spotify/disconnect/",
       {}
       )
       .then(
@@ -261,7 +261,7 @@ class ProfilePage extends React.Component {
   }
 
   componentWillMount() {
-    axios.get("http://34.210.127.92:8000/user/spotify/profile").then(
+    axios.get("http://34.210.127.92:8000/user/spotify/profile/").then(
       response => {
         spotifyProfile = response.data;
       },
@@ -286,7 +286,7 @@ class ProfilePage extends React.Component {
     if (params.code) {
       axios
         .post(
-        "http://34.210.127.92:8000/user/spotify/connect",
+        "http://34.210.127.92:8000/user/spotify/connect/",
         {
           "code": params.code,
           "state": params.state,
@@ -365,14 +365,14 @@ class ProfilePage extends React.Component {
         );
         if (!spotifyProfile) {
           spotifyButton = (
-            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyConnect()}>
+            <button className="ui icon right floated button" onClick={() => this.handleSpotifyConnect()}>
               <i className="spotify icon"></i>Connect
           </button>
           )
         }
         else {
           spotifyButton = (
-            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyDisconnect()}>
+            <button className="ui icon right floated button" onClick={() => this.handleSpotifyDisconnect()}>
               <i className="spotify icon"></i>Disconnect
           </button>
           )

@@ -6,10 +6,9 @@ import { Link } from "react-router-dom";
 
 // import gravatarUrl from "gravatar-url";
 import * as actions from "../../actions/auth";
-// import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
-
-// const theToken = localStorage.lfcJWT;
-// setAuthorizationHeader(theToken);
+import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
+import axios from "axios";
+import logo from './l4clogo1.png';
 
 // const fn = input =>
 //   {this.props.history.push("/home");}
@@ -22,6 +21,7 @@ import * as actions from "../../actions/auth";
 const TopNavigation = ({ isAuthenticated, logout }) => (
   <Menu secondary pointing>
     <Menu.Item header as={Link} to="/home">
+      <img src={logo}/>
       LookingForConcerts
     </Menu.Item>
     <Menu.Item>
@@ -42,7 +42,7 @@ const TopNavigation = ({ isAuthenticated, logout }) => (
           >
             Profile
           </Menu.Item>
-          <Menu.Item as={Link} to="/">
+          <Menu.Item as={Link} to="/createconcert/">
             Create a Concert
           </Menu.Item>
           
