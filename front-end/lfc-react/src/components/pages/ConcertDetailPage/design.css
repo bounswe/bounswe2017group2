@@ -72,3 +72,12 @@
 .start {
     margin-top: 100px;
 }
+
+#concertNameRibbon {
+    background-color: #800000!important;
+    color: white!important;
+}
+
+#concertNameRibbon::after {
+    border-right-color: #500000;
+}

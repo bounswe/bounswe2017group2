@@ -6,6 +6,10 @@
     color: #800000;
 }
 
+.center {
+    text-align: center;
+}
+
 .ui.button{
     background-color: #800000;
     color: white;
@@ -20,4 +24,5 @@
     background-color: #600000;
     color: white;
 }
+
 
