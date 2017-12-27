@@ -80,8 +80,7 @@ class Concert(models.Model):
     # tags - implemented in tag --MANY TO MANY
     tags = models.ManyToManyField(Tag, related_name = 'concerts', blank=True)
     # comments - implemented in comment - ONE TO MANY
-    date = models.DateField(max_length=50 , null=True)
-    time = models.TimeField(max_length=50, null =True)
+    date_time = models.CharField(max_length=50 , null=True)
     description =  models.CharField(max_length=2000, blank=True)
     price_min = models.IntegerField()
     price_max = models.IntegerField()
@@ -92,7 +91,7 @@ class Concert(models.Model):
     #concertReports -implemented in Report --ONE TO MANY
 
     class Meta: # artist and date_time combination should be unique for concerts!
-        unique_together = ("artist", "date")
+        unique_together = ("artist", "date_time")
 
 class Comment(models.Model):
     comment_id = models.AutoField(primary_key=True)
@@ -119,8 +118,7 @@ class ConcertReport(models.Model):
     reporter = models.ForeignKey(RegisteredUser, related_name = 'concert_reports', on_delete = models.CASCADE, null=True)
     REPORT_TYPES = (
         ("ARTIST","artist"),
-        ("DATE","date"),
-        ("TIME","time"),
+        ("DATE_TIME","date_time"),
         ("DESCRIPTION","description"),
         ("LOCATION","location"),
         ("TAG","tag"),

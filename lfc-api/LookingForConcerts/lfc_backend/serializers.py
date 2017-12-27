@@ -112,7 +112,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     reports = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Concert
-        fields = ('concert_id','name','artist','date','time','description','price_min','price_max','tags','location','comments','attendees','ratings', 'image', 'seller_url', 'reports')
+        fields = ('concert_id','name','artist','date_time','description','price_min','price_max','tags','location','comments','attendees','ratings', 'image', 'seller_url', 'reports')
         # location should be retrieved from Google API
         # tags should be retrieved from a 3rd party semantic tag repository such as; Wikidata.
 
@@ -137,8 +137,7 @@ class ConcertSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name',instance.name)
         instance.artist = validated_data.get('artist',instance.artist)
-        instance.date = validated_data.get('date',instance.date)
-        instance.time = validated_data.get('time',instance.time)
+        instance.date_time = validated_data.get('date_time',instance.date_time)
         instance.description = validated_data.get('description',instance.description)
         instance.price_min = validated_data.get('price_min', instance.price_min)
         instance.price_max = validated_data.get('price_max', instance.price_max)

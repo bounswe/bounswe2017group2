@@ -586,7 +586,7 @@ def list_concerts(request):
     @params: None
     '''
     if request.method =='GET':
-        concerts = Concert.objects.all().order_by('-date') # sort by decreasing date
+        concerts = Concert.objects.all().order_by('-date_time') # sort by decreasing date_time
         serializer = ConcertSerializer(concerts, many=True)
         return Response(serializer.data)
     else:
