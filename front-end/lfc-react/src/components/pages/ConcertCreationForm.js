@@ -35,7 +35,9 @@ class GoogleLocationChooser extends React.Component{
         Enter venue name: 
         <input type="text" value={this.state.value} onChange={this.handleChange} />
       </label>
-      <Button primary onClick={this.handleSubmit}> Set Location </Button></div>
+      <p></p>
+      <Button onClick={this.handleSubmit}> Set Location </Button></div>
+      <p></p>
       <LocationMap lat={this.state.lat} lng={this.state.lng} venue_name={this.state.value}/>
       </div>
       );
@@ -289,7 +291,7 @@ class ConcertCreationForm extends React.Component {
               <TagForm  tagSelected={this.selectTag} />
             </Form.Field>
 
-          <Button primary>Create Concert</Button>
+          <Button>Create Concert</Button>
         </Form>
       );
     }
@@ -306,7 +308,8 @@ class TagForm extends React.Component{
     this.state ={
         allTags: [],
         selectedTags: [],
-        value: "",
+        searchvalue: "",
+        value:[]
     
   };
   this.handleChange = this.handleChange.bind(this);
@@ -314,16 +317,29 @@ class TagForm extends React.Component{
   this.handleClick = this.handleClick.bind(this);
   }
   handleChange(event){
-    this.setState({value: event.target.value});
+    this.setState({searchvalue: event.target.value});
   }
   handleSubmit(event){
     event.preventDefault();
-    axios.get("http://34.210.127.92:8000/tags/"+this.state.value+"/",{},{
+    axios.get("http://34.210.127.92:8000/tags/"+this.state.searchvalue+"/",{},{
       'Content-Type': 'application/json',
       Authorization: "Bearer " + theToken      
     }
     ).then(resp => {
+      console.log(resp);
       let tags=this.state.allTags;
+      let selecttags=[];
+      for(let index of this.state.value){
+          selecttags.push(tags[index]);
+      }
+      tags=selecttags;
+      let selectedCount=this.state.value.length;
+      let newIndices=[];
+      for(let i=0;i<selectedCount;i++){
+          newIndices.push(i);
+      }
+      this.setState({value:newIndices});
+      //remove tags that do not 
       let newtags=tags.concat(resp.data.filter(function (item){
         let duplicate=true;
         for(let arraydata of tags){
@@ -336,9 +352,10 @@ class TagForm extends React.Component{
       //console.log(this.state.allTags);
     }).catch(err => {console.log(err)});
   }
-  handleClick(event,data){
+  handleClick(event,{value}){
+      this.setState({value});
       let indices=[];
-      indices=data.value;
+      indices=this.state.value;
       let selectedtags=[];
       let taglist=this.state.allTags;
       for(let index of indices){
@@ -351,7 +368,7 @@ class TagForm extends React.Component{
     let tags=[];
     for(var i=0;i<this.state.allTags.length;i++){
       tags.push({
-        text:this.state.allTags[i].value,
+        text:this.state.allTags[i].value+":"+this.state.allTags[i].context,
         value:i,
         key:this.state.allTags[i].wikidata_uri,
   
@@ -359,14 +376,17 @@ class TagForm extends React.Component{
       
     );
     }
+    const {value}=this.state;
     return(
     <div>
       <label>
       Enter tag: 
-      <input type="text" value={this.state.value} onChange={this.handleChange} />
+      <input type="text" value={this.state.searchvalue} onChange={this.handleChange} />
       </label>
-      <Button primary  onClick={this.handleSubmit}> Find Tags</Button>
-      <Dropdown onChange={this.handleClick} placeholder="Select Tags" fluid multiple selection options={tags}/>
+      <p></p>
+      <Button onClick={this.handleSubmit}> Find Tags</Button>
+      <p></p>
+      <Dropdown onChange={this.handleClick} placeholder="Select Tags" value={value} fluid multiple selection options={tags}/>
       </div>
   );
   }
@@ -426,9 +446,12 @@ class ArtistForm extends React.Component{
     <label>
       Enter artist name: 
       <input type="text" value={this.state.value} onChange={this.handleChange} />
-    </label>
-    <Button primary onClick={this.handleSubmit} > List Artists </Button>
+      </label>
+      <p></p>
+    <Button onClick={this.handleSubmit} > List Artists </Button>
+    <p></p>
     <Dropdown onChange={this.handleClick} placeholder='Select Artist' fluid selection options={artists} />
+    
     </div>
     
   );

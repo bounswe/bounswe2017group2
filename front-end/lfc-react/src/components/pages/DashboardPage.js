@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { Image, Label, Icon, Card } from "semantic-ui-react";
-import { fetch } from "../../actions/concert";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { Image, Icon, Card } from "semantic-ui-react";
+import { fetch, search, fetchRecommended } from "../../actions/concert";
 import "./design.css";
 
 const ConcertItem = ({ concert }) => (
@@ -60,7 +60,14 @@ const ConcertsList = ({ concerts }) => (
 
 class DashboardPage extends React.Component {
   componentWillMount() {
+    // if(this.props.isAuthenticated) {
+    // this.props.fetchRecommended();
+    // } else {
+    // this.props.fetch();
+    // }
     this.props.fetch();
+    // this.props.fetch();
+    // this.props.search("nadia");
   }
   render() {
     const { concerts } = this.props;
@@ -111,13 +118,19 @@ ConcertItem.propTypes = {
 
 DashboardPage.propTypes = {
   concerts: PropTypes.arrayOf(PropTypes.object).isRequired,
-  fetch: PropTypes.func.isRequired
+  recommended: PropTypes.arrayOf(PropTypes.object).isRequired,
+  fetch: PropTypes.func.isRequired,
+  search: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
+  fetchRecommended: PropTypes.func.isRequired
+
 };
 
 function mapStateToProps(state) {
   return {
-    concerts: state.concerts
+    concerts: state.concerts,
+    isAuthenticated: !!state.user.access_token
   };
 }
 
-export default connect(mapStateToProps, { fetch })(DashboardPage);
+export default connect(mapStateToProps, { fetch, search, fetchRecommended })(DashboardPage);
