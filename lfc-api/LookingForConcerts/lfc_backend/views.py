@@ -15,7 +15,7 @@ from django.contrib.auth import authenticate, login # for user authentication an
 from django.contrib.auth.decorators import login_required, permission_required # permissions
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q # used in basic search
+from django.db.models import Q, Count # used in basic search
 from rest_framework.parsers import JSONParser # for PUT in edit_profile
 
 
@@ -983,12 +983,24 @@ def get_recommendations(request):
     artistIDs = []
     #Concerts that are already being followed. These should not be in recommendations. Also prefetches the related artists with those concerts
     subscribedconcerts = request.user.concerts.all()
-    #Concerts that can be recommended
-    recommendableconcerts = Concert.objects.all()
+
+    #get recommendations from followed users
+    recommedableconcertsfromfollowings = Concert.objects.all()
+    followed_users = request.user.following.all()
+    recommedableconcertsfromfollowings = recommedableconcertsfromfollowings.filter(Q(attendees__in=followed_users))
+
+    #Get recommendations from tags in subscribed concerts
+    recommendableconcertsfromtags = Concert.objects.all()
+    user_tags = Tag.objects.filter(Q(concerts__in=subscribedconcerts)).distinct()
+    recommendableconcertsfromtags = recommendableconcertsfromtags.filter(Q(tags__in=user_tags))
+    
+    #Get recommendations from the artists from the subscribed concerts
+    recommendableconcertsfromartists = Concert.objects.all()
+    artists = Artist.objects.filter(concerts__in=subscribedconcerts)
+    recommendableconcertsfromartists = recommendableconcertsfromartists.filter(Q(artist__in=artists))
 
     #Get top artist info from spotify if the user connected his/her account with his/her spotify account.
     if request.user.spotify_refresh_token is not None:
-
         #Get access token
         result = spotify_get_access_token(request.user)
         if 'error' in result:
@@ -1002,16 +1014,23 @@ def get_recommendations(request):
             return Response(results['error'], status = results['status'])
         for item in results['items']:
             artistIDs.append(item['id'])
+    
+    recommendableconcertsfromspotify = Concert.objects.all()
+    recommendableconcertsfromspotify = recommendableconcertsfromspotify.filter(Q(artist__spotify_id__in=artistIDs))
 
-    #Get artists from the subscribed concerts
-    artists = Artist.objects.filter(concerts__in=subscribedconcerts)
 
-    #get recommended concerts
-    recommendedConcerts = recommendableconcerts.filter(Q(artist__in=artists)|Q(artist__spotify_id__in=artistIDs))
-    print(len(recommendedConcerts))
+    #append all concerts
+    recommendedConcerts = recommedableconcertsfromfollowings.union(recommendableconcertsfromartists,recommendableconcertsfromtags, all=True)
+    if len(recommendableconcertsfromspotify) is not 0 :
+        recommendedConcerts = recommendedConcerts.union(recommendableconcertsfromspotify, all=True)
+    
+    #group by
+    countDict = dict()
+    recommendedConcerts = recommendedConcerts.annotate(rank=Count('concert_id'))
+        
     recommendedConcerts = recommendedConcerts.difference(subscribedconcerts)
     serializer = ConcertSerializer(recommendedConcerts, many = True)
-
+    
     return Response(serializer.data, status = status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -1024,11 +1043,7 @@ def get_recommendation_by_followed_users(request):
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
 
     subscribed_concerts = request.user.concerts.all()
-    followed_users = request.user.following.all()
-    recommended_concerts = Concert.objects.all()
-
-    recommended_concerts = recommended_concerts.filter(Q(attendees__in=followed_users))
-    recommended_concerts = recommended_concerts.difference(subscribed_concerts)
+    
 
     serializer = ConcertSerializer(recommended_concerts, many = True)
 
