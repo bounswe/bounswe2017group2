@@ -13,6 +13,9 @@ public class Artist implements Serializable {
     @SerializedName("spotify_id")
     @Expose
     public String spotifyId;
+    @SerializedName("concerts")
+    @Expose
+    public List<Integer> concerts;
     @SerializedName("images")
     @Expose
     public List<Image> images;
