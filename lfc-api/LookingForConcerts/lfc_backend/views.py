@@ -360,21 +360,23 @@ def spotify_connect(request):
     Connects the account of the logged in user to his Spotify account.
     '''
     print(request.user.username)
-    print(request.session['username'])
-    print(request.session['state'])
+    if 'username' in request.session:
+        print(request.session['username'])
+    if 'state' in request.session:
+        print(request.session['state'])
 
-    if(request.user.username != request.session['username']):
-         return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
-
-    print("REDIRECT STATE:" + str(request.data['state']))
-    # check state to make sure it is the same user.
-    if 'spotify_state' in request.session:
-        if request.data['state']==request.session['spotify_state']:
-            print("Spotify connect: states matched.")
-        else:
-            return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({'error':'spotify state not found in session.'}, status = status.HTTP_400_BAD_REQUEST)
+    # if(request.user.username != request.session['username']):
+    #      return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
+    #
+    # print("REDIRECT STATE:" + str(request.data['state']))
+    # # check state to make sure it is the same user.
+    # if 'spotify_state' in request.session:
+    #     if request.data['state']==request.session['spotify_state']:
+    #         print("Spotify connect: states matched.")
+    #     else:
+    #         return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
+    # else:
+    #     return Response({'error':'spotify state not found in session.'}, status = status.HTTP_400_BAD_REQUEST)
 
     if 'error' in request.data:
         return Response({'error':'The user did not give authorization for connecting to Spotify.'}, status = status.HTTP_401_UNAUTHORIZED)
