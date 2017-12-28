@@ -1,13 +1,18 @@
 package com.swegroup2.lookingforconcerts.concert;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +29,7 @@ import com.swegroup2.lookingforconcerts.login.LoginActivity;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
@@ -55,6 +61,7 @@ public class ConcertDetails extends Fragment implements com.google.android.gms.m
     EditText commentText;
     RatingBar ratingBar;
     Button attend;
+    ImageView concertImage;
 
     Button comment;
     Button back;
@@ -113,6 +120,8 @@ public class ConcertDetails extends Fragment implements com.google.android.gms.m
         attend = (Button) view.findViewById(R.id.attend);
         commentText = (EditText) view.findViewById(R.id.comment_edittext);
 
+
+
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,6 +158,12 @@ public class ConcertDetails extends Fragment implements com.google.android.gms.m
         if (concertDto.artist != null) {
             artistName.setText("Artist Name: " + concertDto.artist.name);
         }
+
+        if (concertDto.artist.images!=null){
+            new DownloadImageTask((ImageView) view.findViewById(R.id.concert_image))
+                    .execute(concertDto.artist.images.get(1).url);
+        }
+
         date.setText("Date: " + concertDto.date);
         description.setText("Description: " + concertDto.description);
         minPrice.setText("Min Price: " + concertDto.minPrice);
@@ -413,6 +428,31 @@ public class ConcertDetails extends Fragment implements com.google.android.gms.m
         }
 
         return o;
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
 
     @Override
