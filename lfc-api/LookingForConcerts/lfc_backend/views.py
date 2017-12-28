@@ -694,6 +694,7 @@ def advanced_search(request):
     if min_value.isnumeric() :
         concerts = concerts.filter(Q(price_min__gte=min_value))
 
+    concerts = concerts.distinct()
     try:
         serializer = ConcertSerializer(concerts,many=True)
         return Response(serializer.data, status = status.HTTP_200_OK)
@@ -1107,7 +1108,7 @@ def get_recommendations(request):
             artistIDs.append(item['id'])
     recommendableconcertsfromspotify = Concert.objects.all()
     recommendableconcertsfromspotify = recommendableconcertsfromspotify.filter(Q(artist__spotify_id__in=artistIDs))
-    
+
     if len(recommendableconcertsfromspotify) is not 0 :
         recommendableconcertsfromspotify = recommendableconcertsfromspotify.distinct()
         for concert in recommendableconcertsfromspotify :
@@ -1121,7 +1122,7 @@ def get_recommendations(request):
     if len(recommendableconcertsfromspotify) is not 0 :
         recommendableconcertsfromspotify.distinct()
         recommendedConcerts = recommendedConcerts.union(recommendableconcertsfromspotify, all=True)
-    
+
     #Sort the recomm values
     sorted_countDict = sorted(countDict.items(), key=operator.itemgetter(1), reverse=True)
     #print(sorted_countDict)
@@ -1132,7 +1133,7 @@ def get_recommendations(request):
     concerts = []
     for concert in sorted_countDict:
         #print(concert[0])
-        for l in listRecc : 
+        for l in listRecc :
             if l.concert_id == int(concert[0]):
                 #print(l.concert_id)
                 concerts.append(ConcertSerializer(l).data)
@@ -1150,7 +1151,7 @@ def get_recommendation_by_followed_users(request):
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
 
     subscribed_concerts = request.user.concerts.all()
-    
+
 
     serializer = ConcertSerializer(recommended_concerts, many = True)
 
@@ -1207,7 +1208,7 @@ USER REPORT FUNCTIONS
 '''
 
 @api_view(['POST','PUT'])
-def create_or_edit_user_report(request,reported_user_id):   
+def create_or_edit_user_report(request,reported_user_id):
     '''
        Creates or edits a user report for the user with the given reported_user_id
     '''
