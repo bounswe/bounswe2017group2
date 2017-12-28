@@ -5,7 +5,9 @@ from rest_framework.response import Response
 
 
 from lfc_backend.models import RegisteredUser, Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment,  Image, Artist, Annotation
+
 from lfc_backend.serializers import ConcertSerializer, LocationSerializer, UserReportSerializer, ConcertReportSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer, AnnotationSerializer,FullTagSerializer
+
 from django.views.generic import FormView, DetailView, ListView, View
 from django.urls import reverse
 from django.http import HttpResponse
@@ -692,6 +694,7 @@ def advanced_search(request):
     if min_value.isnumeric() :
         concerts = concerts.filter(Q(price_min__gte=min_value))
 
+    concerts = concerts.distinct()
     try:
         serializer = ConcertSerializer(concerts,many=True)
         return Response(serializer.data, status = status.HTTP_200_OK)
@@ -1025,14 +1028,15 @@ def upload_image(request):
         file = request.FILES.get('image')
         filename = request.FILES.get('image').name
         content = file.read()
-        full_path = str(os.getcwd()) + "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + "-" + filename
+        img_path = "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + "-" + filename
+        full_path = str(os.getcwd()) + img_path
         new_file = open(full_path, "wb")
         print ("Writing image...")
         new_file.write(content)
+        return HttpResponse("http://34.210.127.92:8000" + img_path)
     else:
         return Response({'error':'No file provided'}, status = status.HTTP_400_BAD_REQUEST)
 
-    return HttpResponse(full_path)
 
 '''
 RECOMMENDATION FUNCTIONS
@@ -1104,7 +1108,7 @@ def get_recommendations(request):
             artistIDs.append(item['id'])
     recommendableconcertsfromspotify = Concert.objects.all()
     recommendableconcertsfromspotify = recommendableconcertsfromspotify.filter(Q(artist__spotify_id__in=artistIDs))
-    
+
     if len(recommendableconcertsfromspotify) is not 0 :
         recommendableconcertsfromspotify = recommendableconcertsfromspotify.distinct()
         for concert in recommendableconcertsfromspotify :
@@ -1118,7 +1122,7 @@ def get_recommendations(request):
     if len(recommendableconcertsfromspotify) is not 0 :
         recommendableconcertsfromspotify.distinct()
         recommendedConcerts = recommendedConcerts.union(recommendableconcertsfromspotify, all=True)
-    
+
     #Sort the recomm values
     sorted_countDict = sorted(countDict.items(), key=operator.itemgetter(1), reverse=True)
     #print(sorted_countDict)
@@ -1129,7 +1133,7 @@ def get_recommendations(request):
     concerts = []
     for concert in sorted_countDict:
         #print(concert[0])
-        for l in listRecc : 
+        for l in listRecc :
             if l.concert_id == int(concert[0]):
                 #print(l.concert_id)
                 concerts.append(ConcertSerializer(l).data)
@@ -1147,7 +1151,7 @@ def get_recommendation_by_followed_users(request):
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
 
     subscribed_concerts = request.user.concerts.all()
-    
+
 
     serializer = ConcertSerializer(recommended_concerts, many = True)
 
@@ -1198,12 +1202,13 @@ def get_annotation(request, pk):
     except ObjectDoesNotExist:
         return Response({'Error':'Annotation does not exist'}, status = status.HTTP_404_NOT_FOUND)
 
+
 '''
 USER REPORT FUNCTIONS
 '''
 
 @api_view(['POST','PUT'])
-def create_or_edit_user_report(request,reported_user_id):   
+def create_or_edit_user_report(request,reported_user_id):
     '''
        Creates or edits a user report for the user with the given reported_user_id
     '''
@@ -1217,6 +1222,7 @@ def create_or_edit_user_report(request,reported_user_id):
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
+
     if reported_user == user:
         return Response({'error':'You cannot report yourself.'}, status = status.HTTP_401_UNAUTHORIZED)
 
@@ -1224,6 +1230,7 @@ def create_or_edit_user_report(request,reported_user_id):
         user_report = reported_user.received_user_reports.get(reporter = user.pk)
         if request.method == 'POST':
             return Response({'error':'You have already reported this user.'},status = status.HTTP_400_BAD_REQUEST)
+
         elif request.method == 'PUT':
             try:
                 serializer = UserReportSerializer(user_report, data = request.data)

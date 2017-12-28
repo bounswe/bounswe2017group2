@@ -70,8 +70,7 @@ const TopNavigation = ({ isAuthenticated, logout }) => (
 
 TopNavigation.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
-  logout: PropTypes.func.isRequired,
-  onChange: PropTypes.func.isRequired
+  logout: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
