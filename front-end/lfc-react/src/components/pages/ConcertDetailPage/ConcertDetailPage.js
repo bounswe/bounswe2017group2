@@ -493,6 +493,8 @@ class Concert extends React.PureComponent {
                                 <Label as="a" ribbon id="concertNameRibbon">
                                     <h1>{this.state.concert.name}</h1>
                                 </Label>
+                                <Link className="Link" to={"/reportconcert/" + this.props.match.params.concertID +"/"
+}><Button>Report Concert</Button></Link>
                             </div>
                         </div>
                         <div className="row tagsRow">
