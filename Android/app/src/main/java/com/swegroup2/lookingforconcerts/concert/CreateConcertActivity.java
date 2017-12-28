@@ -1,12 +1,16 @@
 package com.swegroup2.lookingforconcerts.concert;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,11 +43,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CreateConcertActivity extends AppCompatActivity implements ArtistListAdapter
-        .ArtistListAdapterOnClickHandler, VenueListAdapter.VenueListAdapterOnClickHandler, TagListAdapter.TagListAdapterOnClickHandler {
+        .ArtistListAdapterOnClickHandler, VenueListAdapter.VenueListAdapterOnClickHandler, TagListAdapter.TagListAdapterOnClickHandler, DatePickerDialog.OnDateSetListener{
 
     EditText concertNameEditText;
     EditText artistNameEditText;
-    EditText dateEditText;
+    TextView dateTextView;
+    Button dateButton;
     EditText descriptionEditText;
     EditText minPriceEditText;
     EditText maxPriceEditText;
@@ -74,7 +79,7 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
 
     String concertName;
     Artist artist;
-    String date;
+    String date = "";
     String description;
     Integer minPrice;
     Integer maxPrice;
@@ -88,7 +93,8 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         setContentView(R.layout.activity_create_concert);
         concertNameEditText = (EditText) findViewById(R.id.name_edit);
         artistNameEditText = (EditText) findViewById(R.id.artist_edit);
-        dateEditText = (EditText) findViewById(R.id.date_edit);
+        dateTextView = (TextView) findViewById(R.id.date_tv);
+        dateButton = (Button) findViewById(R.id.date_button);
         descriptionEditText = (EditText) findViewById(R.id.description_edit);
         minPriceEditText = (EditText) findViewById(R.id.min_price_edit);
         maxPriceEditText = (EditText) findViewById(R.id.max_price_edit);
@@ -113,11 +119,20 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
 
         tags = new ArrayList<>();
 
+        dateButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View view) {
+                DatePickerDialog dialog = new DatePickerDialog(CreateConcertActivity.this);
+                dialog.setOnDateSetListener(CreateConcertActivity.this);
+                dialog.show();
+            }
+        });
+
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 concertName = concertNameEditText.getText().toString().trim();
-                date = dateEditText.getText().toString();
                 description = descriptionEditText.getText().toString().trim();
                 //TODO: add validation for prices
                 minPrice = Integer.parseInt(minPriceEditText.getText().toString().isEmpty() ? "0" :
@@ -423,6 +438,14 @@ public class CreateConcertActivity extends AppCompatActivity implements ArtistLi
         selectedTagLayout.setVisibility(View.VISIBLE);
 
         tags.add(tag);
+    }
+
+    @Override
+    public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
+        String s = year + "-" + month + "-" + dayOfMonth;
+        dateTextView.setText("Date: " + s);
+        dateTextView.setVisibility(View.VISIBLE);
+        date = s;
     }
 }
 
