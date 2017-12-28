@@ -89,14 +89,17 @@ const ConcertsList = ({ concerts }) => (
 
 class DashboardPage extends React.Component {
   componentWillMount() {
-    // if(this.props.isAuthenticated) {
-    // this.props.fetchRecommended();
-    // } else {
-    // this.props.fetch();
-    // }
-    this.props.fetch();
-    // this.props.fetch();
-    // this.props.search("nadia");
+
+    const params = require('query-string').parse(this.props.location.search);
+   
+    console.log(params.search);
+    
+     if(!!params.search) {
+       this.props.search(params.search);
+    } else {
+      this.props.fetch();
+    }
+
   }
   render() {
     const { concerts } = this.props;
@@ -147,11 +150,9 @@ ConcertItem.propTypes = {
 
 DashboardPage.propTypes = {
   concerts: PropTypes.arrayOf(PropTypes.object).isRequired,
-  recommended: PropTypes.arrayOf(PropTypes.object).isRequired,
   fetch: PropTypes.func.isRequired,
   search: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
-  fetchRecommended: PropTypes.func.isRequired
 
 };
 

@@ -76,12 +76,18 @@
 
             </android.support.v7.widget.RecyclerView>
 
-            <EditText
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="date"
-                android:hint="Date (*)"
-                android:id="@+id/date_edit" />
+                android:textSize="18dp"
+                android:id="@+id/date_tv"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/date_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select A Date (*)"/>
 
             <EditText
                 android:layout_width="match_parent"

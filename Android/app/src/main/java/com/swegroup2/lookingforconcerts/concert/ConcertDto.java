@@ -73,7 +73,7 @@ public class ConcertDto implements Serializable {
 
     @SerializedName("reports")
     @Expose()
-    public List<ConcertReport> reports;
+    public List<Integer> reports;
 }
 
 
