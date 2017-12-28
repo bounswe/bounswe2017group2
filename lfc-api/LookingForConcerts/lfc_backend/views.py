@@ -5,7 +5,9 @@ from rest_framework.response import Response
 
 
 from lfc_backend.models import RegisteredUser, Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment,  Image, Artist, Annotation
+
 from lfc_backend.serializers import ConcertSerializer, LocationSerializer, UserReportSerializer, ConcertReportSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer, AnnotationSerializer,FullTagSerializer
+
 from django.views.generic import FormView, DetailView, ListView, View
 from django.urls import reverse
 from django.http import HttpResponse
@@ -1026,14 +1028,15 @@ def upload_image(request):
         file = request.FILES.get('image')
         filename = request.FILES.get('image').name
         content = file.read()
-        full_path = str(os.getcwd()) + "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + "-" + filename
+        img_path = "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + "-" + filename
+        full_path = str(os.getcwd()) + img_path
         new_file = open(full_path, "wb")
         print ("Writing image...")
         new_file.write(content)
+        return HttpResponse("http://34.210.127.92:8000" + img_path)
     else:
         return Response({'error':'No file provided'}, status = status.HTTP_400_BAD_REQUEST)
 
-    return HttpResponse(full_path)
 
 '''
 RECOMMENDATION FUNCTIONS
@@ -1199,6 +1202,7 @@ def get_annotation(request, pk):
     except ObjectDoesNotExist:
         return Response({'Error':'Annotation does not exist'}, status = status.HTTP_404_NOT_FOUND)
 
+
 '''
 USER REPORT FUNCTIONS
 '''
@@ -1218,6 +1222,7 @@ def create_or_edit_user_report(request,reported_user_id):
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
+
     if reported_user == user:
         return Response({'error':'You cannot report yourself.'}, status = status.HTTP_401_UNAUTHORIZED)
 
@@ -1225,6 +1230,7 @@ def create_or_edit_user_report(request,reported_user_id):
         user_report = reported_user.received_user_reports.get(reporter = user.pk)
         if request.method == 'POST':
             return Response({'error':'You have already reported this user.'},status = status.HTTP_400_BAD_REQUEST)
+
         elif request.method == 'PUT':
             try:
                 serializer = UserReportSerializer(user_report, data = request.data)
