@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-from lfc_backend.models import RegisteredUser, Concert, Tag, Report, Location, Rating, Comment,  Image, Artist
-from lfc_backend.serializers import ConcertSerializer,LocationSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer
+from lfc_backend.models import RegisteredUser, Concert, Tag, UserReport, ConcertReport, Location, Rating, Comment,  Image, Artist, Annotation
+from lfc_backend.serializers import ConcertSerializer, LocationSerializer, UserReportSerializer, ConcertReportSerializer, RegisteredUserSerializer, CommentSerializer, RatingSerializer, ImageSerializer, ArtistSerializer, AnnotationSerializer
 from django.views.generic import FormView, DetailView, ListView, View
 from django.urls import reverse
 from django.http import HttpResponse
@@ -132,6 +132,24 @@ def edit_profile(request):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def search_users(request):
+    '''
+    searches users considering their username, first_name, last_name, spotify_display_name
+    '''
+    query = request.GET.get('query')
+    try:
+        users = RegisteredUser.objects.filter(
+                                            Q(username__contains=query)|
+                                            Q(first_name__contains=query)|
+                                            Q(last_name__contains=query)|
+                                            Q(spotify_display_name__contains=query)
+                                            )
+        serializer = RegisteredUserSerializer(users,many=True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    except:
+        traceback.print_exc()
+        return Response(status = status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def follow_user(request,pk):
@@ -280,7 +298,7 @@ def spotify_redirect(request):
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
 
     # Hard-coded redirect uri for testing purposes.
-    redirect_uri = "http://localhost:8000/spotify/redirect"
+    redirect_uri = BASE_URL + "spotify/redirect/"
 
     TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 
@@ -885,13 +903,13 @@ def get_tags(request, search_str):
     tags = []
     for i in range(lenght):
         if 'description' in json_response[i]:
-            if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)): # we might remove this filter
-                value   = json_response[i]['label']
-                context = json_response[i]['description']
-                uri     = json_response[i]['concepturi']
-                t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
-                print(t)
-                tags.append(json.loads(t))
+            #if any(re.findall(r'music|genre', json_response[i]['description'], re.IGNORECASE)): # we might remove this filter
+            value   = json_response[i]['label']
+            context = json_response[i]['description']
+            uri     = json_response[i]['concepturi']
+            t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
+            print(t)
+            tags.append(json.loads(t))
 
     return Response(tags, status.HTTP_200_OK)
 
@@ -935,14 +953,15 @@ def upload_image(request):
         file = request.FILES.get('image')
         filename = request.FILES.get('image').name
         content = file.read()
-        full_path = str(os.getcwd()) + "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + "-" + filename
+        img_path = "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + "-" + filename
+        full_path = str(os.getcwd()) + img_path
         new_file = open(full_path, "wb")
         print ("Writing image...")
         new_file.write(content)
+        return HttpResponse("http://34.210.127.92:8000" + img_path)
     else:
         return Response({'error':'No file provided'}, status = status.HTTP_400_BAD_REQUEST)
 
-    return HttpResponse(full_path)
 
 '''
 RECOMMENDATION FUNCTIONS
@@ -1006,3 +1025,79 @@ def get_recommendation_by_followed_users(request):
     serializer = ConcertSerializer(recommended_concerts, many = True)
 
     return Response(serializer.data, status = status.HTTP_200_OK)
+
+
+'''
+ANNOTATION FUNCTIONS
+'''
+@api_view(['POST'])
+def create_annotation(request):
+    serializer = AnnotationSerializer(data = request.data)
+    if serializer.is_valid():
+        annotation = serializer.save()
+        if(request.user.is_authenticated):
+            request.user.annotations.add(annotation)
+        serializer = AnnotationSerializer(annotation)
+        return Response(serializer.data, status = status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def list_annotations(request):
+    url = request.GET
+    annotations = Annotation.objects.all()
+    annotations = annotations.filter(Q(target__target_id__contains=request.GET.get('url')))
+    serializer = AnnotationSerializer(annotations, many=True)
+    return Response(serializer.data, status.HTTP_200_OK)
+
+@api_view(['GET'])
+def all_annotations(request):
+    annotations = Annotation.objects.all()
+    serializer = AnnotationSerializer(annotations, many=True)
+    return Response(serializer.data, status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+def delete_annotation(request, pk):
+    Annotation.objects.delete(pk = pk)
+    return Response(status = status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+def get_annotation(request, pk):
+    try:
+        annotation = Annotation.objects.get(pk = pk)
+        serializer = AnnotationSerializer(annotation)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    except ObjectDoesNotExist:
+        return Response({'Error':'Annotation does not exist'}, status = status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST','PUT'])
+def create_or_edit_user_report(request,reported_user_id):
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        reported_user = RegisteredUser.objects.get(pk=reported_user_id)
+    except:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    try:
+        user_report = reported_user.received_user_reports.get(reporter = user.pk)
+        if request.method == 'POST':
+            return Response({'error':'You have already reported this user.'},status = status.HTTP_404_NOT_FOUND)
+        elif request.method == 'PUT':
+            try:
+                serializer = UserReportSerializer(user_report, data = request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                return Response(serializer.data, status = status.HTTP_200_OK)
+            except:
+                return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    except:
+        serializer = UserReportSerializer(data=request.data)
+        if serializer.is_valid():
+            user_report = serializer.save()
+            user.sent_user_reports.add(user_report)
+            reported_user.received_user_reports.add(user_report)
+            return Response(serializer.data,status = status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
