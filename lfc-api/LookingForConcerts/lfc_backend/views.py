@@ -73,6 +73,18 @@ class FrontendAppView(View):
 
 
 '''
+ARTIST FUNCTIONS
+'''
+@api_view(['GET'])
+def list_artists(request):
+    '''
+    returns all the artists
+    '''
+    artists = Artist.objects.all()
+    serializer = ArtistSerializer(artists, many=True)
+    return Response(serializer.data)
+
+'''
 USER FUNCTIONS
 '''
 @api_view(['GET'])
@@ -348,10 +360,13 @@ def spotify_connect(request):
     Connects the account of the logged in user to his Spotify account.
     '''
     print(request.user.username)
-    print(request.session['username'])
+    if 'username' in request.session:
+        print(request.session['username'])
+    if 'state' in request.session:
+        print(request.session['state'])
 
     # if(request.user.username != request.session['username']):
-    #     return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
+    #      return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
     #
     # print("REDIRECT STATE:" + str(request.data['state']))
     # # check state to make sure it is the same user.
@@ -363,10 +378,12 @@ def spotify_connect(request):
     # else:
     #     return Response({'error':'spotify state not found in session.'}, status = status.HTTP_400_BAD_REQUEST)
 
-    if request.data['error'] is not None:
-        return Response({'error':'The user did not give authorization for connecting to Spotify'}, status = status.HTTP_401_UNAUTHORIZED)
-
-    code = request.data['code'] # got the authorization code.
+    if 'error' in request.data:
+        return Response({'error':'The user did not give authorization for connecting to Spotify.'}, status = status.HTTP_401_UNAUTHORIZED)
+    if 'code' in request.data:
+        code = request.data['code'] # got the authorization code.
+    else:
+        return Response({'error':'Code not provided.'}, status = status.HTTP_400_BAD_REQUEST)
 
     client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
@@ -469,7 +486,7 @@ def spotify_authorize(request):
         'redirect_uri' : redirect_uri ,
         'state': state,
         'scope' : scope,
-        'show_dialog':False
+        'show_dialog':True
     }
     print("sending request for Spotify connect step 1...")
     r = requests.get(AUTHORIZATION_ENDPOINT, params = params, allow_redirects=True)
@@ -925,15 +942,15 @@ COMMENT FUNCTIONS
 '''
 
 @api_view(['POST'])
-def create_comment(request,pk):
+def create_comment(request,concert_id):
     '''
-    Uploads an image to the folder /media/images/ by using multipart form json type
+    Creates a comment by the current user on the concert with the given pk
     '''
     if (not request.user.is_authenticated):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     try:
-        concert = Concert.objects.get(pk=pk)
+        concert = Concert.objects.get(pk=concert_id)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -943,6 +960,56 @@ def create_comment(request,pk):
     request.user.comments.add(comment)
     concert.comments.add(comment)
     return Response(serializer.data)
+
+@api_view(['PUT'])
+def edit_comment(request, comment_id):
+    '''
+    Changes the comment with the given comment_id
+    '''
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    try:
+        comment = Comment.objects.get(pk=comment_id)
+    except:
+        return Response({'error':'Comment not found.'}, status = status.HTTP_404_NOT_FOUND)
+    creator = comment.owner
+
+    if user !=creator:
+        return Response({'error':'You cannot edit someone else\'s comment!'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    serializer = CommentSerializer(comment, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['DELETE'])
+def delete_comment(request, comment_id):
+    '''
+    Deletes the comment with the given comment_id
+    '''
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    try:
+        comment = Comment.objects.get(pk=comment_id)
+    except:
+        return Response({'error':'Comment not found.'}, status = status.HTTP_404_NOT_FOUND)
+    creator = comment.owner
+
+    if user.is_staff==False:
+        if user !=creator:
+            return Response({'error':'You cannot delete someone else\'s comment!'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    comment.delete()
+    return Response({'error':'Successfully deleted the comment.'}, status = status.HTTP_204_NO_CONTENT)
+
 
 '''
 IMAGE FUNCTIONS
@@ -1077,6 +1144,10 @@ def get_annotation(request, pk):
     except ObjectDoesNotExist:
         return Response({'Error':'Annotation does not exist'}, status = status.HTTP_404_NOT_FOUND)
 
+'''
+USER REPORT FUNCTIONS
+'''
+
 @api_view(['POST','PUT'])
 def create_or_edit_user_report(request,reported_user_id):
     '''
@@ -1147,17 +1218,21 @@ def list_user_reports(request):
     serializer = UserReportSerializer(user_reports, many=True)
     return Response(serializer.data, status = status.HTTP_200_OK)
 
+'''
+CONCERT REPORT FUNCTIONS
+'''
+
 @api_view(['POST'])
 def create_concert_report(request, reported_concert_id):
     '''
     Creates a concert report for the concert with the given reported_concert_id.
     @params:
     report_type: choices
+        "NAME",
         "ARTIST",
         "DATE_TIME",
         "DESCRIPTION",
         "LOCATION",
-        "TAG",
         "MIN_PRICE",
         "MAX_PRICE",
         "SELLER_URL",
@@ -1235,16 +1310,74 @@ def upvote_concert_report(request, concert_report_id):
             concert_report.upvoters.add(user)
             upvoters = concert_report.upvoters.all()
             # IF THE UPVOTES REACH THE LIMIT, MODIFY THE RELATED CONCERT INFORMATION
-            if len(upvoters) == LIMIT:
-                concert = concert_report.concert
-                serializer = ConcertSerializer(concert)
-                field = concert_report.report_type.lower()
-                print("Current concert data:")
-                print(serializer.data)
-                print("Updating field: " + str(field))
-                #concert_report.delete()
-                return Response({'message':'Since upvotes reached the limit, the related concert information has been changed and the associated report has been deleted.'},status = status.HTTP_200_OK)
+            try:
+                if len(upvoters) == LIMIT:
+                    concert = concert_report.concert
+                    serializer = ConcertSerializer(concert)
+                    field = concert_report.report_type.lower()
+                    suggestion = concert_report.suggestion
+                    if field == "name":
+                        concert.name = suggestion
+                        concert.save(update_fields=[field])
+                    if field == "artist":
+                        artist_data = json.loads(suggestion)
+                        artist_serializer = ArtistSerializer(data=artist_data)
+                        if artist_serializer.is_valid():
+                            artist = artist_serializer.save()
+                            old_artist = concert.artist
+                            old_artist.concerts.remove(concert)
+                            artist.concerts.add(concert)
+                        else:
+                            if artist_serializer.errors['spotify_id'][0] == "artist with this spotify id already exists.":
+                                artist = Artist.objects.get(spotify_id=artist_serializer.data['spotify_id'])
+                                old_artist = concert.artist
+                                old_artist.concerts.remove(concert)
+                                artist.concerts.add(concert)
+                            else:
+                                return Response(artist_serializer.errors, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    elif field == "date_time":
+                        concert.date_time = suggestion
+                        concert.save(update_fields=[field])
+                    elif field == "description":
+                        concert.description = suggestion
+                        concert.save(update_fields=[field])
+                    elif field == "location":
+                        location_data = json.loads(suggestion)
+                        location_serializer = LocationSerializer(data=location_data)
+                        if location_serializer.is_valid():
+                            location = Location.objects.get(**location_data)
+                            if location is None:
+                                location = location_serializer.save()
+                            old_location = concert.location
+                            old_location.concerts.remove(concert)
+                            location.concerts.add(concert)
+                        else:
+                            return Response(location_serializer.errors, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    elif field == "min_price":
+                        concert.description = int(suggestion)
+                        concert.save(update_fields=[field])
+                    elif field == "max_price":
+                        concert.description = int(suggestion)
+                        concert.save(update_fields=[field])
+                    elif field == "seller_url":
+                        concert.description = suggestion
+                        concert.save(update_fields=[field])
+                    elif field == "image":
+                        concert.description = suggestion
+                        concert.save(update_fields=[field])
+                    else:
+                        print("Field type inappropriate. Doing nothing.")
 
+                    print("Old concert data:")
+                    pprint.pprint(serializer.data)
+                    print("\nUpdated field: " + str(field) + "\n")
+                    print("New concert data:")
+                    pprint.pprint(ConcertSerializer(concert).data)
+
+                    concert_report.delete() # delete the concert report since the proposed change has been applied to the concert.
+                    return Response({'message':'Since upvotes reached the limit, the related concert information has been changed and the associated report has been deleted.'},status = status.HTTP_200_OK)
+            except:
+                return Response({'error':'Problem with changing concert information.'},status = status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response({'message':'Successfully upvoted concert report.'},status = status.HTTP_200_OK)
         except:
             return Response({'error':'could not add user to upvoters.'},status = status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1275,7 +1408,7 @@ def cancel_upvote_concert_report(request, concert_report_id):
     if user in upvoters:
         try:
             concert_report.upvoters.remove(user)
-            return Response(status = status.HTTP_200_OK)
+            return Response({'message':'Successfully removed the upvote.'},status = status.HTTP_200_OK)
         except:
             return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:

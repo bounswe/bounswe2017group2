@@ -117,11 +117,11 @@ class ConcertReport(models.Model):
     concert_report_id = models.AutoField(primary_key=True)
     reporter = models.ForeignKey(RegisteredUser, related_name = 'concert_reports', on_delete = models.CASCADE, null=True)
     REPORT_TYPES = (
+        ("NAME","name"),
         ("ARTIST","artist"),
         ("DATE_TIME","date_time"),
         ("DESCRIPTION","description"),
         ("LOCATION","location"),
-        ("TAG","tag"),
         ("MIN_PRICE","min_price"),
         ("MAX_PRICE","max_price"),
         ("SELLER_URL","seller_url"),
