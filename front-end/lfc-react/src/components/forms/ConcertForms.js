@@ -133,13 +133,14 @@ class ArtistForm extends React.Component{
     handleClick(event,{value}){
         this.setState({value});
         let indices=[];
-        indices=this.state.value;
+        indices=value;
         let selectedtags=[];
         let taglist=this.state.allTags;
         for(let index of indices){
             selectedtags.push(taglist[index]);
         }
         this.setState({selectedTags:selectedtags});
+
         this.props.tagSelected(selectedtags);
     }
     render(){
