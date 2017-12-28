@@ -37,6 +37,10 @@ public class UserDto implements Serializable {
     @Expose()
     public String lastName;
 
+    @SerializedName("spotify_display_name")
+    @Expose()
+    public String spotifyDisplayName;
+
     @SerializedName("birth_date")
     @Expose()
     public String birthDate;
@@ -55,7 +59,7 @@ public class UserDto implements Serializable {
 
     @SerializedName("comments")
     @Expose()
-    public List<ConcertComment> comments;
+    public List<Integer> comments;
 
     @SerializedName("concerts")
     @Expose()
@@ -63,9 +67,17 @@ public class UserDto implements Serializable {
 
     @SerializedName("followers")
     @Expose()
-    public List<Integer> followers;
+    public List<UserDto> followers;
 
     @SerializedName("following")
     @Expose()
-    public List<Integer> following;
+    public List<UserDto> following;
+
+    @SerializedName("sent_user_reports")
+    @Expose()
+    public List<UserReport> sentUserReports;
+
+    @SerializedName("received_user_reports")
+    @Expose()
+    public List<UserReport> receivedUserReports;
 }
