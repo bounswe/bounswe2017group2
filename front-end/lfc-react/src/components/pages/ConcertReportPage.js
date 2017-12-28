@@ -53,8 +53,7 @@ class ReportForm extends React.Component{
       this.setState({
         ...this.state,
         data: { ...this.state.data, ['date_time']: day.getFullYear()+'-'+(day.getMonth()+1)+'-'+day.getDate() }
-      });
-      
+      });      
     }
     selectTag=(tags)=>{
       this.setState({
@@ -71,22 +70,7 @@ class ReportForm extends React.Component{
     }
     onSubmit = e => {
       e.preventDefault();
-      const errors = this.validate(this.state.data);
-      this.setState({ errors });
-      if (Object.keys(errors).length === 0) {
-        	console.log(JSON.stringify(this.state.data));
-        axios.post('http://34.210.127.92:8000/newconcert/', this.state.data,{
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " + theToken
-          
-      }
-      ).then((responseJson) => {
-          window.open("http://"+window.location.host+"/concert/"+responseJson.data.concert_id,"_self")
-      },error=>{
-        console.log(error);
-      }
-    );
-      }
+        this.props.onSubmit(this.state.data);
     };
   
     validate = data => {
@@ -210,7 +194,7 @@ class ReportForm extends React.Component{
             </Message>
           )} 
           {formField}
-          <Button>Create Concert</Button>
+          <Button>Suggest this change</Button>
         </Form>
       );
     }
@@ -242,11 +226,61 @@ class ConcertReportPage extends React.Component {
     );
       }
     };
-  
+    submitReport=data=>{
+        let reportTypeToSubmit=this.state.reportType;
+        let reportTypeString;
+        let reportString;
+        if(reportTypeToSubmit==1){
+            reportTypeString="NAME";
+            reportString=data.name;
+        }
+        if(reportTypeToSubmit==2){
+          reportTypeString="DESCRIPTION";
+          reportString=data.description;
+        }if(reportTypeToSubmit==3){
+          reportTypeString="MIN_PRICE";
+          reportString=data.price_min;
+        }if(reportTypeToSubmit==4){
+          reportTypeString="MAX_PRICE";
+          reportString=data.price_max;
+        }if(reportTypeToSubmit==5){
+          reportTypeString="SELLER_URL";
+          reportString=data.seller_url;
+        }if(reportTypeToSubmit==6){
+          reportTypeString="LOCATION";
+          reportString=JSON.stringify(data.location);
+        }if(reportTypeToSubmit==7){
+          reportTypeString="ARTIST";
+          reportString=JSON.stringify(data.artist);
+        }if(reportTypeToSubmit==8){
+          reportTypeString="DATE_TIME";
+          reportString=data.date_time;
+        }
+        axios
+                .post(
+                "http://34.210.127.92:8000/concert/" +
+                this.props.match.params.concertID +
+                "/report/",
+                {
+                    report_type: reportTypeString,
+                    suggestion: reportString
+                },{
+                  'Content-Type': 'application/json',
+                  Authorization: "Bearer " + theToken
+                  
+              }
+                )
+                .then(
+                response => {
+                    console.log(response);
+                },
+                error => {
+                    console.log(error);
+                }
+                );
+    };
     validate = data => {
       const errors = {};
-  
-
       return errors;
     };
     typeChanged=(e, data)=>{
@@ -280,13 +314,8 @@ class ConcertReportPage extends React.Component {
     },{
         text:"Date",
         value:8
-    },{
-        text:"Tags",
-        value:9
     }
-
-      ];
-      
+      ];      
       return (
           <div>
           <Dropdown onChange={this.typeChanged}placeholder="Select Information to Report" fluid selection options={reportOptions}/>
@@ -295,8 +324,6 @@ class ConcertReportPage extends React.Component {
       );
     }
   }
-  
-
   ConcertReportPage.propTypes = {
     isAuthenticated: PropTypes.bool.isRequired,
 }
