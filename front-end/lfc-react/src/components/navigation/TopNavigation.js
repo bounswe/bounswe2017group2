@@ -10,13 +10,19 @@ import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
 import axios from "axios";
 import logo from './l4clogo1.png';
 
-// const fn = input =>
-//   {this.props.history.push("/home");}
 
-// const onSubmit = e => {
-//   e.preventDefault()
-//   onChange(searchInput.value)
-// }
+let input;
+
+const onChange = e => {
+  input = e.target.value;
+}
+
+const onSubmit = e => {
+  console.log(input);
+  window.history.pushState({urlPath:'/?search='+input},"",'/?search='+input);
+  window.location.reload();
+}
+
 
 const TopNavigation = ({ isAuthenticated, logout }) => (
   <Menu secondary pointing>
@@ -25,8 +31,8 @@ const TopNavigation = ({ isAuthenticated, logout }) => (
       LookingForConcerts
     </Menu.Item>
     <Menu.Item>
-      <Form onSubmit={this.onSubmit}>
-        <Input icon="search" type='text' placeholder='Search..' />
+      <Form onSubmit={onSubmit}>
+        <Input icon="search" onChange = {onChange} type='text' placeholder='Search..' />
       </Form>
     </Menu.Item>
 
