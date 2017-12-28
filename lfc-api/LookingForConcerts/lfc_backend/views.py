@@ -15,10 +15,10 @@ from django.contrib.auth import authenticate, login # for user authentication an
 from django.contrib.auth.decorators import login_required, permission_required # permissions
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q # used in basic search
+from django.db.models import Q, Count # used in basic search
 from rest_framework.parsers import JSONParser # for PUT in edit_profile
 
-
+import operator
 import spotipy # Lightweight Python library for the Spotify Web API
 import traceback
 from spotipy.oauth2 import SpotifyClientCredentials # for connecting Spotify when doing artist search
@@ -39,7 +39,7 @@ from rest_framework_simplejwt.views import (
 
 from rest_framework import permissions
 
-from datetime import datetime
+import datetime
 import os
 
 #from drf_openapi.views import SchemaView
@@ -71,18 +71,6 @@ class FrontendAppView(View):
                 status=501,
             )
 
-
-'''
-ARTIST FUNCTIONS
-'''
-@api_view(['GET'])
-def list_artists(request):
-    '''
-    returns all the artists
-    '''
-    artists = Artist.objects.all()
-    serializer = ArtistSerializer(artists, many=True)
-    return Response(serializer.data)
 
 '''
 USER FUNCTIONS
@@ -784,6 +772,15 @@ def unsubscribe_concert(request, pk):
 ARTIST FUNCTIONS
 '''
 @api_view(['GET'])
+def list_artists(request):
+    '''
+    returns all the artists
+    '''
+    artists = Artist.objects.all()
+    serializer = ArtistSerializer(artists, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
 def search_artists(request):
     data = request.GET
     client_credentials_manager = SpotifyClientCredentials(client_id='60ab66df7413492bbc86150d7a3617d7', client_secret='007ccb30ee7e4eb98478b7a34fc869e4')
@@ -795,6 +792,7 @@ def search_artists(request):
         result = {'images':spotifyresult['images'], 'spotify_id':spotifyresult['id'], 'name':spotifyresult['name']}
         results.append(result)
     return Response(results, status = status.HTTP_200_OK)
+
 
 '''
 LOCATION FUNCTIONS
@@ -1043,17 +1041,54 @@ RECOMMENDATION FUNCTIONS
 def get_recommendations(request):
     if not request.user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    #the dictionary which stores the recommendation value of the concert for the user
+    countDict = dict()
 
     #spotify ids of the top artists info from spotify
     artistIDs = []
     #Concerts that are already being followed. These should not be in recommendations. Also prefetches the related artists with those concerts
     subscribedconcerts = request.user.concerts.all()
-    #Concerts that can be recommended
-    recommendableconcerts = Concert.objects.all()
+
+    #get recommendations from followed users for each user Weight = 0.3
+    recommedableconcertsfromfollowings = Concert.objects.all()
+    followed_users = request.user.following.all()
+    recommedableconcertsfromfollowings = recommedableconcertsfromfollowings.filter(Q(attendees__in=followed_users))
+    #recommedableconcertsfromfollowings = recommedableconcertsfromfollowings.distinct()
+    #print(len(recommedableconcertsfromfollowings))
+    for concert in recommedableconcertsfromfollowings :
+        if str(concert.concert_id) in countDict :
+            countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 0.3
+        else :
+            countDict[str(concert.concert_id)] = 0.3
+
+    #Get recommendations from tags in subscribed concerts Weight for each tag = 0.5
+    recommendableconcertsfromtags = Concert.objects.all()
+    user_tags = Tag.objects.filter(Q(concerts__in=subscribedconcerts)).distinct()
+    recommendableconcertsfromtags = recommendableconcertsfromtags.filter(Q(tags__in=user_tags))
+    #More matching tags, better the concert
+    #recommendableconcertsfromtags = recommendableconcertsfromtags.distinct()
+    #print(len(recommendableconcertsfromtags))
+    for concert in recommendableconcertsfromtags :
+        if str(concert.concert_id) in countDict :
+            countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 0.5
+        else :
+            countDict[str(concert.concert_id)] = 0.5
+
+    #Get recommendations from the artists from the subscribed concerts Weight = 1
+    recommendableconcertsfromartists = Concert.objects.all()
+    artists = Artist.objects.filter(concerts__in=subscribedconcerts)
+    recommendableconcertsfromartists = recommendableconcertsfromartists.filter(Q(artist__in=artists))
+    recommendableconcertsfromartists = recommendableconcertsfromartists.distinct()
+    #print(len(recommendableconcertsfromartists))
+
+    for concert in recommendableconcertsfromartists :
+        if str(concert.concert_id) in countDict :
+            countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 1
+        else :
+            countDict[str(concert.concert_id)] = 1
 
     #Get top artist info from spotify if the user connected his/her account with his/her spotify account.
     if request.user.spotify_refresh_token is not None:
-
         #Get access token
         result = spotify_get_access_token(request.user)
         if 'error' in result:
@@ -1067,17 +1102,40 @@ def get_recommendations(request):
             return Response(results['error'], status = results['status'])
         for item in results['items']:
             artistIDs.append(item['id'])
+    recommendableconcertsfromspotify = Concert.objects.all()
+    recommendableconcertsfromspotify = recommendableconcertsfromspotify.filter(Q(artist__spotify_id__in=artistIDs))
+    
+    if len(recommendableconcertsfromspotify) is not 0 :
+        recommendableconcertsfromspotify = recommendableconcertsfromspotify.distinct()
+        for concert in recommendableconcertsfromspotify :
+            if str(concert.concert_id) in countDict :
+                countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 2
+            else :
+                countDict[str(concert.concert_id)] = 2
 
-    #Get artists from the subscribed concerts
-    artists = Artist.objects.filter(concerts__in=subscribedconcerts)
+    #append all concerts
+    recommendedConcerts = recommedableconcertsfromfollowings.union(recommendableconcertsfromartists,recommendableconcertsfromtags, all=True)
+    if len(recommendableconcertsfromspotify) is not 0 :
+        recommendableconcertsfromspotify.distinct()
+        recommendedConcerts = recommendedConcerts.union(recommendableconcertsfromspotify, all=True)
+    
+    #Sort the recomm values
+    sorted_countDict = sorted(countDict.items(), key=operator.itemgetter(1), reverse=True)
+    #print(sorted_countDict)
 
-    #get recommended concerts
-    recommendedConcerts = recommendableconcerts.filter(Q(artist__in=artists)|Q(artist__spotify_id__in=artistIDs))
-    print(len(recommendedConcerts))
+    #take only the concerts that our user is not attending
     recommendedConcerts = recommendedConcerts.difference(subscribedconcerts)
-    serializer = ConcertSerializer(recommendedConcerts, many = True)
+    listRecc = list(recommendedConcerts)
+    concerts = []
+    for concert in sorted_countDict:
+        #print(concert[0])
+        for l in listRecc : 
+            if l.concert_id == int(concert[0]):
+                #print(l.concert_id)
+                concerts.append(ConcertSerializer(l).data)
+                continue
 
-    return Response(serializer.data, status = status.HTTP_200_OK)
+    return Response(concerts, status = status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_recommendation_by_followed_users(request):
@@ -1089,11 +1147,7 @@ def get_recommendation_by_followed_users(request):
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
 
     subscribed_concerts = request.user.concerts.all()
-    followed_users = request.user.following.all()
-    recommended_concerts = Concert.objects.all()
-
-    recommended_concerts = recommended_concerts.filter(Q(attendees__in=followed_users))
-    recommended_concerts = recommended_concerts.difference(subscribed_concerts)
+    
 
     serializer = ConcertSerializer(recommended_concerts, many = True)
 
@@ -1149,9 +1203,9 @@ USER REPORT FUNCTIONS
 '''
 
 @api_view(['POST','PUT'])
-def create_or_edit_user_report(request,reported_user_id):
+def create_or_edit_user_report(request,reported_user_id):   
     '''
-        Creates or edits a user report for the user with the given reported_user_id
+       Creates or edits a user report for the user with the given reported_user_id
     '''
     LIMIT = 3
     user = request.user
