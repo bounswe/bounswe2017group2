@@ -1,0 +1,28 @@
+.ui.card:hover{
+    box-shadow: 0px 3px 10px grey,0px 1px 15px grey;
+}
+
+.concertNameLink:hover {
+    color: #800000;
+}
+
+.center {
+    text-align: center;
+}
+
+.ui.button{
+    background-color: #800000;
+    color: white;
+}
+
+.ui.button:hover{
+    background-color: #400000;
+    color: white;
+}
+
+.ui.button:focus{
+    background-color: #600000;
+    color: white;
+}
+
+

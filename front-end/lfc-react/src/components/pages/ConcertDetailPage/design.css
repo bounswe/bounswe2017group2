@@ -20,9 +20,8 @@
     padding-top: 0px!important;
 }
 
-.tag {
-    color: grey;
-    font-size: 15pt;
+.ui.label:hover{
+    background-color: lightgrey;
 }
 
 .tagsRow {
@@ -45,7 +44,6 @@
     font-size: 13pt;
     font-weight: bold;
     color: #800000;
-    text-decoration: underline;
 }
 
 .center {
@@ -72,4 +70,13 @@
 
 .start {
     margin-top: 100px;
+}
+
+#concertNameRibbon {
+    background-color: #800000!important;
+    color: white!important;
+}
+
+#concertNameRibbon::after {
+    border-right-color: #500000;
 }

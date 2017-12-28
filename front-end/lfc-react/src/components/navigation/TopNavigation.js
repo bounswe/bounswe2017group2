@@ -1,40 +1,57 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Menu, Input, Button, Form } from "semantic-ui-react";
+import { Menu, Input, Form, Icon } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import decode from "jwt-decode";
+
 // import gravatarUrl from "gravatar-url";
 import * as actions from "../../actions/auth";
 import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
 import axios from "axios";
+import logo from './l4clogo1.png';
 
-const theToken = localStorage.lfcJWT;
-setAuthorizationHeader(theToken);
+
+let input;
+
+const onChange = e => {
+  input = e.target.value;
+}
+
+const onSubmit = e => {
+  console.log(input);
+  window.history.pushState({urlPath:'/?search='+input},"",'/?search='+input);
+  window.location.reload();
+}
+
 
 const TopNavigation = ({ isAuthenticated, logout }) => (
   <Menu secondary pointing>
     <Menu.Item header as={Link} to="/home">
+      <img src={logo}/>
       LookingForConcerts
     </Menu.Item>
     <Menu.Item>
-      <Form onSubmit={this.onSubmit}>
-        <Input icon="search" placeholder="Search..." />
+      <Form onSubmit={onSubmit}>
+        <Input icon="search" onChange = {onChange} type='text' placeholder='Search..' />
       </Form>
     </Menu.Item>
 
     <Menu.Menu position="right">
       {isAuthenticated ? (
         <Menu secondary>
+          <Menu.Item as={Link} to="/recommended">
+            <Icon name="idea" />Recommendations
+          </Menu.Item>
           <Menu.Item
             as={Link}
-            to={"/me"}
+            to="/me"
           >
             Profile
           </Menu.Item>
           <Menu.Item as={Link} to="/createconcert/">
             Create a Concert
           </Menu.Item>
+          
           <Menu.Item onClick={() => logout()}>Logout</Menu.Item>
         </Menu>
       ) : (
@@ -53,7 +70,8 @@ const TopNavigation = ({ isAuthenticated, logout }) => (
 
 TopNavigation.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
-  logout: PropTypes.func.isRequired
+  logout: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
@@ -64,5 +82,5 @@ function mapStateToProps(state) {
 }
 
 export default connect(mapStateToProps, { logout: actions.logout })(
-  TopNavigation
+  TopNavigation,
 );

@@ -15,7 +15,6 @@ import dj_database_url
 import datetime
 from datetime import timedelta
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -65,7 +64,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -82,7 +81,7 @@ SIMPLE_JWT = {
     'TOKEN_TYPE_CLAIM': 'token_type',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=30),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=60),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
@@ -102,8 +101,8 @@ SOCIALACCOUNT_PROVIDERS= {
         'client_id': 'f868164aafa94586aa37fa23926f1830',
         'client_secret':'fcad57195d6144fa82959e7516a0e07e',
         'backend_redirect_uri': BASE_URL + 'spotify/redirect',
-        'frontend_redirect_uri': HOST + ":" + FRONTEND_PORT + "/home",
-        'android_redirect_uri': HOST + ":" + ANDROID_PORT + "/home",
+        'frontend_redirect_uri': HOST + ":" + FRONTEND_PORT + "/me",
+        'android_redirect_uri': HOST + ":" + ANDROID_PORT + "/me",
     }
 }
 
@@ -245,4 +244,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-

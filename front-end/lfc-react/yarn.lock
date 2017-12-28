@@ -4904,6 +4904,10 @@ pluralize@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
 
+popper.js@^1.12.5:
+  version "1.12.9"
+  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.12.9.tgz#0dfbc2dff96c451bb332edcfcfaaf566d331d5b3"
+
 portfinder@^1.0.9:
   version "1.0.13"
   resolved "https://registry.yarnpkg.com/portfinder/-/portfinder-1.0.13.tgz#bb32ecd87c27104ae6ee44b5a3ccbf0ebb1aede9"
@@ -5390,6 +5394,22 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-datepicker@^0.64.0:
+  version "0.64.0"
+  resolved "https://registry.yarnpkg.com/react-datepicker/-/react-datepicker-0.64.0.tgz#b2e1a7983ddc29ad78d82d5763a174cf33e68ee0"
+  dependencies:
+    classnames "^2.2.5"
+    prop-types "^15.6.0"
+    react-onclickoutside "^6.6.3"
+    react-popper "^0.7.4"
+
+react-day-picker@^7.0.5:
+  version "7.0.5"
+  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-7.0.5.tgz#595e709525322c1bc29e09ed3894c9279f718b46"
+  dependencies:
+    object-assign "^4.1.1"
+    prop-types "^15.6.0"
+
 react-dev-utils@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-4.2.1.tgz#9f2763e7bafa1a1b9c52254d2a479deec280f111"
@@ -5442,6 +5462,17 @@ react-google-maps@9.4.1:
     recompose "^0.26.0"
     scriptjs "^2.5.8"
     warning "^3.0.0"
+
+react-onclickoutside@^6.6.3:
+  version "6.7.0"
+  resolved "https://registry.yarnpkg.com/react-onclickoutside/-/react-onclickoutside-6.7.0.tgz#997a4d533114c9a0a104913638aa26afc084f75c"
+
+react-popper@^0.7.4:
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-0.7.4.tgz#8649d539837e7c6f47bc9b24c9cf57a404e199a1"
+  dependencies:
+    popper.js "^1.12.5"
+    prop-types "^15.5.10"
 
 react-redux@^5.0.6:
   version "5.0.6"

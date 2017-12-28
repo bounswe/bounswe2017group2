@@ -1,0 +1,27 @@
+{
+    "manifest_version": 2,
+    "name": "L4C Annotation",
+    "version": "1.0",
+    "description": "A annotation application for websites",
+    "permissions": [
+        "<all_urls>",
+        "contextMenus",
+        "webNavigation",
+        "tabs"
+    ],
+    "icons": {
+        "16": "l4clogo1.png"
+    },
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"]
+        }
+    ]
+}

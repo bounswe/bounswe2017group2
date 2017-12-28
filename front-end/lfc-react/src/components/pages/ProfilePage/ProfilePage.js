@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import "./design.css";
 import decode from "jwt-decode";
+import { Modal, Button, Popup, Input } from "semantic-ui-react";
 
 let theToken = localStorage.getItem("lfcJWT");
 let userID;
@@ -80,7 +81,7 @@ class MiniConcertDetail extends React.Component {
   }
 }
 
-class MiniUserDetail extends React.Component {
+export class MiniUserDetail extends React.Component {
   constructor(props) {
     super(props);
     this.handleRemove = this.handleRemove.bind(this);
@@ -166,22 +167,121 @@ class ProfilePage extends React.Component {
         concerts: [],
         date_joined: "",
         followers: [],
-        following: []
+        following: [],
+        received_user_reports: []
       },
       willAttend: [],
       attended: [],
-      accessToken: theToken
+      accessToken: theToken,
+      reportText: "",
+      imageFile: "",
+      imagePreUrl: ""
     };
     this.handleTab = this.handleTab.bind(this);
     this.handleFollow = this.handleFollow.bind(this);
     this.handleSpotifyConnect = this.handleSpotifyConnect.bind(this);
     this.handleSpotifyDisconnect = this.handleSpotifyDisconnect.bind(this);
+    this.handleReportChange = this.handleReportChange.bind(this);
+    this.handleReport = this.handleReport.bind(this);
+    this.handleDeleteReport = this.handleDeleteReport.bind(this);
+    this.handleImageChange = this.handleImageChange.bind(this);
+    this.handleImageSubmit = this.handleImageSubmit.bind(this);
+  }
+
+  handleImageChange(e) {
+    e.preventDefault();
+
+    let reader = new FileReader();
+    let file = e.target.files[0];
+
+    reader.onload = () => {
+      this.setState({
+        "imageFile": file,
+        "imagePreUrl": reader.result
+      });
+    }
+
+    reader.readAsDataURL(file);
+  }
+
+  handleImageSubmit(e) {
+    e.preventDefault();
+    let formD = new FormData();
+    formD.append('image', this.state.imageFile);
+    console.log(this.state.imageFile);
+    axios
+      .post(
+      "http://34.210.127.92:8000/upload_image/",
+      formD
+      )
+      .then(
+      response => {
+        axios
+          .put(
+          "http://34.210.127.92:8000/user/edit_profile/",
+          {
+            "image": response.data
+          }
+          )
+          .then(
+          response => {
+            window.location.reload();
+          },
+          error => {
+            console.log(error);
+          }
+          );
+      },
+      error => {
+        console.log(error);
+      }
+      );
+  }
+
+  handleDeleteReport(id) {
+    axios
+      .delete(
+      "http://34.210.127.92:8000/userreport/" + id + "/delete/",
+    )
+      .then(
+      response => {
+        window.location.reload();
+      },
+      error => {
+        console.log(error);
+      }
+      );
+  }
+
+  handleReportChange(event) {
+    this.setState({
+      reportText: event.target.value
+    });
+  }
+
+  handleReport() {
+    console.log(this.state.reportText);
+    axios
+      .post(
+      "http://34.210.127.92:8000/user/" + profileID + "/report/",
+      {
+        "reason": this.state.reportText
+      }
+      )
+      .then(
+      response => {
+        window.location.reload();
+      },
+      error => {
+        console.log(error);
+      }
+      );
   }
 
   handleSpotifyConnect() {
     axios
       .post(
-      "http://34.210.127.92:8000/user/spotify/authorize",
+      "http://34.210.127.92:8000/user/spotify/authorize/",
       { "redirect_type": "frontend" }
       )
       .then(
@@ -189,7 +289,7 @@ class ProfilePage extends React.Component {
         window.location.href = response.data.url;
       },
       error => {
-        console.log("refresh");
+        console.log(error);
       }
       );
   }
@@ -197,7 +297,7 @@ class ProfilePage extends React.Component {
   handleSpotifyDisconnect() {
     axios
       .post(
-      "http://34.210.127.92:8000/user/spotify/disconnect",
+      "http://34.210.127.92:8000/user/spotify/disconnect/",
       {}
       )
       .then(
@@ -261,9 +361,12 @@ class ProfilePage extends React.Component {
   }
 
   componentWillMount() {
-    axios.get("http://34.210.127.92:8000/user/spotify/profile").then(
+    axios.get("http://34.210.127.92:8000/user/spotify/profile/").then(
       response => {
-        spotifyProfile = response.data;
+        spotifyProfile = null;
+        if (response.status == 200) {
+          spotifyProfile = response.data;
+        }
       },
       error => {
         console.log("refresh user");
@@ -286,7 +389,7 @@ class ProfilePage extends React.Component {
     if (params.code) {
       axios
         .post(
-        "http://34.210.127.92:8000/user/spotify/connect",
+        "http://34.210.127.92:8000/user/spotify/connect/",
         {
           "code": params.code,
           "state": params.state,
@@ -345,7 +448,7 @@ class ProfilePage extends React.Component {
   render() {
 
     let editFollowButton;
-    let spotifyButton
+    let spotifyReportButton;
     let followedUsersList = this.state.user.following.map(usr => (
       <MiniUserDetail
         user={usr}
@@ -364,20 +467,61 @@ class ProfilePage extends React.Component {
           </Link>
         );
         if (!spotifyProfile) {
-          spotifyButton = (
-            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyConnect()}>
+          spotifyReportButton = (
+            <button className="ui icon button" onClick={() => this.handleSpotifyConnect()}>
               <i className="spotify icon"></i>Connect
           </button>
           )
         }
         else {
-          spotifyButton = (
-            <button className="ui icon right floated button spotifyGreen" onClick={() => this.handleSpotifyDisconnect()}>
+          spotifyReportButton = (
+            <button className="ui icon button" onClick={() => this.handleSpotifyDisconnect()}>
               <i className="spotify icon"></i>Disconnect
           </button>
           )
         }
       } else {
+        var reported = false;
+        var ourReport;
+        for (var report of this.state.user.received_user_reports) {
+          if (report.reporter == userID) {
+            ourReport = report;
+            reported = true;
+            break;
+          }
+        }
+        if (reported) {
+          spotifyReportButton = (
+            <Popup
+              trigger={<button className="ui button" onClick={() => this.handleDeleteReport(report.user_report_id)}>Remove Report</button>}
+              content={
+                <div style={{ maxWidth: "300px" }}>
+                  {report.reason}
+                </div>
+              }
+              position="bottom center"
+            />
+          );
+        }
+        else {
+          spotifyReportButton = (
+            <Modal trigger={<Button>Report</Button>}>
+              <Modal.Header>Report User</Modal.Header>
+              <Modal.Content>
+                <div className="ui form">
+                  <div className="field">
+                    <textarea
+                      placeholder="Write a reason..."
+                      value={this.state.reportText}
+                      onChange={this.handleReportChange}
+                    ></textarea>
+                  </div>
+                  <button className="ui button" onClick={() => this.handleReport()}>Report</button>
+                </div>
+              </Modal.Content>
+            </Modal>
+          );
+        }
         if (
           !this.state.user.followers.find(function (user) {
             return user.id === userID;
@@ -422,7 +566,7 @@ class ProfilePage extends React.Component {
 
     let spotifyData;
 
-    if (spotifyProfile && userID==profileID) {
+    if (spotifyProfile && userID == profileID) {
       spotifyData = (
         <div className="item userData">
           <b>spotify name</b> &nbsp; {spotifyProfile.display_name}
@@ -435,9 +579,9 @@ class ProfilePage extends React.Component {
           <img
             className="ui image two wide column"
             height="130px"
-            src={"http://34.210.127.92:8000" + this.state.user.image}
+            src={this.state.user.image}
           />
-          <div className="ten wide column">
+          <div className="nine wide column">
             <div className="ui grid">
               <div className="row usersName">
                 {this.state.user.first_name + " " + this.state.user.last_name}
@@ -452,8 +596,17 @@ class ProfilePage extends React.Component {
               </div>
             </div>
           </div>
-          <div className="two wide column">{spotifyButton}</div>
-          <div className="two wide column">{editFollowButton}</div>
+          <div className="five wide column" style={{ textAlign: "right" }}>{spotifyReportButton}{editFollowButton}</div>
+        </div>
+        <div className="row">
+          <Modal trigger={<Button style={{ marginLeft: "25px" }}>Change</Button>}>
+            <Modal.Content>
+              <form>
+                <Input type="file" onChange={this.handleImageChange} />
+                <Button onClick={this.handleImageSubmit}>Submit</Button>
+              </form>
+            </Modal.Content>
+          </Modal>
         </div>
         <div className="row">
           <div className="ui top attached tabular menu">
@@ -528,7 +681,7 @@ class ProfilePage extends React.Component {
             <div className="ui grid center">{followersList}</div>
           </div>
         </div>
-      </div>
+      </div >
     );
   }
 }
