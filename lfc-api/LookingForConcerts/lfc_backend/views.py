@@ -979,7 +979,7 @@ def edit_comment(request, comment_id):
 
     serializer = CommentSerializer(comment, data=request.data)
     if serializer.is_valid():
-        serializer.save() 
+        serializer.save()
         return Response(serializer.data, status = status.HTTP_200_OK)
     else:
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -1001,8 +1001,9 @@ def delete_comment(request, comment_id):
         return Response({'error':'Comment not found.'}, status = status.HTTP_404_NOT_FOUND)
     creator = comment.owner
 
-    if user !=creator:
-        return Response({'error':'You cannot delete someone else\'s comment!'}, status = status.HTTP_401_UNAUTHORIZED)
+    if user.is_staff==False:
+        if user !=creator:
+            return Response({'error':'You cannot delete someone else\'s comment!'}, status = status.HTTP_401_UNAUTHORIZED)
 
     comment.delete()
     return Response({'error':'Successfully deleted the comment.'}, status = status.HTTP_204_NO_CONTENT)

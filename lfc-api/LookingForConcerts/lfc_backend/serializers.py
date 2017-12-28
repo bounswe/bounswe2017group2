@@ -63,6 +63,9 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('comment_id','content','owner')
 
+    def update(self, instance, validated_data):
+        instance.content = validated_data.get('content',instance.content)
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
