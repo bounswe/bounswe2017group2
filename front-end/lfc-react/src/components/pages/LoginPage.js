@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Grid, Image } from "semantic-ui-react";
-import logo from '../../assets/images/logo.png';
+import logo from './logo.png';
 import LoginForm from "../forms/LoginForm";
 import { login } from "../../actions/auth";
 
@@ -16,7 +16,7 @@ class LoginPage extends React.Component {
 
       <Grid.Row> 
         <Grid.Column>
-          <Image src={logo} size="medium" centered/> 
+          <Image src={logo} size="small" centered/> 
         </Grid.Column>
       </Grid.Row>
 
