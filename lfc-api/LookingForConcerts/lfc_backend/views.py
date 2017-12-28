@@ -486,7 +486,7 @@ def spotify_authorize(request):
         'redirect_uri' : redirect_uri ,
         'state': state,
         'scope' : scope,
-        'show_dialog':False
+        'show_dialog':True
     }
     print("sending request for Spotify connect step 1...")
     r = requests.get(AUTHORIZATION_ENDPOINT, params = params, allow_redirects=True)
