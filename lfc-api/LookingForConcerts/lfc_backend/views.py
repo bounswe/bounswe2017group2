@@ -654,6 +654,7 @@ def search_concerts(request):
                                           Q(location__venue__contains=searchString)|
                                           Q(artist__name__contains=searchString)|
                                           Q(tags__value__contains=searchString))
+        concerts = concerts.distinct()
         serializer = ConcertSerializer(concerts,many=True)
         return Response(serializer.data, status = status.HTTP_200_OK)
     except:
