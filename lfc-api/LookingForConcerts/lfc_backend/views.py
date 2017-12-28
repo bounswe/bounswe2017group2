@@ -1054,7 +1054,7 @@ def get_recommendations(request):
     followed_users = request.user.following.all()
     recommedableconcertsfromfollowings = recommedableconcertsfromfollowings.filter(Q(attendees__in=followed_users))
     #recommedableconcertsfromfollowings = recommedableconcertsfromfollowings.distinct()
-    #print(len(recommedableconcertsfromfollowings))
+    print(len(recommedableconcertsfromfollowings))
     for concert in recommedableconcertsfromfollowings :
         if str(concert.concert_id) in countDict :
             countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 0.3
@@ -1067,7 +1067,7 @@ def get_recommendations(request):
     recommendableconcertsfromtags = recommendableconcertsfromtags.filter(Q(tags__in=user_tags))
     #More matching tags, better the concert
     #recommendableconcertsfromtags = recommendableconcertsfromtags.distinct()
-    #print(len(recommendableconcertsfromtags))
+    print(len(recommendableconcertsfromtags))
     for concert in recommendableconcertsfromtags :
         if str(concert.concert_id) in countDict :
             countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 0.5
@@ -1086,6 +1086,28 @@ def get_recommendations(request):
             countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 1
         else :
             countDict[str(concert.concert_id)] = 1
+
+    #Related Artist info from spotify
+    artistsList = list(artists.values('spotify_id'))
+    relatedArtistIDs = []
+    client_credentials_manager = SpotifyClientCredentials(client_id='60ab66df7413492bbc86150d7a3617d7', client_secret='007ccb30ee7e4eb98478b7a34fc869e4')
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    for artist in artistsList:
+        relatedArtists = sp.artist_related_artists(artist['spotify_id'])['artists']
+        for relartist in relatedArtists:
+            if relartist['id'] not in relatedArtistIDs :
+                relatedArtistIDs.append(relartist['id'])
+
+    recommendableconcertsfromrelatedartists = Concert.objects.all()
+    recommendableconcertsfromrelatedartists = recommendableconcertsfromrelatedartists.filter(Q(artist__spotify_id__in=relatedArtistIDs))
+    recommendableconcertsfromrelatedartists = recommendableconcertsfromrelatedartists.distinct()
+    #print(len(recommendableconcertsfromrelatedartists))
+
+    for concert in recommendableconcertsfromrelatedartists :
+        if str(concert.concert_id) in countDict :
+            countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 0.4
+        else :
+            countDict[str(concert.concert_id)] = 0.4
 
     #Get top artist info from spotify if the user connected his/her account with his/her spotify account.
     if request.user.spotify_refresh_token is not None:
@@ -1114,24 +1136,25 @@ def get_recommendations(request):
                 countDict[str(concert.concert_id)] = 2
 
     #append all concerts
-    recommendedConcerts = recommedableconcertsfromfollowings.union(recommendableconcertsfromartists,recommendableconcertsfromtags, all=True)
+    recommendedConcerts = recommedableconcertsfromfollowings.union(recommendableconcertsfromartists,recommendableconcertsfromtags,recommendableconcertsfromrelatedartists, all=True)
     if len(recommendableconcertsfromspotify) is not 0 :
         recommendableconcertsfromspotify.distinct()
         recommendedConcerts = recommendedConcerts.union(recommendableconcertsfromspotify, all=True)
     
     #Sort the recomm values
     sorted_countDict = sorted(countDict.items(), key=operator.itemgetter(1), reverse=True)
-    #print(sorted_countDict)
-
+    print(sorted_countDict)
+    print(recommendedConcerts.values())
     #take only the concerts that our user is not attending
     recommendedConcerts = recommendedConcerts.difference(subscribedconcerts)
     listRecc = list(recommendedConcerts)
+    print(listRecc)
     concerts = []
     for concert in sorted_countDict:
-        #print(concert[0])
+        print(concert[0])
         for l in listRecc : 
             if l.concert_id == int(concert[0]):
-                #print(l.concert_id)
+                print(l.concert_id)
                 concerts.append(ConcertSerializer(l).data)
                 continue
 
