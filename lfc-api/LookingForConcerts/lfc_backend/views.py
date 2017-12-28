@@ -1049,12 +1049,12 @@ def get_recommendations(request):
     #Concerts that are already being followed. These should not be in recommendations. Also prefetches the related artists with those concerts
     subscribedconcerts = request.user.concerts.all()
 
-    #get recommendations from followed users Weight = 1
+    #get recommendations from followed users for each user Weight = 0.3
     recommedableconcertsfromfollowings = Concert.objects.all()
     followed_users = request.user.following.all()
     recommedableconcertsfromfollowings = recommedableconcertsfromfollowings.filter(Q(attendees__in=followed_users))
     #recommedableconcertsfromfollowings = recommedableconcertsfromfollowings.distinct()
-    print(len(recommedableconcertsfromfollowings))
+    #print(len(recommedableconcertsfromfollowings))
     for concert in recommedableconcertsfromfollowings :
         if str(concert.concert_id) in countDict :
             countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 0.3
@@ -1067,7 +1067,7 @@ def get_recommendations(request):
     recommendableconcertsfromtags = recommendableconcertsfromtags.filter(Q(tags__in=user_tags))
     #More matching tags, better the concert
     #recommendableconcertsfromtags = recommendableconcertsfromtags.distinct()
-    print(len(recommendableconcertsfromtags))
+    #print(len(recommendableconcertsfromtags))
     for concert in recommendableconcertsfromtags :
         if str(concert.concert_id) in countDict :
             countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 0.5
@@ -1079,7 +1079,7 @@ def get_recommendations(request):
     artists = Artist.objects.filter(concerts__in=subscribedconcerts)
     recommendableconcertsfromartists = recommendableconcertsfromartists.filter(Q(artist__in=artists))
     recommendableconcertsfromartists = recommendableconcertsfromartists.distinct()
-    print(len(recommendableconcertsfromartists))
+    #print(len(recommendableconcertsfromartists))
 
     for concert in recommendableconcertsfromartists :
         if str(concert.concert_id) in countDict :
@@ -1106,11 +1106,12 @@ def get_recommendations(request):
     recommendableconcertsfromspotify = recommendableconcertsfromspotify.filter(Q(artist__spotify_id__in=artistIDs))
     
     if len(recommendableconcertsfromspotify) is not 0 :
+        recommendableconcertsfromspotify = recommendableconcertsfromspotify.distinct()
         for concert in recommendableconcertsfromspotify :
             if str(concert.concert_id) in countDict :
-                countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 1
+                countDict[str(concert.concert_id)] = countDict[str(concert.concert_id)] + 2
             else :
-                countDict[str(concert.concert_id)] = 1
+                countDict[str(concert.concert_id)] = 2
 
     #append all concerts
     recommendedConcerts = recommedableconcertsfromfollowings.union(recommendableconcertsfromartists,recommendableconcertsfromtags, all=True)
@@ -1120,17 +1121,17 @@ def get_recommendations(request):
     
     #Sort the recomm values
     sorted_countDict = sorted(countDict.items(), key=operator.itemgetter(1), reverse=True)
-    print(sorted_countDict)
+    #print(sorted_countDict)
 
     #take only the concerts that our user is not attending
     recommendedConcerts = recommendedConcerts.difference(subscribedconcerts)
     listRecc = list(recommendedConcerts)
     concerts = []
     for concert in sorted_countDict:
-        print(concert[0])
+        #print(concert[0])
         for l in listRecc : 
             if l.concert_id == int(concert[0]):
-                print(l.concert_id)
+                #print(l.concert_id)
                 concerts.append(ConcertSerializer(l).data)
                 continue
 
