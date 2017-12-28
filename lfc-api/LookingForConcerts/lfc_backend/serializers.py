@@ -61,7 +61,7 @@ class CommentSerializer(serializers.ModelSerializer):
     owner = FollowedFollowingUserSerializer(read_only=True)
     class Meta:
         model = Comment
-        fields = ('content','owner',)
+        fields = ('comment_id','content','owner')
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:

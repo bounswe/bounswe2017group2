@@ -361,24 +361,27 @@ def spotify_connect(request):
     '''
     print(request.user.username)
     print(request.session['username'])
+    print(request.session['state'])
 
-    # if(request.user.username != request.session['username']):
-    #     return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
-    #
-    # print("REDIRECT STATE:" + str(request.data['state']))
-    # # check state to make sure it is the same user.
-    # if 'spotify_state' in request.session:
-    #     if request.data['state']==request.session['spotify_state']:
-    #         print("Spotify connect: states matched.")
-    #     else:
-    #         return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
-    # else:
-    #     return Response({'error':'spotify state not found in session.'}, status = status.HTTP_400_BAD_REQUEST)
+    if(request.user.username != request.session['username']):
+         return Response({'error':'users do not match'}, status = status.HTTP_401_UNAUTHORIZED)
 
-    if request.data['error'] is not None:
-        return Response({'error':'The user did not give authorization for connecting to Spotify'}, status = status.HTTP_401_UNAUTHORIZED)
+    print("REDIRECT STATE:" + str(request.data['state']))
+    # check state to make sure it is the same user.
+    if 'spotify_state' in request.session:
+        if request.data['state']==request.session['spotify_state']:
+            print("Spotify connect: states matched.")
+        else:
+            return Response({'error':'states do not match.'}, status = status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({'error':'spotify state not found in session.'}, status = status.HTTP_400_BAD_REQUEST)
 
-    code = request.data['code'] # got the authorization code.
+    if 'error' in request.data:
+        return Response({'error':'The user did not give authorization for connecting to Spotify.'}, status = status.HTTP_401_UNAUTHORIZED)
+    if 'code' in request.data:
+        code = request.data['code'] # got the authorization code.
+    else:
+        return Response({'error':'Code not provided.'}, status = status.HTTP_400_BAD_REQUEST)
 
     client_id = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_id']
     client_secret = settings.SOCIALACCOUNT_PROVIDERS['spotify']['client_secret']
@@ -937,15 +940,15 @@ COMMENT FUNCTIONS
 '''
 
 @api_view(['POST'])
-def create_comment(request,pk):
+def create_comment(request,concert_id):
     '''
-    Uploads an image to the folder /media/images/ by using multipart form json type
+    Creates a comment by the current user on the concert with the given pk
     '''
     if (not request.user.is_authenticated):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     try:
-        concert = Concert.objects.get(pk=pk)
+        concert = Concert.objects.get(pk=concert_id)
     except:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
@@ -955,6 +958,55 @@ def create_comment(request,pk):
     request.user.comments.add(comment)
     concert.comments.add(comment)
     return Response(serializer.data)
+
+@api_view(['PUT'])
+def edit_comment(request, comment_id):
+    '''
+    Changes the comment with the given comment_id
+    '''
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    try:
+        comment = Comment.objects.get(pk=comment_id)
+    except:
+        return Response({'error':'Comment not found.'}, status = status.HTTP_404_NOT_FOUND)
+    creator = comment.owner
+
+    if user !=creator:
+        return Response({'error':'You cannot edit someone else\'s comment!'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    serializer = CommentSerializer(comment, data=request.data)
+    if serializer.is_valid():
+        serializer.save() 
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['DELETE'])
+def delete_comment(request, comment_id):
+    '''
+    Deletes the comment with the given comment_id
+    '''
+    user = request.user
+
+    if not user.is_authenticated:
+        return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
+    try:
+        comment = Comment.objects.get(pk=comment_id)
+    except:
+        return Response({'error':'Comment not found.'}, status = status.HTTP_404_NOT_FOUND)
+    creator = comment.owner
+
+    if user !=creator:
+        return Response({'error':'You cannot delete someone else\'s comment!'}, status = status.HTTP_401_UNAUTHORIZED)
+
+    comment.delete()
+    return Response({'error':'Successfully deleted the comment.'}, status = status.HTTP_204_NO_CONTENT)
+
 
 '''
 IMAGE FUNCTIONS
@@ -1089,6 +1141,10 @@ def get_annotation(request, pk):
     except ObjectDoesNotExist:
         return Response({'Error':'Annotation does not exist'}, status = status.HTTP_404_NOT_FOUND)
 
+'''
+USER REPORT FUNCTIONS
+'''
+
 @api_view(['POST','PUT'])
 def create_or_edit_user_report(request,reported_user_id):
     '''
@@ -1159,17 +1215,21 @@ def list_user_reports(request):
     serializer = UserReportSerializer(user_reports, many=True)
     return Response(serializer.data, status = status.HTTP_200_OK)
 
+'''
+CONCERT REPORT FUNCTIONS
+'''
+
 @api_view(['POST'])
 def create_concert_report(request, reported_concert_id):
     '''
     Creates a concert report for the concert with the given reported_concert_id.
     @params:
     report_type: choices
+        "NAME",
         "ARTIST",
         "DATE_TIME",
         "DESCRIPTION",
         "LOCATION",
-        "TAG",
         "MIN_PRICE",
         "MAX_PRICE",
         "SELLER_URL",
@@ -1253,7 +1313,9 @@ def upvote_concert_report(request, concert_report_id):
                     serializer = ConcertSerializer(concert)
                     field = concert_report.report_type.lower()
                     suggestion = concert_report.suggestion
-                    newdata = serializer.data
+                    if field == "name":
+                        concert.name = suggestion
+                        concert.save(update_fields=[field])
                     if field == "artist":
                         artist_data = json.loads(suggestion)
                         artist_serializer = ArtistSerializer(data=artist_data)
