@@ -30,6 +30,7 @@ export const login = credentials => dispatch =>
         };
         localStorage.lfcJWT = user.access_token;
         dispatch(userLoggedIn(user));
+        window.location.reload();
       })
       .catch(err => {
         console.log("There is an error with /user/me endpoint: " + err.data);

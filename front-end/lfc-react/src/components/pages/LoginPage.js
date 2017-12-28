@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { Grid, Image } from "semantic-ui-react";
+import logo from '../../assets/images/logo.png';
 import LoginForm from "../forms/LoginForm";
 import { login } from "../../actions/auth";
 
@@ -10,11 +12,23 @@ class LoginPage extends React.Component {
 
   render() {
     return (
-      <div>
-        <h2>Login</h2>
+      <Grid centered columns={2}>
 
-        <LoginForm submit={this.submit} />
-      </div>
+      <Grid.Row> 
+        <Grid.Column>
+          <Image src={logo} size="medium" centered/> 
+        </Grid.Column>
+      </Grid.Row>
+
+      <Grid.Row> 
+        <Grid.Column>
+          <LoginForm submit={this.submit} />   
+
+        </Grid.Column>
+      </Grid.Row>  
+
+      </Grid>  
+
     );
   }
 }

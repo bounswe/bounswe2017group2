@@ -61,6 +61,8 @@ urlpatterns = [
     url(r'^user/me/$', views.get_user_info), # returns the logged in user object; requires authorization
     url(r'^user/edit_profile/$', views.edit_profile), # updates the information of the user
     url(r'^user/(?P<reported_user_id>[0-9]+)/report/$', views.create_or_edit_user_report), # creates or edits a user report for the user with the given pk
+    url(r'^userreport/(?P<user_report_id>[0-9]+)/delete/$', views.delete_user_report), # deletes the user report with the given id
+    url(r'^userreports/$', views.list_user_reports), # lists all user reports
 
     # SPOTIFY
     url(r'^spotify/redirect/$', views.spotify_redirect, name='spotify_redirect'),
@@ -79,6 +81,8 @@ urlpatterns = [
     url(r'^user/delete/$', views.delete_user, name='delete_user'), # deletes the account of a given user; only admins are authorized.
     url(r'^user/delete_all/$', views.delete_all_users, name='delete_all_users'), # deletes all user accounts; only admins are authorized.
     url(r'^user/recommendation_by_followed_users/$', views.get_recommendation_by_followed_users), # recommendations based on followed users
+    # ARTIST
+    url(r'^artists/$', views.list_artists), # lists all artists in DB
     # CONCERT
     url(r'^concert/(?P<pk>[0-9]+)/subscribe/$', views.subscribe_concert), # subscribes logged in user to the concert; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/unsubscribe/$', views.unsubscribe_concert), # unsubscribes logged in user from concert; requires authorization
@@ -86,6 +90,11 @@ urlpatterns = [
     url(r'^concerts/get_recommended_concerts/$', views.get_recommendations), #lists the concerts that are recommended to the user using his/her subscribed concerts and spotify top artists if spotify connection is made.
     url(r'^newconcert/$', views.create_concert), # creates a concert with provided info; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/$', views.concert_detail), # gets, modifies or deletes a specific concert; only admins are authorized for modification or deletion
+    url(r'^concert/(?P<reported_concert_id>[0-9]+)/report/$', views.create_concert_report), # creates a concert report for the concert with the given id
+    url(r'^concertreports/$', views.list_concert_reports), # lists all concert reports
+    url(r'^concertreport/(?P<concert_report_id>[0-9]+)/delete/$', views.delete_concert_report), # deletes the concert report with the given id
+    url(r'^concertreport/(?P<concert_report_id>[0-9]+)/upvote/$', views.upvote_concert_report), # upvotes the concert report with the given id
+    url(r'^concertreport/(?P<concert_report_id>[0-9]+)/cancel_upvote/$', views.cancel_upvote_concert_report), # cancels the upvote for the concert report with the given id
     # CONCERT SEARCH
     url(r'^concerts/search/$', views.search_concerts), # returns a list of concerts matching with data on their name, location, artist and tags.
     url(r'^concerts/advanced_search/$', views.advanced_search),
@@ -108,6 +117,7 @@ urlpatterns = [
     url(r'^location/(?P<pk>[0-9]+)/$',views.location_detail), # gets a specific location in DB
     # TAG
     url(r'^tags/(?P<search_str>[\w\s*\-]+)/$',views.get_tags),
+    url(r'^all_tags/$', views.get_all_tags),
     # IMAGE
     url(r'^upload_image/', views.upload_image),
 
