@@ -101,7 +101,10 @@ urlpatterns = [
     #ARTIST
     url(r'^searchartists/', views.search_artists), # returns a list of artists by doing a search on Spotify given a query string
     # COMMENT
-    url(r'^concert/(?P<pk>[0-9]+)/newcomment/$', views.create_comment), # adds a new comment by the logged in user to the concert specified by its primary key; requires authorization
+    url(r'^concert/(?P<concert_id>[0-9]+)/newcomment/$', views.create_comment), # adds a new comment by the logged in user to the concert specified by its primary key; requires authorization
+    url(r'^comment/(?P<comment_id>[0-9]+)/edit/$', views.edit_comment), # edits the comment with given id
+    url(r'^comment/(?P<comment_id>[0-9]+)/delete/$', views.delete_comment), # deletes the comment with given id
+
     # RATING
     url(r'^concert/(?P<pk>[0-9]+)/rate/$', views.rate_concert), # adds a new rating by the logged in user to the concert specified by its primary key; requires authorization
     url(r'^concert/(?P<pk>[0-9]+)/average_ratings/$', views.get_average_ratings), # returns the average ratings for the concert specified by its primary key

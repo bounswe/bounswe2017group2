@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import decode from "jwt-decode";
 import axios from "axios";
+import {Button} from "semantic-ui-react";
 import setAuthorizationHeader from "../../utils/setAuthorizationHeader";
 
 let theToken = localStorage.lfcJWT;
@@ -65,7 +66,7 @@ class EditProfile extends React.Component {
         }).then(response => {
             const payload = decode(theToken);
             const user_id = payload.user_id;
-           window.location.assign('/user/' + user_id + '/');
+           window.location.assign('/me');
         }, error => {
             console.log("error");
         });
@@ -89,7 +90,7 @@ class EditProfile extends React.Component {
                     <input type="date" placeholder={this.state.user.birth_date}
                            onChange={this.handleBirthDate}/> <br/>
                     <br/>
-                    <input type="submit" value="Edit"/>
+                    <Button type="submit"> Edit </Button>
                 </div>
             </form>
 
