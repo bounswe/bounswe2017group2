@@ -14,6 +14,7 @@ import UserRoute from "./components/routes/UserRoute";
 import GuestRoute from "./components/routes/GuestRoute";
 import TopNavigation from "./components/navigation/TopNavigation";
 import ConcertCreationForm from "./components/pages/ConcertCreationForm"
+import ConcertReportPage from "./components/pages/ConcertReportPage";
 
 const App = ({ location, isAuthenticated }) => (
   <div className="ui container">
@@ -25,6 +26,7 @@ const App = ({ location, isAuthenticated }) => (
     <Route location={location} path="/me/" exact component={ProfilePage} />
 	  <Route location={location} path="/EditProfile/" exact component={EditProfile} />
     <Route location={location} path="/createconcert/" exact component={ConcertCreationForm} />
+    <Route location={location} path="/reportconcert/:concertID/" exact component={ConcertReportPage} />
     <Route location={location} path="/home" exact component={DashboardPage} />
     <UserRoute location={location} path="/recommended" exact component={RecommendationPage} />
 
