@@ -31,6 +31,8 @@ let isRated = [0, 0, 0, 0];
 let currentRatings;
 const theToken = localStorage.lfcJWT;
 let averageRatings;
+let isFutureConcert;
+let isFollowedConcert = false;
 setAuthorizationHeader(theToken);
 
 //lat: 41.015, lng: 28.979
@@ -234,7 +236,7 @@ class Concert extends React.PureComponent {
     }
 
     handleFollowButton(event) {
-        if (this.state.concert.attendees.indexOf(userID) == -1) {
+        if (!isFollowedConcert) {
             axios
                 .post(
                 "http://34.210.127.92:8000/concert/" +
@@ -285,30 +287,31 @@ class Concert extends React.PureComponent {
         var visibleMessage = "";
         var invisibleMessage = "";
         var dateOfConcert = new Date(this.state.concert.date_time);
+        isFutureConcert = dateOfConcert > Date.now();
         let ratingsHeaders;
-        if (dateOfConcert > Date.now()) {
+        if (isFutureConcert) {
             visibleMessage = "Attending";
             invisibleMessage = "Not Attending";
         } else {
             if (averageRatings && averageRatings.music_quality) {
                 ratingsHeaders = (
-                    <div class="ui grid">
-                        <div class="four wide column center ratingHeaders">
+                    <div className="ui grid">
+                        <div className="four wide column center ratingHeaders">
                             <div>
                                 <h5>Music Quality: {Number(averageRatings.music_quality).toFixed(1)}</h5>
                             </div>
                         </div>
-                        <div class="four wide column center ratingHeaders">
+                        <div className="four wide column center ratingHeaders">
                             <div>
                                 <h5>Stage Show: {Number(averageRatings.stage_show).toFixed(1)}</h5>
                             </div>
                         </div>
-                        <div class="four wide column center ratingHeaders">
+                        <div className="four wide column center ratingHeaders">
                             <div>
                                 <h5>Artist Costumes: {Number(averageRatings.artist_costumes).toFixed(1)}</h5>
                             </div>
                         </div>
-                        <div class="four wide column center ratingHeaders">
+                        <div className="four wide column center ratingHeaders">
                             <div>
                                 <h5>Concert Atmosphere: {Number(averageRatings.concert_atmosphere).toFixed(1)}</h5>
                             </div>
@@ -319,7 +322,15 @@ class Concert extends React.PureComponent {
             visibleMessage = "Attended";
             invisibleMessage = "Didn't Attend";
         }
-        if (this.state.concert.attendees.indexOf(userID) == -1) {
+
+        for (let attendee of this.state.concert.attendees) {
+            if (attendee.id == userID) {
+                isFollowedConcert = true;
+                break;
+            }
+        }
+
+        if (!isFollowedConcert) {
             var temp;
             temp = visibleMessage;
             visibleMessage = invisibleMessage;
@@ -357,23 +368,23 @@ class Concert extends React.PureComponent {
             if (visibleMessage == "Attended") {
                 if (!ratingsHeaders) {
                     ratingsHeaders = (
-                        <div class="ui grid">
-                            <div class="four wide column center ratingHeaders">
+                        <div className="ui grid">
+                            <div className="four wide column center ratingHeaders">
                                 <div>
                                     <h5>Music Quality</h5>
                                 </div>
                             </div>
-                            <div class="four wide column center ratingHeaders">
+                            <div className="four wide column center ratingHeaders">
                                 <div>
                                     <h5>Stage Show</h5>
                                 </div>
                             </div>
-                            <div class="four wide column center ratingHeaders">
+                            <div className="four wide column center ratingHeaders">
                                 <div>
                                     <h5>Artist Costumes</h5>
                                 </div>
                             </div>
-                            <div class="four wide column center ratingHeaders">
+                            <div className="four wide column center ratingHeaders">
                                 <div>
                                     <h5>Concert Atmosphere</h5>
                                 </div>
@@ -499,7 +510,7 @@ class Concert extends React.PureComponent {
                             <div className="sixteen wide column">
                                 {this.state.concert.tags.map(tag => (
                                     <div className="ui label">
-                                        <i class="hashtag icon"></i>
+                                        <i className="hashtag icon"></i>
                                         {tag.value}
                                     </div>
                                 ))}
@@ -554,7 +565,7 @@ class Concert extends React.PureComponent {
                         </div>
                     )}
                     {this.state.concert.attendees.length == 0 && (
-                        <div style={{paddingTop:"20px", width: "280px", textAlign: "right" }}>
+                        <div style={{ paddingTop: "20px", width: "280px", textAlign: "right" }}>
                             <a href={"http://" + this.state.concert.seller_url}>
                                 <Button>Get ticket</Button>
                             </a>
