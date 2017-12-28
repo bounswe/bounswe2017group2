@@ -161,7 +161,7 @@ public class ConcertDetails extends Fragment implements com.google.android.gms.m
 
         if (concertDto.artist.images!=null){
             new DownloadImageTask((ImageView) view.findViewById(R.id.concert_image))
-                    .execute(concertDto.artist.images.get(1).url);
+                    .execute(concertDto.artist.images.get(0).url);
         }
 
         date.setText("Date: " + concertDto.date);

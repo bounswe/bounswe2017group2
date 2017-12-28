@@ -2,14 +2,20 @@ package com.swegroup2.lookingforconcerts.concert;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.swegroup2.lookingforconcerts.R;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -51,6 +57,12 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
         }
         holder.mConcertName.setText(concert.name);
         holder.mConcertDate.setText(concert.date);
+        if (concert.artist.images!=null){
+            if(concert.artist.images.size()==3){
+                new DownloadImageTask(holder.mConcertImage)
+                        .execute(concert.artist.images.get(2).url);
+            }
+        }
     }
 
     @Override
@@ -66,6 +78,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
         public final TextView mConcertName;
         public final TextView mArtistName;
         public final TextView mConcertDate;
+        public final ImageView mConcertImage;
 
 
         public ConcertListAdapterViewHolder(View view) {
@@ -74,6 +87,7 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
             mConcertName = (TextView) view.findViewById(R.id.concert_name_tv);
             mArtistName = (TextView) view.findViewById(R.id.artist_name_tv);
             mConcertDate = (TextView) view.findViewById(R.id.date_tv);
+            mConcertImage = (ImageView) view.findViewById(R.id.item_concert_image);
 
             view.setOnClickListener(this);
         }
@@ -81,6 +95,31 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
         @Override
         public void onClick(View view) {
             mClickHandler.onClick(mConcertData.get(getAdapterPosition()));
+        }
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
         }
     }
 
