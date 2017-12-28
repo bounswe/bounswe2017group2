@@ -39,7 +39,7 @@ from rest_framework_simplejwt.views import (
 
 from rest_framework import permissions
 
-from datetime import datetime
+import datetime
 import os
 
 #from drf_openapi.views import SchemaView
@@ -432,7 +432,7 @@ def spotify_connect(request):
 
         return Response({'message':'Successfully connected the account with Spotify!'}, status = status.HTTP_200_OK)
     else:
-        Response(status = r.status_code)
+        return Response(status = r.status_code)
 
 
 @api_view(['POST'])
@@ -1027,7 +1027,7 @@ def upload_image(request):
         file = request.FILES.get('image')
         filename = request.FILES.get('image').name
         content = file.read()
-        full_path = str(os.getcwd()) + "/media/images/" + datetime.now().isoformat().replace(":", "-") + "-" + filename
+        full_path = str(os.getcwd()) + "/media/images/" + datetime.datetime.now().isoformat().replace(":", "-") + "-" + filename
         new_file = open(full_path, "wb")
         print ("Writing image...")
         new_file.write(content)
@@ -1153,7 +1153,7 @@ def create_or_edit_user_report(request,reported_user_id):
     '''
         Creates or edits a user report for the user with the given reported_user_id
     '''
-    LIMIT = 3
+    LIMIT = 5
     user = request.user
     if not user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
