@@ -77,4 +77,8 @@ public interface RestInterfaceController {
     Call<List<com.swegroup2.lookingforconcerts.concert.Tag>> searchTags(@Path("tag") String tag,
                                                                         @HeaderMap Map<String,
             String> headerMap);
+/*
+    @GET("/user/spotify/profile/")
+    Call<>
+    */
 }

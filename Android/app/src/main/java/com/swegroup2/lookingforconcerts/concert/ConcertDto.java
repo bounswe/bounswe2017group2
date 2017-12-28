@@ -2,6 +2,7 @@ package com.swegroup2.lookingforconcerts.concert;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.swegroup2.lookingforconcerts.user.UserDto;
 
 import java.io.Serializable;
 import java.util.List;
@@ -56,7 +57,7 @@ public class ConcertDto implements Serializable {
 
     @SerializedName("attendees")
     @Expose()
-    public List<Integer> attendees;
+    public List<UserDto> attendees;
 
     @SerializedName("ratings")
     @Expose()
@@ -69,6 +70,10 @@ public class ConcertDto implements Serializable {
     @SerializedName("image")
     @Expose()
     public String image;
+
+    @SerializedName("reports")
+    @Expose()
+    public List<ConcertReport> reports;
 }
 
 
