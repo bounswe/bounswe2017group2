@@ -556,7 +556,7 @@ class Concert extends React.PureComponent {
                                             <div className="row" style={{ marginTop: "3px" }}>
                                                 <Segment>
                                                     <Link className="Link" to={"/user/" + attendee.id}>
-                                                        <Icon name="user circle" />{attendee.username}
+                                                        <img style={{width:"25px", height:"25px"}} src={attendee.image} />  {attendee.username}
                                                     </Link>
                                                 </Segment>
                                             </div>

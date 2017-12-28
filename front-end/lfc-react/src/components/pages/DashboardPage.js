@@ -41,8 +41,8 @@ const ConcertItem = ({ concert }) => (
                     {concert.attendees.map(attendee => (
                       <div className="row" style={{ marginTop: "3px" }}>
                         <Link to={"user/"+attendee.id}>
-                          <Label className="fluid">
-                            <Icon name="user circle" />{attendee.username}
+                          <Label className="fluid" image>
+                            <img src={attendee.image} />{attendee.username}
                           </Label>
                         </Link>
                       </div>
