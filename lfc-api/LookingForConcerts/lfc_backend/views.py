@@ -1333,8 +1333,9 @@ def delete_concert_report(request, concert_report_id):
 
     reporter = concert_report.reporter
 
-    if user != reporter:
-        return Response({'error':'Since you did not create this report, you cannot delete it.'},status = status.HTTP_401_UNAUTHORIZED)
+    if user.is_staff == False:
+        if user != reporter:
+            return Response({'error':'Since you did not create this report, you cannot delete it.'},status = status.HTTP_401_UNAUTHORIZED)
 
     concert_report.delete()
     return Response(status = status.HTTP_204_NO_CONTENT)
