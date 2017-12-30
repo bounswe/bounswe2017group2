@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import "./design.css";
 import decode from "jwt-decode";
-import { Modal, Button, Popup } from "semantic-ui-react";
+import { Modal, Button, Popup, Input } from "semantic-ui-react";
 
 let theToken = localStorage.getItem("lfcJWT");
 let userID;
@@ -104,8 +104,9 @@ export class MiniUserDetail extends React.Component {
         <div className="ui grid segment">
           <img
             className="ui image three wide column"
+            width="100px"
             height="100px"
-            src={"http://34.210.127.92:8000" + this.props.user.image}
+            src={this.props.user.image}
           />
           <div className="ten wide column">
             <h3>
@@ -173,7 +174,9 @@ class ProfilePage extends React.Component {
       willAttend: [],
       attended: [],
       accessToken: theToken,
-      reportText: ""
+      reportText: "",
+      imageFile: "",
+      imagePreUrl: ""
     };
     this.handleTab = this.handleTab.bind(this);
     this.handleFollow = this.handleFollow.bind(this);
@@ -182,13 +185,65 @@ class ProfilePage extends React.Component {
     this.handleReportChange = this.handleReportChange.bind(this);
     this.handleReport = this.handleReport.bind(this);
     this.handleDeleteReport = this.handleDeleteReport.bind(this);
+    this.handleImageChange = this.handleImageChange.bind(this);
+    this.handleImageSubmit = this.handleImageSubmit.bind(this);
+  }
+
+  handleImageChange(e) {
+    e.preventDefault();
+
+    let reader = new FileReader();
+    let file = e.target.files[0];
+
+    reader.onload = () => {
+      this.setState({
+        "imageFile": file,
+        "imagePreUrl": reader.result
+      });
+    }
+
+    reader.readAsDataURL(file);
+  }
+
+  handleImageSubmit(e) {
+    e.preventDefault();
+    let formD = new FormData();
+    formD.append('image', this.state.imageFile);
+    console.log(this.state.imageFile);
+    axios
+      .post(
+      "http://34.210.127.92:8000/upload_image/",
+      formD
+      )
+      .then(
+      response => {
+        axios
+          .put(
+          "http://34.210.127.92:8000/user/edit_profile/",
+          {
+            "image": response.data
+          }
+          )
+          .then(
+          response => {
+            window.location.reload();
+          },
+          error => {
+            console.log(error);
+          }
+          );
+      },
+      error => {
+        console.log(error);
+      }
+      );
   }
 
   handleDeleteReport(id) {
     axios
       .delete(
       "http://34.210.127.92:8000/userreport/" + id + "/delete/",
-      )
+    )
       .then(
       response => {
         window.location.reload();
@@ -525,7 +580,7 @@ class ProfilePage extends React.Component {
           <img
             className="ui image two wide column"
             height="130px"
-            src={"http://34.210.127.92:8000" + this.state.user.image}
+            src={this.state.user.image}
           />
           <div className="nine wide column">
             <div className="ui grid">
@@ -542,8 +597,20 @@ class ProfilePage extends React.Component {
               </div>
             </div>
           </div>
-          <div className="five wide column" style={{textAlign: "right"}}>{spotifyReportButton}{editFollowButton}</div>
+          <div className="five wide column" style={{ textAlign: "right" }}>{spotifyReportButton}{editFollowButton}</div>
         </div>
+        {userID == profileID && 
+          <div className="row">
+            <Modal trigger={<Button style={{ marginLeft: "25px" }}>Change</Button>}>
+              <Modal.Content>
+                <form>
+                  <Input type="file" onChange={this.handleImageChange} />
+                  <Button onClick={this.handleImageSubmit}>Submit</Button>
+                </form>
+              </Modal.Content>
+            </Modal>
+          </div>
+        }
         <div className="row">
           <div className="ui top attached tabular menu">
             <a
@@ -617,7 +684,7 @@ class ProfilePage extends React.Component {
             <div className="ui grid center">{followersList}</div>
           </div>
         </div>
-      </div>
+      </div >
     );
   }
 }

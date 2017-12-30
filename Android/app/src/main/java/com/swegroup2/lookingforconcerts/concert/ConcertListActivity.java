@@ -62,6 +62,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
     private EditText concertSearch;
     private Button concertSearchButton;
+    private Button refreshButton;
 
     LinearLayout selectedConcertLayout;
     TextView selectedConcertName;
@@ -95,6 +96,8 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
         spotifyButton = (Button) findViewById(R.id.spotifyButton);
 
+        refreshButton = (Button) findViewById(R.id.refresh_button);
+
 
         concertSearch = (EditText) findViewById(R.id.search_edit);
         concertSearch.clearFocus();
@@ -124,6 +127,14 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
         getConcerts();
         getProfileInfo(this);
         getRecommendedConcerts();
+
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getConcerts();
+                getRecommendedConcerts();
+            }
+        });
 
 
     }
@@ -159,7 +170,7 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
 
                          @Override
                          public void onFailure(Call<List<ConcertDto>> call, Throwable t) {
-                             Toast.makeText(ConcertListActivity.this, "ERROR", Toast.LENGTH_SHORT).show();
+                             Toast.makeText(ConcertListActivity.this, t.getCause().toString(), Toast.LENGTH_SHORT).show();
                          }
                      }
 
@@ -226,7 +237,6 @@ public class ConcertListActivity extends AppCompatActivity implements ConcertLis
     public void advancedSearch(View view) {
         Intent intent = new Intent(this, AdvancedSearchActivity.class);
         startActivity(intent);
-        finish();
     }
 
 
