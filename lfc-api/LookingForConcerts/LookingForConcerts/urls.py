@@ -37,8 +37,8 @@ from django.contrib.auth.views import logout # for user logout
 #API_PREFIX = r'^v(?P<version>[0-9]+\.[0-9]+)'
 
 urlpatterns = [
-    url(r'^$', generic.RedirectView.as_view(
-         url='/home/', permanent=False)), # redirect to /home/ if no matches are found
+    # url(r'^$', generic.RedirectView.as_view(
+    #      url='/home/', permanent=False)), # redirect to /home/ if no matches are found
     url(r'^api/$', get_swagger_view(title='Looking for Concerts API')), # our API Documentation
     # for drf Open API - if we want to switch to it later
     #url(f'{API_PREFIX}/schema/', views.MySchemaView.as_view(title='Looking For Concerts API'), name='api_schema'),
