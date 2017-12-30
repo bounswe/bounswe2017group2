@@ -86,9 +86,8 @@ class Concert(models.Model):
     price_max = models.IntegerField()
     seller_url = models.CharField(max_length = 300, null= True)
     image = models.CharField(max_length=300, null=True, blank=True)
-
     #ratings -implemented in Rating
-    #concertReports -implemented in Report --ONE TO MANY
+    #reports -implemented in ConcertReport --ONE TO MANY
 
     class Meta: # artist and date_time combination should be unique for concerts!
         unique_together = ("artist", "date_time")
@@ -131,6 +130,9 @@ class ConcertReport(models.Model):
     concert = models.ForeignKey(Concert, related_name = 'reports',on_delete = models.CASCADE, null=True)
     suggestion = models.CharField(max_length=1000)  # the suggestion as an alternative to the reported information.
     upvoters = models.ManyToManyField(RegisteredUser, related_name = 'upvoted_concert_reports', blank=True)
+
+    class Meta:
+        unique_together= ("reporter", "concert", "report_type", "suggestion")
 
 class Rating(models.Model):
     '''
