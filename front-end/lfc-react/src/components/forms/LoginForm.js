@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Form, Button, Message, Icon } from "semantic-ui-react";
 import InlineError from "../messages/InlineError";
+import './design.css';
 
 class LoginForm extends React.Component {
   state = {
@@ -78,7 +79,7 @@ class LoginForm extends React.Component {
           </div>
           {errors.password && <InlineError text={errors.password} />}
         </Form.Field>
-        <Button fluid color='red'>LOG IN</Button>
+        <Button fluid>LOG IN</Button>
       </Form>
     );
   }

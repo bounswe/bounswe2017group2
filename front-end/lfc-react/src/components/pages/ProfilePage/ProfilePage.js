@@ -104,8 +104,9 @@ export class MiniUserDetail extends React.Component {
         <div className="ui grid segment">
           <img
             className="ui image three wide column"
+            width="100px"
             height="100px"
-            src={"http://34.210.127.92:8000" + this.props.user.image}
+            src={this.props.user.image}
           />
           <div className="ten wide column">
             <h3>
@@ -598,16 +599,18 @@ class ProfilePage extends React.Component {
           </div>
           <div className="five wide column" style={{ textAlign: "right" }}>{spotifyReportButton}{editFollowButton}</div>
         </div>
-        <div className="row">
-          <Modal trigger={<Button style={{ marginLeft: "25px" }}>Change</Button>}>
-            <Modal.Content>
-              <form>
-                <Input type="file" onChange={this.handleImageChange} />
-                <Button onClick={this.handleImageSubmit}>Submit</Button>
-              </form>
-            </Modal.Content>
-          </Modal>
-        </div>
+        {userID == profileID && 
+          <div className="row">
+            <Modal trigger={<Button style={{ marginLeft: "25px" }}>Change</Button>}>
+              <Modal.Content>
+                <form>
+                  <Input type="file" onChange={this.handleImageChange} />
+                  <Button onClick={this.handleImageSubmit}>Submit</Button>
+                </form>
+              </Modal.Content>
+            </Modal>
+          </div>
+        }
         <div className="row">
           <div className="ui top attached tabular menu">
             <a

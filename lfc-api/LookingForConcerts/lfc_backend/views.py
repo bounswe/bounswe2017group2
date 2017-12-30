@@ -656,6 +656,7 @@ def search_concerts(request):
                                           Q(location__venue__contains=searchString)|
                                           Q(artist__name__contains=searchString)|
                                           Q(tags__value__contains=searchString))
+        concerts = concerts.distinct()
         serializer = ConcertSerializer(concerts,many=True)
         return Response(serializer.data, status = status.HTTP_200_OK)
     except:
@@ -1245,7 +1246,7 @@ def create_or_edit_user_report(request,reported_user_id):
             user_report = serializer.save()
             user.sent_user_reports.add(user_report)
             reported_user.received_user_reports.add(user_report)
-            if len(list(reported_user.received_user_reports.all())) == LIMIT:
+            if (len(list(reported_user.received_user_reports.all()))-(reported_user.reliability_points)) == LIMIT:
                 reported_user.delete()
                 return Response({'message':'The reported user is deleted since this user has been reported ' + str(LIMIT) + ' amount of times.'},status = status.HTTP_204_NO_CONTENT)
             return Response(serializer.data,status = status.HTTP_200_OK)
@@ -1332,8 +1333,9 @@ def delete_concert_report(request, concert_report_id):
 
     reporter = concert_report.reporter
 
-    if user != reporter:
-        return Response({'error':'Since you did not create this report, you cannot delete it.'},status = status.HTTP_401_UNAUTHORIZED)
+    if user.is_staff == False:
+        if user != reporter:
+            return Response({'error':'Since you did not create this report, you cannot delete it.'},status = status.HTTP_401_UNAUTHORIZED)
 
     concert_report.delete()
     return Response(status = status.HTTP_204_NO_CONTENT)
@@ -1435,6 +1437,9 @@ def upvote_concert_report(request, concert_report_id):
                     print("New concert data:")
                     pprint.pprint(ConcertSerializer(concert).data)
 
+                    reporter = concert_report.reporter
+                    reporter.reliability_points = reporter.reliability_points + 1 # increment the reliability score of this user
+                    reporter.save(update_fields=['reliability_points'])
                     concert_report.delete() # delete the concert report since the proposed change has been applied to the concert.
                     return Response({'message':'Since upvotes reached the limit, the related concert information has been changed and the associated report has been deleted.'},status = status.HTTP_200_OK)
             except:

@@ -85,7 +85,9 @@ public class SignupActivity extends AppCompatActivity implements LoaderManager.L
                 firstname = mFirstName.getText().toString().trim();
                 lastname = mLastName.getText().toString().trim();
                 birthdate = mBirthDate.getText().toString().trim();
-                profilepic = imageURI.getPath();
+                if (imageURI != null) {
+                    profilepic = imageURI.getPath();
+                }
                 postRequestMethod();
 
 
