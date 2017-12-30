@@ -12,8 +12,78 @@ import { isEmail, isLength } from "validator";
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 import InlineError from "..//messages/InlineError";
+
+import decode from "jwt-decode";
 const googleMapKey = "AIzaSyCrs1xLdXw8y4rfXc4tiJZZIWcwjmOR7BM";
 const theToken = localStorage.lfcJWT;
+class SingleReport extends React.Component{
+  onApprove=e=>{
+    axios
+    .post(
+    "http://34.210.127.92:8000/concertreport/" +
+    this.props.reportID +
+    "/upvote/",
+    {},{
+      'Content-Type': 'application/json',
+      Authorization: "Bearer " + theToken      
+  }
+    )
+    .then(
+    response => {
+        console.log(response);
+        if(response.status==200){
+          window.location.reload();
+        }
+    },
+    error => {
+        console.log(error);
+        alert(JSON.parse(error.request.response)['error']);
+    }
+    );
+  }
+  onDelete=e=>{
+    axios
+    .delete(
+    "http://34.210.127.92:8000/concertreport/"+this.props.reportID+
+    "/delete/",
+    {},{
+      'Content-Type': 'application/json',
+      Authorization: "Bearer " + theToken      
+  }
+    )
+    .then(
+    response => {
+        console.log(response);
+        if(response.status==204){
+          window.location.reload();
+        }
+    },
+    error => {
+        console.log(error);
+
+        alert(JSON.parse(error.request.response)['error']);
+    }
+    );
+  }
+  render(){
+    let printString=this.props.suggestion;
+    let upvotes=this.props.upvoteCount;
+    let reportType=this.props.reportType;
+    let reporter=this.props.reporterID;
+    if(reporter==decode(localStorage.lfcJWT).user_id)
+    return(
+      <div>
+        {reportType}:{printString} Upvotes:{upvotes}<Button onClick={this.onDelete}>Delete report</Button>
+      </div>
+      );
+    else 
+    return(
+    <div>
+      {reportType}:{printString} Upvotes:{upvotes}<Button onClick={this.onApprove}>Vote up</Button>
+    </div>
+    );
+  }
+}
 class ReportForm extends React.Component{
     state= {
         data: {
@@ -204,28 +274,11 @@ class ConcertReportPage extends React.Component {
         reportType:0,
         data:"",
         loading: false,
+        reports:[],
         errors: {}
     };
   
-    onSubmit = e => {
-      e.preventDefault();
-      const errors = this.validate(this.state.data);
-      this.setState({ errors });
-      if (Object.keys(errors).length === 0) {
-        	console.log(JSON.stringify(this.state.data));
-        axios.post('http://34.210.127.92:8000/newconcert/', this.state.data,{
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " + theToken
-          
-      }
-      ).then((responseJson) => {
-          window.open("http://"+window.location.host+"/concert/"+responseJson.data.concert_id,"_self")
-      },error=>{
-        console.log(error);
-      }
-    );
-      }
-    };
+
     submitReport=data=>{
         let reportTypeToSubmit=this.state.reportType;
         let reportTypeString;
@@ -273,9 +326,18 @@ class ConcertReportPage extends React.Component {
                 .then(
                 response => {
                     console.log(response);
+                    if(response.status==200){
+                      window.location.reload();
+                    }
                 },
                 error => {
                     console.log(error);
+                    let errorString="";
+                    for (let name in JSON.parse(error.request.response)){
+                        errorString+=name+":";
+                        errorString+=JSON.parse(error.request.response)[name]+"\n";
+                    }
+                    alert(errorString);
                 }
                 );
     };
@@ -286,6 +348,42 @@ class ConcertReportPage extends React.Component {
     typeChanged=(e, data)=>{
         let index=data.value;
         this.setState({reportType:index});
+      };
+     getSuggestion(report_type,suggestion){
+      if(report_type=="LOCATION"){
+        let locationObj=JSON.parse(suggestion);
+        return locationObj['venue'];
+      }
+      if(report_type=="ARTIST"){
+        let artistObj=JSON.parse(suggestion);
+        return artistObj['name'];
+      }
+      return suggestion;
+      };
+      getReportType(report_type){
+          if(report_type=="MIN_PRICE")return "MINUMUM TICKET PRICE";
+          if(report_type=="MAX_PRICE")return "MAXIMUM TICKET PRICE";
+          if(report_type=="SELLER_URL")return "TICKET SELLER URL";
+          if(report_type=="DATE_TIME")return "CONCERT DATE";
+          return report_type;
+      };
+      componentWillMount(){
+        let reportsOfThisConcert=[];
+      let concertID=this.props.match.params.concertID;
+      axios.get("http://34.210.127.92:8000/concertreports/").then(
+        response => {
+            reportsOfThisConcert=reportsOfThisConcert.concat(response.data.filter(function (item){
+              let thisConcert=false;
+              if(item['concert']==concertID){
+                thisConcert=true;
+                return thisConcert;
+              }
+              return thisConcert;
+            }
+            ));
+          this.setState({reports:reportsOfThisConcert});
+        }, error => {});
+
       };
     render() {
       const { data, errors, loading } = this.state;
@@ -315,11 +413,18 @@ class ConcertReportPage extends React.Component {
         text:"Date",
         value:8
     }
-      ];      
+      ];
+      let reportList= this.state.reports.map(report => (
+        <div>
+        <p></p>
+        <SingleReport reportID={report['concert_report_id']} suggestion={this.getSuggestion(report['report_type'],report['suggestion'])} upvoteCount={report['upvoters'].length} reportType={this.getReportType(report['report_type'])} reporterID={report['reporter']} />
+        </div>              
+    ));
       return (
           <div>
           <Dropdown onChange={this.typeChanged}placeholder="Select Information to Report" fluid selection options={reportOptions}/>
           <ReportForm type={this.state.reportType} onSubmit={this.submitReport}/>
+          {reportList}
           </div>
       );
     }
