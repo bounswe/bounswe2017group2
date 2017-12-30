@@ -32,6 +32,7 @@ class RegisteredUser(AbstractUser):
     spotify_id = models.CharField(_('spotify_id'), max_length=50,null=True, blank=True)
     spotify_display_name = models.CharField(_('spotify_display_name'),max_length=50,null=True, blank=True)
     spotify_refresh_token = models.CharField(_('spotify_refresh_token'),max_length=50,null=True, blank=True)
+    reliability_points = models.IntegerField(default=0)
 
     email = models.EmailField(
         _('Email Address'), blank=False, unique=True,
