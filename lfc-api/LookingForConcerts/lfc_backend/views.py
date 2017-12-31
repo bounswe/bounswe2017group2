@@ -641,7 +641,10 @@ def create_concert(request):
     serializer = ConcertSerializer(data = request.data)
     if serializer.is_valid():
         concert = serializer.save()
-        artist.concerts.add(concert)
+        try:
+            artist.concerts.add(concert)
+        except:
+            return Response({'Error':'An artist can not have more than one concert in one day.'}, status = status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status = status.HTTP_201_CREATED)
     return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
