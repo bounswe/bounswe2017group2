@@ -6,15 +6,15 @@ import pytest
 import requests
 from rest_framework_simplejwt import authentication
 from lfc_backend.serializers import RegisteredUserSerializer
-from rest_framework_simplejwt.tokens import AccessToken, SlidingToken
 from datetime import timedelta
+from datetime import datetime
 from rest_framework_simplejwt.exceptions import (
     AuthenticationFailed, InvalidToken
 )
 import time
 from django.conf import settings
-from rest_framework_simplejwt.tokens import RefreshToken
-from lfc_backend.tests.utils import override_api_settings
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+import pprint
 
 @pytest.mark.django_db
 class JSONWebTokenAuthTestCase(TestCase):
@@ -33,8 +33,8 @@ class JSONWebTokenAuthTestCase(TestCase):
         self.signup_url = '/signup/'
 
         self.backend = authentication.JWTAuthentication()
-        self.fake_token = b'ThisTokenIsFake'
-        self.fake_header = b'Bearer ' + self.fake_token
+        self.fake_token = 'ThisTokenIsFake'
+        self.fake_header = 'Bearer ' + self.fake_token
 
         serializer = RegisteredUserSerializer(data=self.credentials)
         if serializer.is_valid():
@@ -164,21 +164,38 @@ class JSONWebTokenAuthTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 401) # unauthorized
 
-    # DOES NOT WORK RIGHT NOW
     # def test_expired_token(self):
-    #     with override_api_settings(ACCESS_TOKEN_LIFETIME=timedelta(seconds=1)):
-    #         refresh = RefreshToken.for_user(self.user)
-    #         expired_access_token = refresh.access_token
-    #         print(str(expired_access_token.lifetime))
+    #     print(str(settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']))
+    #     old_access_token_lifetime = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']
+    #     settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'] = timedelta(seconds=0)
+    #     print(str(settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']))
+    #     response = self.client.post(
+    #         self.login_url,
+    #         json.dumps(self.credentials),
+    #         content_type='application/json'
+    #     )
     #
-    #         expired_auth_header = 'Bearer ' + str(expired_access_token)
+    #     access = AccessToken.for_user(self.user)
+    #     access.set_exp(lifetime=timedelta(seconds=1))
+    #     access['exp']=datetime.now()
     #
-    #         print(expired_auth_header)
-    #         time.sleep(1)
-    #         response = self.client.get(
-    #             '/user/me/',
-    #             content_type='application/json',
-    #             HTTP_AUTHORIZATION=expired_auth_header
-    #         )
-    #         print(response.data)
-    #         self.assertEqual(response.status_code, 401)
+    #     print(access)
+    #     print(str(access.lifetime))
+    #
+    #
+    #     token = response.data['access']
+    #     expired_auth_header = 'Bearer ' + token
+    #     time.sleep(1)
+    #     response = self.client.get(
+    #         '/user/me/',
+    #         content_type='application/json',
+    #         HTTP_AUTHORIZATION=expired_auth_header
+    #     )
+    #
+    #     # Restore settings
+    #     try:
+    #         settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'] = old_access_token_lifetime
+    #     except KeyError:
+    #         pass
+    #
+    #     #pprint.pprint(response.data)
