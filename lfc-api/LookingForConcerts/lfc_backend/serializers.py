@@ -26,9 +26,25 @@ class UserReportSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class ConcertReportSerializer(serializers.ModelSerializer):
+    reporter = serializers.PrimaryKeyRelatedField(read_only=True)
+    concert = serializers.PrimaryKeyRelatedField(read_only=True)
+    upvoters = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = ConcertReport
+        fields = (
+        "concert_report_id",
+            "reporter",
+          "concert",
+          "report_type",
+          "suggestion",
+          "upvoters")
+
 class RegisteredUserSerializer(serializers.ModelSerializer):
     sent_user_reports = UserReportSerializer(many=True, read_only=True)
     received_user_reports = UserReportSerializer(many=True, read_only=True)
+    concert_reports = ConcertReportSerializer(many=True, read_only=True)
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     concerts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     followers = FollowedFollowingUserSerializer(many=True, read_only=True)
@@ -146,21 +162,6 @@ class ConcertSerializer(serializers.ModelSerializer):
         instance.price_max = validated_data.get('price_max', instance.price_max)
         #needs implementing for updating tags. Note 3
         #needs implementing for updating location. Also need the outcome of Google Maps API
-
-class ConcertReportSerializer(serializers.ModelSerializer):
-    reporter = serializers.PrimaryKeyRelatedField(read_only=True)
-    concert = serializers.PrimaryKeyRelatedField(read_only=True)
-    upvoters = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-
-    class Meta:
-        model = ConcertReport
-        fields = (
-        "concert_report_id",
-            "reporter",
-          "concert",
-          "report_type",
-          "suggestion",
-          "upvoters")
 
 class SelectorSerializer(serializers.ModelSerializer):
     class Meta:
