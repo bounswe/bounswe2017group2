@@ -153,7 +153,6 @@ class CreateConcertTestCase(TestCase):
             "location": self.location,
             "seller_url": self.seller_url
         }
-        self.client.login(username=self.username, password=self.password)
         response = self.client.post(
                  self.createConcertUrl,
                  json.dumps(info),
@@ -182,7 +181,6 @@ class CreateConcertTestCase(TestCase):
             "location": self.location,
             "seller_url": self.seller_url
         }
-        self.client.login(username=self.username, password=self.password)
         response = self.client.post(
                  self.createConcertUrl,
                  json.dumps(info),
