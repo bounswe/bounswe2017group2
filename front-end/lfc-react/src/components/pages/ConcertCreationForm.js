@@ -29,8 +29,8 @@ class ConcertCreationForm extends React.Component {
             price_min: 0,
             price_max: 0,
             tags: [],
-            location: {'venue':null,
-                       'coordinates':null},
+            location: {'venue':"",
+                       'coordinates':""},
             image: null,
             seller_url: null
         },
@@ -86,14 +86,30 @@ class ConcertCreationForm extends React.Component {
           window.open("http://"+window.location.host+"/concert/"+responseJson.data.concert_id,"_self")
       },error=>{
         console.log(error);
+        let errorString="";
+        for (let name in JSON.parse(error.request.response)){
+            errorString+=name+":";
+            errorString+=JSON.parse(error.request.response)[name]+"\n";
+        }
+        alert(errorString);
       }
     );
+      }else{
+        let errorString="";
+        for (let name in errors){
+            errorString+=name+":";
+            errorString+=errors[name]+"\n";
+        }
+        alert(errorString);
       }
     };
   
     validate = data => {
-      const errors = {};
-  
+      let errors = {};
+      if(data.name=="")errors.concert_name="Please enter a concert name.";
+      if(data.artist.name=="")errors.artist="Please choose an artist.";
+      if(data.date_time=="")errors.date_time="Please select the concert date";
+      if(data.location.coordinates=="")errors.location="Please set the venue";
 
       return errors;
     };

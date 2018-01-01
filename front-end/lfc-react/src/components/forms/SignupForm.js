@@ -137,7 +137,7 @@ class SignupForm extends React.Component {
           {errors.password && <InlineError text={errors.password} />}
         </Form.Field>
 
-        <Button fluid color='red'>SIGN UP</Button>
+        <Button fluid >SIGN UP</Button>
       </Form>
     );
   }
