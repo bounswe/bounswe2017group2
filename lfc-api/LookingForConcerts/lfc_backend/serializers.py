@@ -79,6 +79,9 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('comment_id','content','owner')
 
+    def create(self, validated_data):
+            comment = Comment.objects.create(**validated_data)
+            return comment
     def update(self, instance, validated_data):
         instance.content = validated_data.get('content',instance.content)
 
@@ -97,10 +100,6 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('venue','coordinates')
-
-    def create(self, validated_data):
-        comment = Comment.objects.create(**validated_data)
-        return comment
 
 class RatingSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -154,14 +153,16 @@ class ConcertSerializer(serializers.ModelSerializer):
         return concert
 
     def update(self, instance, validated_data):
+        print("Updating concert")
         instance.name = validated_data.get('name',instance.name)
-        instance.artist = validated_data.get('artist',instance.artist)
         instance.date_time = validated_data.get('date_time',instance.date_time)
         instance.description = validated_data.get('description',instance.description)
         instance.price_min = validated_data.get('price_min', instance.price_min)
         instance.price_max = validated_data.get('price_max', instance.price_max)
-        #needs implementing for updating tags. Note 3
-        #needs implementing for updating location. Also need the outcome of Google Maps API
+        instance.seller_url = validated_data.get('seller_url', instance.seller_url)
+        instance.image = validated_data.get('image', instance.image)
+        instance.save()
+        return instance
 
 class SelectorSerializer(serializers.ModelSerializer):
     class Meta:

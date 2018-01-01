@@ -1213,7 +1213,7 @@ def create_or_edit_user_report(request,reported_user_id):
     '''
        Creates or edits a user report for the user with the given reported_user_id
     '''
-    LIMIT = 5
+    LIMIT = 10
     user = request.user
     if not user.is_authenticated:
         return Response({'error':'The user needs to sign in first.'}, status = status.HTTP_401_UNAUTHORIZED)
@@ -1354,7 +1354,7 @@ def upvote_concert_report(request, concert_report_id):
     '''
     upvotes the concert report with the given id. If the upvotes reach a certain limit, the related concert info is automatically updated and the concert report is deleted.
     '''
-    LIMIT = 2
+    LIMIT = 3
     user = request.user
 
     if not user.is_authenticated:
@@ -1379,12 +1379,22 @@ def upvote_concert_report(request, concert_report_id):
                     serializer = ConcertSerializer(concert)
                     field = concert_report.report_type.lower()
                     suggestion = concert_report.suggestion
+                    print("Suggestion:")
+                    try:
+                        suggestion = json.loads(suggestion)
+                        pprint.pprint(suggestion)
+                    except:
+                        print(suggestion)
+
                     if field == "name":
+                        print("Updating name...")
                         concert.name = suggestion
                         concert.save(update_fields=[field])
-                    if field == "artist":
-                        artist_data = json.loads(suggestion)
+                    elif field == "artist":
+                        print("Updating artist...")
+                        artist_data = suggestion
                         artist_serializer = ArtistSerializer(data=artist_data)
+                        #print(artist_serializer.is_valid())
                         if artist_serializer.is_valid():
                             artist = artist_serializer.save()
                             old_artist = concert.artist
@@ -1402,31 +1412,41 @@ def upvote_concert_report(request, concert_report_id):
                         concert.date_time = suggestion
                         concert.save(update_fields=[field])
                     elif field == "description":
+                        print("Updating description...")
                         concert.description = suggestion
                         concert.save(update_fields=[field])
                     elif field == "location":
-                        location_data = json.loads(suggestion)
+                        print("Updating location...")
+                        location_data = suggestion
                         location_serializer = LocationSerializer(data=location_data)
+                        print(location_serializer.is_valid())
                         if location_serializer.is_valid():
-                            location = Location.objects.get(**location_data)
-                            if location is None:
+
+                            try:
+                                location = Location.objects.get(**location_data)
+                            except:
                                 location = location_serializer.save()
+
                             old_location = concert.location
                             old_location.concerts.remove(concert)
                             location.concerts.add(concert)
                         else:
                             return Response(location_serializer.errors, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
                     elif field == "min_price":
-                        concert.description = int(suggestion)
-                        concert.save(update_fields=[field])
+                        print("Updating min price...")
+                        concert.price_min = int(suggestion)
+                        concert.save(update_fields=['price_min'])
                     elif field == "max_price":
-                        concert.description = int(suggestion)
-                        concert.save(update_fields=[field])
+                        print("Updating max price...")
+                        concert.price_max = int(suggestion)
+                        concert.save(update_fields=['price_max'])
                     elif field == "seller_url":
-                        concert.description = suggestion
+                        print("Updating seller_url...")
+                        concert.seller_url = suggestion
                         concert.save(update_fields=[field])
                     elif field == "image":
-                        concert.description = suggestion
+                        print("Updating image...")
+                        concert.image = suggestion
                         concert.save(update_fields=[field])
                     else:
                         print("Field type inappropriate. Doing nothing.")
