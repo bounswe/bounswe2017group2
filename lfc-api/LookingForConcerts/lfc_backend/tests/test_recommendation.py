@@ -17,7 +17,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 import pprint
 
 @pytest.mark.django_db
-class CreateConcertTestCase(TestCase):
+class RecommendationTestCase(TestCase):
     def setUp(self):
         self.username1 = 'HalukAlper'
         self.password1 = 'looking4C'
