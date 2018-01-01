@@ -641,7 +641,10 @@ def create_concert(request):
     serializer = ConcertSerializer(data = request.data)
     if serializer.is_valid():
         concert = serializer.save()
-        artist.concerts.add(concert)
+        try:
+            artist.concerts.add(concert)
+        except:
+            return Response({'Error':'An artist can not have more than one concert in one day.'}, status = status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status = status.HTTP_201_CREATED)
     return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -787,6 +790,8 @@ def list_artists(request):
 @api_view(['GET'])
 def search_artists(request):
     data = request.GET
+    if data.get('name') is None:
+        return Response({'Error':'You need to give an artist name.'}, status = status.HTTP_400_BAD_REQUEST)
     client_credentials_manager = SpotifyClientCredentials(client_id='60ab66df7413492bbc86150d7a3617d7', client_secret='007ccb30ee7e4eb98478b7a34fc869e4')
     spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
     spotifyresults = spotify.search(q='artist:'+data.get('name'), type='artist')
@@ -925,7 +930,7 @@ def get_tags(request, search_str):
             context = json_response[i]['description']
             uri     = json_response[i]['concepturi']
             t       = '{"value":"'+value.replace('"','')+ '","context":"' + context.replace('"','') + '","wikidata_uri":"' + uri.replace('"','') + '"}'
-            print(t)
+            #print(t)
             tags.append(json.loads(t))
 
     return Response(tags, status.HTTP_200_OK)
