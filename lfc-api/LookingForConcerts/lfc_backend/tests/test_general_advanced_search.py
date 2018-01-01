@@ -18,7 +18,6 @@ import pprint
 
 @pytest.mark.django_db
 class CreateConcertTestCase(TestCase):
-    
     def setUp(self):
         self.username = 'HalukAlper'
         self.password = 'looking4C'
@@ -80,7 +79,7 @@ class CreateConcertTestCase(TestCase):
         self.seller_url1 = "www.biletix.com/etkinlik/V1T01/TURKIYE/tr"
 
         #CONCERT 2
-        self.concertName2 = '"Metallica"'
+        self.concertName2 = "Metallica"
         self.date_time2 = '2017-12-31'
         self.artist2 = {
             "name": "Metallica",
@@ -167,42 +166,42 @@ class CreateConcertTestCase(TestCase):
                  HTTP_AUTHORIZATION=self.authorization
         )
 
-    def advanced_search_by_concert_name(self):
-        response = client.get(advancedSearchUrl,{'concert_name':'Metallica'})
+    def test_advanced_search_by_concert_name(self):
+        response = self.client.get(self.advancedSearchUrl,{'concert_name':'Metallica'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'],'Metallica')
         self.assertEqual(len(response.data),1)
 
-    def advanced_search_by_location_name(self):
-        response = client.get(advancedSearchUrl,{'location_venue':'Şükrü'})
+    def test_advanced_search_by_location_name(self):
+        response = self.client.get(self.advancedSearchUrl,{'location_venue':'Şükrü'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data),2)
 
-    def advanced_search_by_artist_name(self):
-        response = client.get(advancedSearchUrl,{'artist_name':'MFÖ'})
+    def test_advanced_search_by_artist_name(self):
+        response = self.client.get(self.advancedSearchUrl,{'artist_name':'MFÖ'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'],'MFÖ Yılbaşı Konseri')
         self.assertEqual(len(response.data),1)
 
-    def advanced_search_by_tag_value(self):
-        response = client.get(advancedSearchUrl,{'tag_value':'hard rock'})
+    def test_advanced_search_by_tag_value(self):
+        response = self.client.get(self.advancedSearchUrl,{'tag_value':'hard rock'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'],'Metallica')
         self.assertEqual(len(response.data),1)
 
-    def advanced_search_by_max_price(self):
-        response = client.get(advancedSearchUrl,{'max_price': 180})
+    def test_advanced_search_by_max_price(self):
+        response = self.client.get(self.advancedSearchUrl,{'max_price': 180})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'],'MFÖ Yılbaşı Konseri')
         self.assertEqual(len(response.data),1)
     
-    def advanced_search_by_min_price(self):
-        response = client.get(advancedSearchUrl,{'min_price': 50})
+    def test_advanced_search_by_min_price(self):
+        response = self.client.get(self.advancedSearchUrl,{'min_price': 50})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data),2)
 
-    def advanced_search_with_two_parameters(self):
-        response = client.get(advancedSearchUrl,{'min_price': 50, 'tag_value':'Istanbul'})
+    def test_advanced_search_with_two_parameters(self):
+        response = self.client.get(self.advancedSearchUrl,{'min_price': 50, 'tag_value':'Istanbul'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'],'MFÖ Yılbaşı Konseri')
         self.assertEqual(len(response.data),1)

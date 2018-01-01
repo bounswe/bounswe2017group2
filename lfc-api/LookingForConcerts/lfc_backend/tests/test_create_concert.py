@@ -18,25 +18,25 @@ import pprint
 
 @pytest.mark.django_db
 class SearchArtistTestCase(TestCase):
-    def SetUp(self):
+    def setUp(self):
         self.artistName = 'Tarkan'
         self.artistSearchUrl = '/searchartists/'
         self.client = Client()
     
-    def search_artist_with_valid_info(self):
+    def test_search_artist_with_valid_info(self):
         data = {'name': self.artistName}
         response = self.client.get(self.artistSearchUrl,data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['name'], 'Tarkan')
 
-    def search_artist_without_info(self):
+    def test_search_artist_without_info(self):
         response = self.client.get(self.artistSearchUrl)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, [])
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['Error'], 'You need to give an artist name.')
 
 @pytest.mark.django_db
 class SearchTagTestCase(TestCase):
-    def SetUp(self):
+    def setUp(self):
         self.login_url = '/login/'
         self.username = 'HalukAlper'
         self.password = 'looking4C'
@@ -53,9 +53,9 @@ class SearchTagTestCase(TestCase):
             self.user = serializer.save()
         self.client = Client()
         response = self.client.post(self.login_url,{'username':self.username, 'password':self.password})
-        self.authorization = 'Bearer ' + response['access']
+        self.authorization = 'Bearer ' + response.data['access']
 
-    def search_tags_with_valid_info(self):
+    def test_search_tags_with_valid_info(self):
         url = self.artistSearchUrl + self.tagValue + '/'
         result = {
             "value": "Turkish Republic of Northern Cyprus",
@@ -66,7 +66,7 @@ class SearchTagTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0],result)
 
-    def search_tags_with_unregistered_user(self):
+    def test_search_tags_with_unregistered_user(self):
         url = self.artistSearchUrl + self.tagValue + '/'
         newClient = Client()
         response = newClient.get(url)
