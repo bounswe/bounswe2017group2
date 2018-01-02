@@ -1320,7 +1320,7 @@ def create_concert_report(request, reported_concert_id):
         concert_report=serializer.save()
         user.concert_reports.add(concert_report)
         reported_concert.reports.add(concert_report)
-        return Response(serializer.data, status = status.HTTP_200_OK)
+        return Response(serializer.data, status = status.HTTP_201_CREATED)
     return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
