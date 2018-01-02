@@ -1,0 +1,12 @@
+This document describes how you can deploy LookingForConcerts in your own server:
+Download the git repo from: https://github.com/bounswe/bounswe2017group2
+
+A.Back end:
+1.Install dependencies with pip...
+B.Front end:
+1. Go to frontend/lfc-react directory.
+2. Change all 34.210.127.92:8000 to your domain in all source files.
+3. Type npm install and npm run build in terminal.
+4. Move the build folder to lfc-api/LookingForConcerts/frontend/
+
+C.Android:
