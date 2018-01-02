@@ -367,8 +367,8 @@ class ConcertReportTestCase(TestCase):
 
     def test_concert_report_upvote_threshold_reached(self):
         report_data = {
-            'report_type':'DESCRIPTION',
-            'suggestion':'newdesc'
+            'report_type':'ARTIST',
+            'suggestion':'{\"images\":[{\"height\":640,\"url\":\"https://i.scdn.co/image/db112ac3a4069660f697d400483d1b15dbb547f0\",\"width\":640},{\"height\":320,\"url\":\"https://i.scdn.co/image/28df9821ea9c020a5051b2596209d5dfd927fd24\",\"width\":320},{\"height\":160,\"url\":\"https://i.scdn.co/image/a0024a8d0dbe789a346fdbdb211884eef15fc20e\",\"width\":160}],\"spotify_id\":\"1MIVXf74SZHmTIp4V4paH4\",\"name\":\"Mabel\"}'
         }
 
         response = self.client.post('/concert/1/report/',
@@ -395,7 +395,8 @@ class ConcertReportTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['message'], 'Since upvotes reached the limit, the related concert information has been changed and the associated report has been deleted.')
         # the concert should be updated.
-        self.assertEqual(concert.description, 'newdesc')
+        self.assertEqual(concert.artist.spotify_id, '1MIVXf74SZHmTIp4V4paH4')
+        self.assertEqual((concert in concert.artist.concerts.all()), True)
         # the concert report should be deleted.
         self.assertEqual((concert_report in ConcertReport.objects.all()), False)
         # the reporter should gain a reliability point.
