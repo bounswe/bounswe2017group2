@@ -1,9 +1,6 @@
 # Requirements
 
 - `sudo apt install python-pip`
-- `pip install django`
-- `pip install djangorestframework`
-- `pip install pygments`
 
 # How to run
 - Create an environment with the command `virtualenv -p python3 envname`
