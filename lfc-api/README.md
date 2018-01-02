@@ -1,5 +1,4 @@
 # Requirements
-
 - `sudo apt install python-pip`
 
 # How to run
