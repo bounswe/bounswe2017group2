@@ -27,14 +27,19 @@ const ConcertItem = ({ concert }) => (
         </div>
       </Card.Header>
       <Card.Meta>
-        <Icon name="calendar" /> {concert.date_time}
+
+        <div>
+          <Link to={"/concert/" + concert.concert_id} >
+        <Icon  name="calendar" /> {concert.date_time}
+        </Link>
+        </div>
       </Card.Meta>
       <Card.Description>
         <div>
           {concert.attendees.length > 0 && (
             <Popup
               basic
-              trigger={<div>Attendees:<Icon name="user" /> {concert.attendees.length}</div>}
+              trigger={<div>Attendees:<Icon  name="user" /> {concert.attendees.length}</div>}
               content={
                 <div style={{ maxHeight: "100px", overflowY: "auto" }} className="ui grid">
                   <div className="sixteen wide column" style={{ padding: "2px" }}>
@@ -63,8 +68,9 @@ const ConcertItem = ({ concert }) => (
       </Card.Description>
     </Card.Content>
     <Card.Content extra>
-      <Icon name="tag" />
+      <Icon  name="tag" />
       {concert.location.venue}
+      
     </Card.Content>
   </Card>
 );

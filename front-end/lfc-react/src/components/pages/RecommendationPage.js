@@ -23,7 +23,11 @@ const ConcertItem = ({ concert }) => (
         {concert.artist ? concert.artist.name : ""}
       </Card.Header>
       <Card.Meta>
-        <Icon name="calendar" /> {concert.date_time}
+      <div>
+          <Link to={"/concert/" + concert.concert_id} >
+        <Icon  name="calendar" /> {concert.date_time}
+        </Link>
+        </div>
       </Card.Meta>
       <Card.Description>
         Attendees: <Icon name="user" />

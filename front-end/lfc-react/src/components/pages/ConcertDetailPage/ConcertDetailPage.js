@@ -579,7 +579,7 @@ class Concert extends React.PureComponent {
                     <img
                         className="ui image five wide column"
                         height="300px"
-                        src={this.state.concert.artist.images[0].url}
+                        src={this.state.concert.artist.images[0] ? this.state.concert.artist.images[0].url : ""}
                     />
                     <div className="eleven wide column">
                         <ConcertLocationMap isMarkerShown={true} />
