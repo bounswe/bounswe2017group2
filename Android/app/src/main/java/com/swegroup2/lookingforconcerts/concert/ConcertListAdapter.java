@@ -57,10 +57,12 @@ public class ConcertListAdapter extends RecyclerView.Adapter<ConcertListAdapter.
         }
         holder.mConcertName.setText(concert.name);
         holder.mConcertDate.setText(concert.date);
-        if (concert.artist.images!=null){
-            if(concert.artist.images.size()==3){
-                new DownloadImageTask(holder.mConcertImage)
-                        .execute(concert.artist.images.get(2).url);
+        if(concert.artist!=null) {
+            if (concert.artist.images != null) {
+                if (concert.artist.images.size() == 3) {
+                    new DownloadImageTask(holder.mConcertImage)
+                            .execute(concert.artist.images.get(2).url);
+                }
             }
         }
     }
