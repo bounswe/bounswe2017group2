@@ -16,3 +16,7 @@
 # How to test
 - Go into the directory `lfc-api/LookingForConcerts` in our repository
 - Run the command `python manage.py test lfc_backend/`
+
+# Important points
+- If you would like to deploy the django app on a different host, you should change the HOST variable in django settings file and all the host variables in the front end files.
+- Notice that if you change the host, Spotify connect would not work since the redirect uri should be whitelisted.
