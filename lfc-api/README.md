@@ -9,7 +9,7 @@
 - Run the server `python manage.py runserver`
 - It should work at this point
 - If there is a problem with the db remove everything in the folder `lfc-api/LookingForConcerts/lfc_backend/migrations`
-- Create an empty python file named `__init__.py`
+- Create an empty python file named `__init__.py` in the migrations folder
 - Run `python manage.py makemigrations && pyhton manage.py migrate`
 - Again run the server `python manage.py runserver`
 
