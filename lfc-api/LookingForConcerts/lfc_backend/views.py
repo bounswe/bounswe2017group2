@@ -1377,6 +1377,7 @@ def upvote_concert_report(request, concert_report_id):
         try:
             concert_report.upvoters.add(user)
             upvoters = concert_report.upvoters.all()
+
             # IF THE UPVOTES REACH THE LIMIT, MODIFY THE RELATED CONCERT INFORMATION
             try:
                 if len(upvoters) == LIMIT:
@@ -1384,12 +1385,16 @@ def upvote_concert_report(request, concert_report_id):
                     serializer = ConcertSerializer(concert)
                     field = concert_report.report_type.lower()
                     suggestion = concert_report.suggestion
+
                     print("Suggestion:")
                     try:
                         suggestion = json.loads(suggestion)
                         pprint.pprint(suggestion)
                     except:
                         print(suggestion)
+
+                    print("Old concert data:")
+                    pprint.pprint(serializer.data[field])
 
                     if field == "name":
                         print("Updating name...")
@@ -1400,11 +1405,24 @@ def upvote_concert_report(request, concert_report_id):
                         artist_data = suggestion
                         artist_serializer = ArtistSerializer(data=artist_data)
                         #print(artist_serializer.is_valid())
+                        # new Artist
                         if artist_serializer.is_valid():
                             artist = artist_serializer.save()
+                            #images creation and relating with artist
+                            for image_data in artist_data['images']:
+                                try:
+                                    image_serializer = ImageSerializer(data = image_data)
+                                    if image_serializer.is_valid():
+                                        image = image_serializer.save()
+                                        artist.images.add(image) #Exception
+                                except:
+                                    traceback.print_exc()
+                                    return Response(image_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
                             old_artist = concert.artist
                             old_artist.concerts.remove(concert)
                             artist.concerts.add(concert)
+
                         else:
                             if artist_serializer.errors['spotify_id'][0] == "artist with this spotify id already exists.":
                                 artist = Artist.objects.get(spotify_id=artist_serializer.data['spotify_id'])
@@ -1456,11 +1474,10 @@ def upvote_concert_report(request, concert_report_id):
                     else:
                         print("Field type inappropriate. Doing nothing.")
 
-                    print("Old concert data:")
-                    pprint.pprint(serializer.data)
+
                     print("\nUpdated field: " + str(field) + "\n")
                     print("New concert data:")
-                    pprint.pprint(ConcertSerializer(concert).data)
+                    pprint.pprint(ConcertSerializer(concert).data[field])
 
                     reporter = concert_report.reporter
                     reporter.reliability_points = reporter.reliability_points + 1 # increment the reliability score of this user
