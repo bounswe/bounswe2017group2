@@ -1,4 +1,4 @@
-Django==1.11
+Django==1.11.23
 Pygments==2.2.0
 dj-database-url==0.4.2
 djangorestframework==3.6.2
